@@ -1,0 +1,57 @@
+---
+# For jekyll
+---
+
+@import "minima";
+
+/*
+ * Color
+ */
+
+
+$font-color: #555;
+$header-font-color: #004;
+$header-font-weight: 500;
+
+/**
+ * Reset some basic elements
+ */
+.post-content {
+  h1 {
+    color: lighten($header-font-color, 15%);
+    font-size: 36px;
+  }
+
+  h2 {
+    font-size: 28px;
+  }
+
+
+  h2, h3, h4, h5, h6 {
+    color: $header-font-color;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: $header-font-weight;
+  }
+
+  body {
+    color: $font-color;
+  }
+}
+
+blockquote.intro {
+  padding: 15px;
+  font-size: $small-font-size;
+  font-style: normal;
+  border-color: #f4a460;
+  background-color: #fffff0;
+
+  h3 {
+    font-size: 20px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #777;
+  }
+}
