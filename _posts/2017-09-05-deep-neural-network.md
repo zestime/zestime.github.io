@@ -110,5 +110,3 @@ Forward propagation의 경우, $$ W^{[l]} $$, $$ b^{[l]} $$ 그리고 $$ A^{[l-1
 
 neuron이라고 NN에서 사용하고 있지만, 아직 뇌 과학자들도 정확히 neuron의 역활에 대해서 아직 알지 못한다고 합니다. 교수님의 생각에는 아직 빈약한 유추(loose analogy)로 생각된다고 하시네요.
 
-
-Sigmoid function directly
