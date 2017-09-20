@@ -10,8 +10,8 @@ categories: classes improving-deep-neural-networks
 > 교수님의 말씀을 잘 이해하지 못한 부분도 있으니, 수업을 들으시면 더욱 좋을 것 같습니다.
 >
 > - Week1 : [Practical Aspects of Deep Learning]({{ site.baseurl }}{% link _posts/2017-09-08-practical-aspects-of-deep-learning.md %})
-> - Week2 : [Optimization Algorithms]({{ site.baseurl }}{% link _posts/2017-09-01-neural-networks-basics.md %})
-> - Week3 : [Hyperparameter tuning, Batch Normalization, and Programming Frameworks]({{ site.baseurl }}{% link _posts/2017-09-03-shallow-neural-network.md %})
+> - Week2 : [Optimization Algorithms]({{ site.baseurl }}{% link _posts/2017-09-13-optimization-algorithms.md %})
+> - Week3 : [Hyperparameter tuning, Batch Normalization, and Programming Frameworks]({{ site.baseurl }}{% link _posts/2017-09-14-hyperparameter-tuning.md %})
 {:.intro}
 
 이번 강의는 지난 강의에서 neural network을 더욱 심화하여 성능을 향상시키는 방법에 대해 다루고 있습니다. 그러기위해서 기초적인 몇 가지 개념들을 학습해야 할 필요가 있습니다. train/dev/test 셋들이나, bias와 variance에 대한 이해, 또 regularization에 대한 지식도 필요로 합니다. 그리고 몇 가지 실험적인 이슈를 다루는 것까지가 이번 주에 학습할 내용이 되겠습니다.
