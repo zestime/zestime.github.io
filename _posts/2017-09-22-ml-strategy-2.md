@@ -54,7 +54,7 @@ train-dev set과 dev set을 분석하여, 무엇때문에 이러한 mismatch가 
 
 ## Multi-task learning
 
-transfer learning이 기존의 machine learning에 새로운 layer를 추가해서 처리하는 방법인 반면, 동시에 여러 가지 일을 한 번에 진행하는 형태를 multi-task learning이라고 합니다. 예를 들어, 물체를 인식하는데, 자동차를 인식하는 task와 신호등을 인식하는 task를 동시에 진행하는 방법을 뜻합니다. 장점으로는 자연스럽게 데이타가 늘어난다는 점입니다. n개의 task를 동시에 수행하는데, 각 task마다 1000개의 데이타가 있다고 하면, $$m$$은 $$n * 1000$$으로 늘어납니다. 이를 통해서, 각각 훈련시키는 것 보다, 좋은 결과를 가져올 수 있습니다. softmax와 비슷한 것 같다는 생각이 들 수도 있는데, $$\hat{y}$$는 $$\begin{bmatrix} 1 \\ 0 \\ 0 \end{bmatrix}$$과 같이 하나의 요소만 1이 되기에, softmax와는 다른 결과를 가지게 됩니다. 
+transfer learning이 기존의 machine learning에 새로운 layer를 추가해서 처리하는 방법인 반면, 동시에 여러 가지 일을 한 번에 진행하는 형태를 multi-task learning이라고 합니다. 예를 들어, 물체를 인식하는데, 자동차를 인식하는 task와 신호등을 인식하는 task를 동시에 진행하는 방법을 뜻합니다. 장점으로는 자연스럽게 데이타가 늘어난다는 점입니다. n개의 task를 동시에 수행하는데, 각 task마다 1000개의 데이타가 있다고 하면, $$m$$은 $$n * 1000$$으로 늘어납니다. 이를 통해서, 각각 훈련시키는 것 보다, 좋은 결과를 가져올 수 있습니다. softmax와 비슷한 것 같다는 생각이 들 수도 있는데, $$\hat{y}$$는 $$\begin{bmatrix} 1 \\ 0 \\ 1 \end{bmatrix}$$과 같이 합이 1이 넘을 수 있기에, softmax와는 다른 결과를 가지게 됩니다. 
 실제적으로는 transfer learning보다는 잘 사용되지 않는다고 합니다.
 
 # End-to-end deep learning
