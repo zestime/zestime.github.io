@@ -55,3 +55,19 @@ blockquote.intro {
     color: #777;
   }
 }
+
+blockquote.explain {
+  padding: 15px;
+  font-size: $small-font-size;
+  font-style: normal;
+  border-color: #f4a460;
+  background-color: #fff0f0;
+
+  h3 {
+    font-size: 20px;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: #777;
+  }
+}

@@ -6,15 +6,17 @@ date:   2017-09-12 14:03:45 +0900
 categories: javascript play-with-javascript 
 ---
 
+
+
 ## Getting Start
 
 너무 지엽적인 부분에 집착하면, 숲을 보는 지혜를 잊기 쉽습니다. 가야할 길이 멀다면, 정상을 바라보는 것만으로도 강한 동기가 되어줄 수 있습니다. 디테일에 치중하기 보다는, 우리의 여정을 먼저 간략히 살펴보고 갈까 합니다.
 
 ## Contents
 
-1. Cheatsheet
-1. Variables & Scope
-1. Scope
+1. Basic data types
+1. Variable & Scope
+1. Function 
 1. Object
 1. This
 1. Array
@@ -22,24 +24,51 @@ categories: javascript play-with-javascript
 1. Proxy
 1. Async
 
-## Types
+## Basic data types
 
-프로그래밍 언어에서 그 기저가 되는 것이 바로 타입입니다. 다음은 자바스크립트에서
+다른 언어와 마찬가지로 기본적으로 제공되는 타입이 제법 있습니다. number, string, boolean, null, undefined와 같은 기초적인 타입과 object, function 등이 제공됩니다.
+
+**number** : 정수형와 부동소수형의 구분이 없습니다. number라는 하나의 타입만 제공됩니다.
 
 ```
-// 'typeof' 연산자는 type을 확인할 때 사용합니다.
-var undefine;
-console.log(undefine); // "undefined", 아직 값을 지정하지 않은 상태
-console.log(typeof null); // "object", null은 값이 없는 상태
-console.log(typeof true); // "boolean"
-console.log(typeof 100); // "number"
-console.log(typeof "hello"); // "string"
-console.log(typeof symbol.iterator); // "symbol"
+var x = 10;
+console.log(x + 2);    // 12
+console.log(x * 5);    // 50
+console.log(x % 3);    // 1
+console.log(x ** 3);   // 1000, 지수연산(exponentiation)은 chrome, firefox외에는 확인 필요
 ```
-그 외의 타입은 모두 object에서 파생된 타입입니다. 가장 많이 사용하는 타입은 object, array 그리 function입니다. Date, Map, Set 등 많지만, 이들은 앞으로 예제를 통해서 살펴보겠습니다.
+**boolean** : true와 false값이 제공됩니다. 
 
+```
+var b = true;
+console.log(b);     
+console.log(!b);
+console.log()
+```
+
+**string** : 문자열을 만들 때는 "(double quotation, 쌍따옴표)나 '(single quotation, 혿따옴표)로 묶어주면 됩니다. es6에서는 \`(back-quote)를 이용해 여러 줄에 걸쳐 문자열을 만들 수 있습니다.
+
+```
+var str = "Hello";
+console.log(str + " world!");     // "Hello world!", +는 concatenation
+console.log(str.concat(" world!")); // "Hello world!", 위와 동일
+console.log(str.length);        // 5, 문자열 길이
+console.log(`it supports
+multilines`);                   // backquote를 이용해서, 여러 줄에 걸쳐 작성할 수도 있습니다.
+```
+
+**undefined와 null** : undefined는 아직 값이 설정되지 않은 상태를 뜻합니다. null은 값이 없는 상태입니다. 
+
+```
+var x;
+console.log(x);       // undefined
+var y = null;
+console.log(y);       // null
+```
 
 ## Variables
+
+const, let 그리고 var를 이용해서 variable(변수)를 선언합니다. 
 
 ```
 const pi = 3.14;      
@@ -52,7 +81,9 @@ let e = 2.71828;      // error - 선언은 한번만
 var variable = "old-style";       
 var variable = "terrible override, nobody use" // no error
 ```
-const, let 그리고 var를 이용해서 변수를 선언합니다. 조금씩 그 용법이 다르지만, var의 문제점을 대체하기 위해서, const와 let이 고안되었습니다. const와 let은 block-scope을 지원합니다.
+
+const와 let은 es6에 추가되었습니다. const와 let의 가장 큰 특징은 block-scope을 지원한다는 점입니다.
+
 ```
 var nonBlock = "original";
 {
@@ -68,7 +99,30 @@ let block = "outer";
 }
 console.log(block);                   // outer
 ``` 
-기존에는 global, function scope만 제공되었으나, 새로이 block scope이 제공되고 있습니다. 모든 변수는 scope에 종속되어 있으며, scope이 없어지면 변수들도 같이 사라지게 됩니다.
+
+## Function
+
+Function(함수)는 프로그램의 근간을 이루는 타입입니다. function은 first-class object(1급객체)로 다양하게 사용할 수 있습니다. 또 closure를 통해 function의 상태를 가질 수 있습니다.
+
+> ### first-class object 
+> first-class object라는 표현은, 숫자나 문자열과 마찬가지로 사용될 수 있다는 뜻 입니다. 변수에 대입하거나 매개 변수의 인자값으로 함수를 전달하는 것들이 가능합니다. 또한, 함수를 반환값으로 사용할 수도 있습니다. 별로 큰 일이 아닌것 같지만, 이를 통해서 더욱 자유롭게 함수를 사용할 수 있게 됩니다.
+{:.explain}
+
+```
+function consoleLogger(){
+  var no = 0;
+  return function(msg){
+    console.log(`${no++} - ${msg}`);
+  };
+}
+
+var logger = consoleLogger();
+logger("first message");            // "1 - first message"
+logger("it has a number state");    // "2 - it has a number state"
+
+```
+
+
 
 
 ## Object
