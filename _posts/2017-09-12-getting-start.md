@@ -30,7 +30,7 @@ categories: javascript play-with-javascript
 
 **number** : 정수형와 부동소수형의 구분이 없습니다. number라는 하나의 타입만 제공됩니다.
 
-```
+```javascript
 var x = 10;
 console.log(x + 2);    // 12
 console.log(x * 5);    // 50
