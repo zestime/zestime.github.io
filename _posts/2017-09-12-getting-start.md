@@ -1,4 +1,3 @@
-
 ---
 layout: post
 title:  "Javascript Getting Start"
@@ -30,7 +29,7 @@ categories: javascript play-with-javascript
 
 **number** : 정수형와 부동소수형의 구분이 없습니다. number라는 하나의 타입만 제공됩니다.
 
-```javascript
+```js
 var x = 10;
 console.log(x + 2);    // 12
 console.log(x * 5);    // 50
@@ -39,7 +38,7 @@ console.log(x ** 3);   // 1000, 지수연산(exponentiation)은 chrome, firefox�
 ```
 **boolean** : true와 false값이 제공됩니다. 
 
-```
+```js
 var b = true;
 console.log(b);     
 console.log(!b);
@@ -48,7 +47,7 @@ console.log()
 
 **string** : 문자열을 만들 때는 "(double quotation, 쌍따옴표)나 '(single quotation, 혿따옴표)로 묶어주면 됩니다. es6에서는 \`(back-quote)를 이용해 여러 줄에 걸쳐 문자열을 만들 수 있습니다.
 
-```
+```js
 var str = "Hello";
 console.log(str + " world!");     // "Hello world!", +는 concatenation
 console.log(str.concat(" world!")); // "Hello world!", 위와 동일
@@ -59,7 +58,7 @@ multilines`);                   // backquote를 이용해서, 여러 줄에 걸�
 
 **undefined와 null** : undefined는 아직 값이 설정되지 않은 상태를 뜻합니다. null은 값이 없는 상태입니다. 
 
-```
+```js
 var x;
 console.log(x);       // undefined
 var y = null;
@@ -70,7 +69,7 @@ console.log(y);       // null
 
 const, let 그리고 var를 이용해서 variable(변수)를 선언합니다. 
 
-```
+```js
 const pi = 3.14;      
 pi = 3.1415;          // error - const는 값을 변경할 수 없습니다. 
 
@@ -84,7 +83,7 @@ var variable = "terrible override, nobody use" // no error
 
 const와 let은 es6에 추가되었습니다. const와 let의 가장 큰 특징은 block-scope을 지원한다는 점입니다.
 
-```
+```js
 var nonBlock = "original";
 {
   var nonBlock = "updated";
@@ -108,7 +107,7 @@ Function(함수)는 프로그램의 근간을 이루는 타입입니다. functio
 > first-class object라는 표현은, 숫자나 문자열과 마찬가지로 사용될 수 있다는 뜻 입니다. 변수에 대입하거나 매개 변수의 인자값으로 함수를 전달하는 것들이 가능합니다. 또한, 함수를 반환값으로 사용할 수도 있습니다. 별로 큰 일이 아닌것 같지만, 이를 통해서 더욱 자유롭게 함수를 사용할 수 있게 됩니다.
 {:.explain}
 
-```
+```js
 function consoleLogger(){
   var no = 0;
   return function(msg){
@@ -122,12 +121,11 @@ logger("it has a number state");    // "2 - it has a number state"
 
 ```
 
-
-
-
 ## Object
 
-```
+Javascript에서는 모든 type이 object라고 해도 틀린 말이 아닙니다. 기본적인 몇 가지 type외에는 모두 object의 상속을 받습니다. 가장 기본이 되는 type이 되겠습니다.
+
+```js
 const emptyObject = {};
 const complexObject= {
   name: "",
@@ -137,6 +135,49 @@ const complexObject= {
 ```
 
 
+## This
+
+`this`는 OOP에서는 instance 자신을 뜻하는 용어로 사용되나, javascript는 좀 애매하게 작동합니다. 간단히 말하면, `.`연산자의 앞의 object를 의미합니다.
+
+```js
+const math = {
+  pi: 3.14,
+  dir: function() {
+    console.log(this);
+  }
+};
+
+math.dir();		// {pi: 3.14, dir: function(){...}}
+
+const dir = math.dir;
+dir();			// Window{....}
+
+math.dir();		// {pi: 3.14, dir: function(){...}}
+```
+
+참 이상한 결과가 아닐 수 없습니다. 변수에 참조를 걸었더니, 
+잘 작동하는 함수에 대해서, dir로 참조하도록 하고 실행헀더니 전혀 다른 결과가 나옵니다. 그 말인듯, this가 이전에는 math를, 다음 번에는 window객체를 참조하고 있다는 뜻 입니다.
+
+사실, 이건 이해하기 어렵게 만들면 프로그램을 복잡하게 만드는 요소가 있습니다. Javascript는 Java/C#과 같은 강력한 OOP를 제공하는 언어가 아닙니다. 
+
+
+
+`{}`을 이용해서, 빈 object를 만들었습니다. 주로, 여러 변수를 묶는 용도로 사용되기도 하고, 함수등을 value로 할당하여 namespace와 같이 사용하기도 합니다.
+
+```js
+const option = {
+  lang: 'kr',
+  timezone: 'seoul'
+};
+
+const Logger = {
+  error: msg => console.log('ERROR: ' + msg)
+  debug: msg => console.log('DEBUG: ' + msg)
+};
+
+logger.error("Lost");
+
+```
 
 
 
@@ -145,13 +186,13 @@ const complexObject= {
 
 variable은 변수라고 번역되나, 변수라는 단어는 자주 사용하는 말이 아니니 통 무슨 뜻인지 감이 오지 않습니다. 차라리, 이름을 정해주는 일이라고 보셔도 괜찮을 것 같습니다. '3.14를 pi라고 부르겠다'라고 선언하는 일입니다. 제가 선언이라는 표현을 사용했는데, 사실 우리가 쓰는 선언이라는 단어는 혁명이나 크나큰 행사에서 새로운 의미를 정하고 공표하는 일입니다. 여기서는, 작은 의미의 선언이라고 생각하시면 좋겠습니다. 컴퓨터에게 나는 'pi'를 쓴다고 알려주는 일을 선언이라고 표현합니다. 정확히는, declaration이라고 합니다. declaration의 예를 들어보면,
 
-```
+```js
 var pi = 3.14;
 ```
 
 위에 구문을 선언문이라고 하는데, 원래는 declaration statement라고 합니다. declaration이 담고 있는 하나의 문장 정도로 생각하시면 됩니다. 문장을 구분하기 위해서, semicolon(;)을 이용하여 문장이 끝났음을 알려줍니다.
 
-```
+```js
 var a=3, b=5;
 ```
 
@@ -160,13 +201,13 @@ var a=3, b=5;
 
 변수를 선언할 때에는 var를 사용합니다. var라는 키워드 뒤에 변수 이름과 값을 표기하면 되겠습니다. 예를 들면,
 
-```
+```js
 var hello = "world";
 ```
 
 hello라는 변수를 만들고, 거기에 "world"라는 문자열을 넣었습니다. 그렇습니다. 2가지 일을 한 셈입니다. 나눠보면,
 
-```
+```js
 var hello;
 hello = "world";
 ```
