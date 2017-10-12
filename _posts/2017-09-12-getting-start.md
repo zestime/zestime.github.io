@@ -123,16 +123,74 @@ logger("it has a number state");    // "2 - it has a number state"
 
 ## Object
 
-Javascript에서는 모든 type이 object라고 해도 틀린 말이 아닙니다. 기본적인 몇 가지 type외에는 모두 object의 상속을 받습니다. 가장 기본이 되는 type이 되겠습니다.
+Javascript에서는 모든 type이 object라고 해도 틀린 말이 아닙니다. 기본적인 몇 가지 type외에는 모두 object의 상속을 받습니다. 가장 기본이 되는 type이 되겠습니다. Object를 생성하는 방법은 무척 간단합니다. `{}`는 Object를 의미합니다.
 
 ```js
 const emptyObject = {};
-const complexObject= {
-  name: "",
-  
-
-};
 ```
+
+Object는 key/value를 쌍으로 가지는 type입니다. 간단한 dictionary라고 볼 수 있는데, key를 통해서 value를 선언하거나 참조하게 됩니다. key와 value는 `:`(colon)을 통해 구분되며, value는 문자, 숫자 그리고 function이 될 수 있으며, 다른 Object를 가질 수도 있습니다. 이런 특징 때문에 Object는 data를 담는 용도로도 많이 사용합니다. 대표적인 예가, JSON이 되겠습니다. 
+
+```js
+const option = {
+  lang: "euc-kr",                 // key: "lang", value: "euc-kr" 
+  timezone: "seoul"
+};
+
+console.log(option.lang);         // "euc-kr"
+console.log(option["lang"]);      // "euc-kr"
+
+option.summerTime = true;         // 새로운 key/value를 추가합니다.
+
+console.log(option.summerTime);   // true
+```
+
+또한 Object는 클래스와 비슷하게 사용되기도 합니다. property는 물론, function도 가질 수 있기 때문입니다. 
+
+```js
+const country = {
+  supportedTimezone : ["seoul", "tokyo"],
+  set Timezone(val) {
+    if (!this.supportedTimezone.includes(val))
+      throw new Error(`'${val}' is not supported`);
+      
+    this.timezone = val;
+  },
+  get Timezone() {
+    if (!this.timezone)
+      throw new Error("'Timezone' is not initialized");
+      
+    return this.timezone;
+  },
+  Load : function(option) {
+    Object.assign(this, option);
+  },
+  Clone() {
+    return Object.create(this);
+  }
+}
+
+country.Timezone = "bangkok";     // Error
+country.Load({lang:"UTF-8"});     // country { lang:"UTF-8" }
+
+const another = country.Clone();
+another.Timezone = "tokyo"        // another { timezone: "tokyo" }
+console.log(another.lang);        // "UTF-8"
+```
+
+예제 코드가 조금 복잡하지만, 하나씩 살펴보겠습니다. `set`이라는 키워드를 이용해서, `Timezone`이라는 property를 만들었습니다. 지원하는지 않는 timezone에 대해서, template string을 이용해서 error mesage를 만들어 Exception을 발생시킵니다. `get`또한 마찬가지여서, 값이 없는 경우에 Javascript는 `undefiend`를 반환하지만, 이번에는 에러처리하도록 작성했습니다. `Load`와 `Clone`은 둘 다 함수로서, `Load`의 경우에는,  `Clone`의 경우에는 익명함수 대신에 간단한 표기(shorthand)로 선언하였습니다. 
+
+`Object.assign()`과 `Object.create()`는 Object를 만들 때 사용합니다. 특징은 조금 다른데요, `assign`의 경우는 mix-in이라는 표현을 사용하고, `create`의 경우에는 prototype inheritance라고 합니다.
+
+### mix-in
+
+합집합을 구하는 것이라고 할 수 있습니다. A와 B가 서로 다른 Object이지만, mix-in을 하게 되면, A의 모든 key와 B의 모든 key를 합친 하나의 Object를 만들게 됩니다. 겹치는 key에 대해선, 덮어쓰게 되므로 object의 순서에 주의를 해야 합니다.
+
+
+### prototype
+
+prototype은 Javascript에서 inheritance(상속)을 표현하는 방법입니다. prototype이라는 용어가 낯설 수도 있지만, base type 정도로 생각하시면 되겠습니다. 
+
 
 
 ## This
