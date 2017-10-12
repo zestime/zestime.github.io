@@ -31,17 +31,17 @@ $$ X^{\{n\}} = \text{n-th epoch data} $$
 
 ## Exponentially weighted averages
 
-Gradient Descent보다 빠르고 효율적인 알고리즘인 Exponentially weighted averages를 살펴보겠습니다.
+기존의 Gradient Descent을 보다 빠르게 작동하게 위해서, Exponentially weighted averages를 살펴보겠습니다. 통계학에서는 Exponentially weighted moving average이라고 합니다.
 
 $$V_t = \beta V_{t-1} + (1 - \beta)\theta_t$$
 
-$$\beta$$는 새로운 hyper parameter로 전체적인 알고리즘의 정확도를 결정하게 됩니다. 
+$$\beta$$는 새로운 hyper parameter로 이전 값의 반영치를 결정하게 됩니다. 예를 들어, $$\beta = 0.9$$라고 한다면, $$V_{t}$$을 구하는 시점에서도 $$V_{t-10}$$의 값이 반영되게 됩니다.  
 
 ## Understanding exponentially weighted averages
 
 $$V_t = \beta V_{t-1} + (1 - \beta)\theta_t$$
 
-Exponentially weighted averages의 장점은 적은 메모리의 사용으로 효율적이라는 점입니다. 
+Exponentially weighted averages의 장점은 하나의 변수만 사용해서 평균값을 관리하므로, 메모리 사용이 효율적이라는 점입니다. 재밌는 점은 $$\beta$$가 1에 가까울 수록, 더 많은 이전 값들을 참조하게 된다는 점입니다. 만약, $$\beta = 0.98$$이라면, $$\frac{1}{1 - \beta} = \frac{1}{1 - 0.98} = 50$이라는 값을 가지게 되므로 결과적으로 이전 50개의 값들을 참조하게 됩니다. 당연한 의문이지만, $$V_{10}$의 경우에는 10번째 항이므로 이전 50개의 항이 없는 상태이므로, 제대로된 값을 가지지 못합니다. 이를 bias라고 표현하며 다음에서 살펴보겠습니다.
 
 ## Bias correction in exponentially weighted averages
 
