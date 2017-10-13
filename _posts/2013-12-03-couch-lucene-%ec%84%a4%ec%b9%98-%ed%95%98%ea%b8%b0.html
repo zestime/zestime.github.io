@@ -1,0 +1,154 @@
+---
+layout: post
+title: CouchDB-Lucene 설치 하기
+date: 2013-12-03 21:02:11.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Computer
+tags:
+- couchdb
+- lucene
+- search engine
+- simple search
+meta:
+  _edit_last: '1'
+  _oembed_584d73d618e5be6455b8b548abd6f1db: "{{unknown}}"
+  _oembed_3ee406de11799e017fa32da1e640b75e: "{{unknown}}"
+  dsq_thread_id: '4055711173'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<p>이 문서는 Couch-Lucene에 대한 설치 문서 입니다. ubuntu 12.04.3을 기준으로 작성되었습니다.</p>
+<p>Couch-Lucene을 사용하기 위해서는, 다음의 패키지가 필요합니다.</p>
+<p>&nbsp;</p>
+<h1>REQUIREMENT</h1>
+<ul>
+<li>CouchDB 1.2.0 onward</li>
+<li>CouchDB-Lucene (https://github.com/rnewson/couchdb-lucene)
+<ul>
+<li>open jdk 7</li>
+<li>maven</li>
+</ul>
+</li>
+</ul>
+<p>위의 사항들이 기본적으로 필요합니다.</p>
+<p>&nbsp;</p>
+<h1>INSTALL</h1>
+<p>차근 차근, 설치 해보도록 하겠습니다.</p>
+<h2>1. CouchDB</h2>
+<p>최신 버전은 apt에 포함되어 있지 않습니다. 소스를 받아서 직접 컴파일하셔야 합니다. 자세한 내용은 <a href="http://wiki.apache.org/couchdb/Installing_on_Ubuntu">http://wiki.apache.org/couchdb/Installing_on_Ubuntu</a> 문서에 잘 정리되어 있습니다. 제가 진행한 내용은 다음과 같습니다.</p>
+<pre class="theme:vs2012 nums:false lang:sh decode:true"># couchdb라는 계정과 그룹을 추가해야 합니다. 저는 귀찮아서, 옛날 버전을 설치했다가 지웠습니다.
+sudo apt-get install couchdb
+sudo apt-get remove couchdb
+sudo apt-get purge couchdb
+
+# 빌드 환경을 위해, 다음의 패키지를 설치합니다.
+sudo apt-get install -y g++
+sudo apt-get install -y erlang-dev erlang-manpages erlang-base-hipe erlang-eunit erlang-nox erlang-xmerl erlang-inets
+sudo apt-get install -y libmozjs185-dev libicu-dev libcurl4-gnutls-dev libtool
+
+# 소스 코드를 다운 받아, 편하신 위치에 압축을 해제합니다.
+cd /tmp &amp;&amp; tar xvzf apache-couchdb-1.4.0.tar.gz
+cd apache-couchdb-*
+./configure &amp;&amp; make
+# 그리고는, 설치!
+sudo make install
+
+# 이전 버전과 관련된 내용을 마저 지웁니다.
+sudo rm /etc/logrotate.d/couchdb /etc/init.d/couchdb
+
+# 새 버전에 대한 내용으로 설정합니다.
+sudo ln -s /usr/local/etc/logrotate.d/couchdb /etc/logrotate.d/couchdb
+sudo ln -s /usr/local/etc/init.d/couchdb  /etc/init.d
+sudo update-rc.d couchdb defaults</pre>
+<p>위와 같이 진행하는 경우, 설정 파일은 /usr/local/etc/couchdb/local.ini 가 됩니다. (default.ini, local.ini 파일이 비슷하나, local.ini를 수정하셔야합니다. default.ini은 차후 업데이트시에 덮어 쓰여질 수 있습니다.)</p>
+<pre class="theme:vs2012 toolbar:2 nums:false lang:sh decode:true">sudo vi /usr/local/etc/couchdb/local.ini</pre>
+<p>파일을 vi로 연 다음에, [httpd_global_handlers] 섹션에 다음을 추가합니다.</p>
+<pre class="theme:vs2012 nums:false lang:sh decode:true">[httpd_global_handlers]
+_fti = {couch_httpd_proxy, handle_proxy_req, &lt;&lt;"http://127.0.0.1:5985"&gt;&gt;}</pre>
+<p>위의 구문은, couchdb에 lucene을 등록하는 설정 구문입니다. 설정 이후에는, coucbdb를 재시작합니다.</p>
+<pre class="theme:vs2012 toolbar:2 striped:false nums:false lang:default decode:true">sudo service couchdb restart</pre>
+<p>그리고, 외부에서 접근해야 하는 경우라면, loopback으로 설정 되어진, ip 주소를 변경해주어야 합니다. 저의 경우에는, 데이타를 replication하기 위해서, local.ini의 bind_address를 수정했습니다.</p>
+<pre class="theme:vs2012 toolbar:2 striped:false nums:false lang:sh decode:true">bind_address = 0.0.0.0</pre>
+<p>&nbsp;</p>
+<h1>2. couchdb-lucene</h1>
+<p>couchdb-lucene을 설치하기 위해서, https://github.com/rnewson/couchdb-lucene를 참조했습니다. 설치하기 위해서는 maven이 필요힙니다. 그리고 lucence이 java이기 때문에, jdk도 필요합니다.</p>
+<pre class="theme:vs2012 nums:false lang:sh decode:true"># 필요한 패키지를 설치합니다.
+sudo apt-get install git maven openjdk-7-jdk
+
+# git을 이용해서, 최신 버전의 소스를 받습니다.
+git clone https://github.com/rnewson/couchdb-lucene
+
+# 해당 폴더로 이동해, mvn을 실행합니다.
+cd couchdb-lucene
+mvn</pre>
+<p>maven의 실행이 완료되면, target 폴더가 생깁니다. 거기에 lucene 실행 파일이 위치하게 됩니다.압축되어 있으므로, 적절한 실행 위치를 정합니다.</p>
+<pre class="theme:vs2012 toolbar:2 nums:false lang:default decode:true"># 적절한 위치(WhereYouWant)으로 복사합니다.
+cd target
+cp couchdb-lucene-0.10.0-SNAPSHOT-dist.zip ~/WhereYouWant
+cd ~/WhereYouWant
+
+# 압축을 해제합니다.
+unzip couchdb-lucene-0.10.0-SNAPSHOT-dist.zip</pre>
+<p>실행은 다음과 같이 합니다.</p>
+<pre class="theme:vs2012 toolbar:2 nums:false lang:default decode:true"># 저의 경우에는, ~/workspace/lib 라는 폴더에 설치했습니다.
+# couchdb-lucene-0.10.0-SNAPSHOT-dist/bin/run이 실행 파일입니다.
+
+vagrant@vagrant-ubuntu:~$ ./workspace/lib/couchdb-lucene-0.10.0-SNAPSHOT/bin/run
+2013-12-03 04:56:37,236 INFO [Config] Index output goes to: /home/vagrant/workspace/lib/couchdb-lucene-0.10.0-SNAPSHOT/indexes
+2013-12-03 04:56:37,322 INFO [Main] Accepting connections with SelectChannelConnector@localhost:5985
+
+# Log가 나타나며, 정상적으로 실행되었습니다.</pre>
+<p>&nbsp;</p>
+<h1>CHECK STATUS</h1>
+<h2>1. Couchdb</h2>
+<p>coucbdb의 경우, daemon으로 설치되므로, 부팅과 동시에 background에서 실행됩니다. CouchDB가 잘 작동하는지 알기 위해서는 다음의 명령어를 입력합니다.</p>
+<pre class="theme:vs2012 toolbar:2 nums:false lang:default decode:true"># 정상적인 경우, coucbdb가 버전을 반환합니다.
+vagrant@vagrant-ubuntu:~$ curl http://localhost:5984
+{"couchdb":"Welcome","uuid":"3a28fba87cc2c8959a16b43d6966bef7","version":"1.4.0","vendor":{"version":"1.4.0","name":"The Apache Software Foundation”}}
+
+# 설치가 제대로 안된 경우, 연결할 수 없다는 오류가 납니다.
+vagrant@vagrant-ubuntu:~$ curl http://localhost:5984
+curl: (7) couldn't connect to host</pre>
+<h2>2. Lucene</h2>
+<p>coucbdb-lucene도 HTTP를 통해, 작동됩니다. lucene이 실행 중인지 확인하기 위해서는 다음의 명령어를 이용합니다.</p>
+<pre class="theme:vs2012 toolbar:2 nums:false lang:default decode:true">vagrant@vagrant-ubuntu:~$ curl http://localhost:5985
+{"couchdb-lucene":"Welcome","version":"0.10.0-SNAPSHOT"}
+# 정상적인 경우, 버전 정보를 보여 줍니다.</pre>
+<p>&nbsp;</p>
+<h1>How to use</h1>
+<p>실행만 한다고, 모든게 자동적으로 돌아가지는 않습니다. 먼저, couchdb의 설정을 확인합니다. 설치하면서, 입력했던 [http_global_handlers]가 정상적인지 확인합니다.</p>
+<p>&nbsp;</p>
+<p><a href="http://blog.kusweet.com/wp-content/uploads/2013/12/configuration.png"><img class="alignnone size-full wp-image-462" src="{{ site.baseurl }}/assets/configuration.png" alt="configuration" width="824" height="460" /></a>lucene이 couchdb의 문서를 검색하기 위해서는, 무엇을 검색할지 알려주어야 합니다. 이러한 과정은 _design 문서를 통해서 이루어 집니다.</p>
+<p>&nbsp;</p>
+<p><a href="http://blog.kusweet.com/wp-content/uploads/2013/12/fulltext.png"><img class="alignnone size-full wp-image-464" src="{{ site.baseurl }}/assets/fulltext.png" alt="fulltext" width="481" height="372" /></a>위와 같이, '_design/'으로 시작되는 문서를 만들어야 합니다. 그리고 그 안에는 fulltext라는 key에 검색할 대상과 결과에 대한 문서를 작성합니다. 위의 예에서는, 'all'이라는 문서에 index와 analyzer 를 설정한 예입니다. index는 Document를 반환하는 구조인데, add 함수로 검색할 내용과 반환할 내용을 정리합니다. analyzer의 경우에는, lucene이 지원하는 모든 분석기를 사용할 수 있습니다. 한국어에 특화된 '형태소 분석기'는 default로 포함되지 않았습니다.</p>
+<p>위와 같이 design문서를 작성하고 나면, 이제는 실제로 RESTful로 접근할 차례입니다. 주소는 다음과 같습니다.<br />
+<strong>http://&lt;IP&gt;:5984/_fti/local/&lt;DATABASE&gt;/_design/&lt;Design Document Name&gt;/&lt;Search Document Name&gt;?q=&lt;Querying Keyword&gt;</strong><br />
+의 형태로 진행됩니다. 예를 들면, localhost에 접근하고, database가 test이며, 앞에서 정의한 design문서로 abc를 검색하다면,</p>
+<p>http://localhost:5984/_fti/local/test/_design/search/all?q=abc</p>
+<p>와 같은 형태가 됩니다. 실질적인 예를 보면, 다음과 같습니다.</p>
+<p>&nbsp;</p>
+<p><a href="http://blog.kusweet.com/wp-content/uploads/2013/12/RESULT.png"><img class="alignnone size-full wp-image-465" src="{{ site.baseurl }}/assets/RESULT.png" alt="RESULT" width="651" height="259" /></a>당연히, 결과는 JSON으로 반환됩니다. 주요, 값들을 살펴보면, 다음과 같습니다.</p>
+<ul>
+<li>limit : 최대로 반환되는 결과 수</li>
+<li>q : 질의한 내용으로, 앞서 design 문서에서 add 함수로 추가된 field를 뜻합니다. 'default'는 전체를 의미합니다.</li>
+<li>total_rows : 전체 결과 수</li>
+<li>skip : paging 시에, 생략되는 이전 결과의 개 수</li>
+<li>rows : 실질적인 data 결과로, 위의 경우에는 앞에서 title, content를 반환하기로 design되었습니다.
+<ul>
+<li>id : couchdb에 저장할 때, 사용된 문서의 id입니다.</li>
+<li>fields : design문서에서 'store : yes'로 설정한, 반환 값들입니다.</li>
+</ul>
+</li>
+</ul>
+<p>&nbsp;</p>
+<h1>Closing</h1>
+<p>ubuntu환경에서, couchdb와 lucene을 설치했습니다. 이를 이용하는, 실질적인 web application을 만들어 보도록 하겠습니다.</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>

@@ -1,0 +1,123 @@
+---
+layout: post
+title: Hadoop - Sqoop 사용 하기
+date: 2014-03-04 17:41:34.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Computer
+- Hadoop
+tags:
+- hadoop
+- hive
+- sqoop
+- 스쿱
+- 하둡
+- 하이브
+meta:
+  _edit_last: '1'
+  dsq_thread_id: '4021322575'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h1>Intro...</h1>
+<p>BigData가 아무리 잘나가도, RDBMS와의 관계를 단절시킬 수 없습니다. 즉, Hadoop 또한 DBMS가 필요한 상태입니다. 서로 다른 이 둘을 이어주는 가교의 역활을 하는 것이, '<strong>sqoop</strong>'입니다.</p>
+<h1>Import  - From DBMS to HDFS</h1>
+<p>앞서, 말씀드린 것처럼, sqoop이 하는 일은 Data를 DBMS에서 HDFS로 복사 시키는 일입니다. 일반적으로 명령어는 다음과 같습니다.</p>
+<pre class="theme:vs2012 toolbar:2 nums:false lang:default decode:true">$ sqoop import --connect "jdbc://mysql://localhost/sample" --table table_name -m 1</pre>
+<ul>
+<li><span style="color: #0000ff;">import</span> : sqoop에게 어떤 일을 수행할지 알려줍니다. 'sqoop help'를 통해서, 자세한 내용을 볼 수 있으며, export, codegen과 같은 command가 있습니다.</li>
+<li><span style="color: #0000ff;">--connect</span> : 연결하려는 database를 알려 줍니다. 예시에서는 mysql로 driver를 설정했습니다. 다른 RDBMS라면 적절한 driver 이름을 주어야 합니다.</li>
+<li><span style="color: #0000ff;">--table</span> : database에서 대상 table에 대한</li>
+<li><span style="color: #0000ff;">-m, --num-mappers &lt;n&gt;</span> : mapper의 수를 결정하는데, 여러 mapper를 사용한다는 뜻은 병렬 처리를 하겠다는 의미가 되겠습니다.</li>
+</ul>
+<p>이렇게 간단하게, DB table을 가져올 수 있습니다.</p>
+<h1>Import to Hive</h1>
+<p>다들 쓴다던, Hive를 저도 쓰고 있습니다. 위의 방법으로는 Text File로 결과가 나타나기 때문에 다시 EXTERNAL TABLE을 만들어 주어야 합니다. 근데, 그게 귀찮아... 저만 귀찮은게 아니기 때문에, 이미 누군가가 만들어 두었습니다.</p>
+<p>$ sqoop help import</p>
+<p>를 실행시켜 보면,</p>
+<ul>
+<li><span style="color: #0000ff;">--hive-import</span> : Import tables into Hive</li>
+</ul>
+<p>라는 구절을 보실 수 있습니다. 당연하게도, 이 부분은 앞의 결과를 Hive의 table로 받겠다는 의미입니다. 그 외에도 사용하기 좋은 옵션들이 많습니다.</p>
+<ul>
+<li><span style="color: #0000ff;">--hive-overwrite</span> : dimension에 해당되는 data들은 자주 갈아치울 필요가 있습니다. 그럴 때는, overwrite가 편하겠죠.</li>
+<li><span style="color: #0000ff;">--hive-parition-key, --hive-patition-value</span> : Hive의 table에 partition을 기준으로 import를 할 때 사용하시면 됩니다.</li>
+<li><span style="color: #0000ff;">--columns col1,col2,col3...</span> : 특정 컬럼만 사용하고 싶을 때, 사용하시면 좋은 옵션입니다.</li>
+</ul>
+<h1>About SQL Server</h1>
+<p>적절한 설치 과정을 따르셨다면, mysql에 대한 driver는 당연히 가지고 있겠지만, MSSQL의 경우는 다릅니다. 해당 Driver를 다운 받으셔서 따로 설치해주어야 합니다. MS에서 제공하는 <a href="http://www.microsoft.com/en-us/download/details.aspx?displaylang=en&amp;id=21599">SQL Server JDBC Driver</a>를 다운 받습니다. 받으신 jar 파일을 sqoop이 참조할 수 있도록, $SQOOP_HOME/lib 에 넣어주셔야 합니다. 저의 경우에는 다음과 같았습니다.</p>
+<pre class="toolbar:2 nums:false lang:sh decode:true">➜  Downloads  tar xvf sqljdbc_3.0.1301.101_enu.tar.gz
+➜  Downloads  cp sqljdbc_3.0/enu/sqljdbc.jar /usr/lib/sqoop/lib</pre>
+<p>이렇게 위치시키면, connection string에서 sqlserver를 사용할 수 있게 됩니다. 예를 들면 다음과 같습니다.</p>
+<pre class="nums:false lang:sh decode:true">$ sqoop import -P --connect "jdbc:sqlserver://database_server_ip;database=default;" --username sa --table table_name -m 1 --hive-import</pre>
+<h1>Export</h1>
+<p>export는 의미 그대로, 데이타를 밖으로 내보냄을 뜻합니다. 아시다시피, Map Reduce한 결과를 어딘가에는 알려주어야 하는데요, 잘 정제된 데이타를 기존의 RDBMS에게 반영하는 경우에 유용하게 사용할 수 있습니다. 주로, hive를 기준으로 작업을 하니, hive의 table을 SQL Server의 table로 내보내는 경우로 설명하겠습니다. 일반 Plain Text와의 차이점은 delimiter 정도가 되겠습니다.</p>
+<pre class="theme:vs2012 toolbar:2 nums:false lang:sh decode:true">#!/bin/bash
+
+hive_char=$( printf "x01" )
+
+sqoop export -P --connect "jdbc:sqlserver://server_ip;database=default;" --username sa --table table_name -m 1 --export-dir /apps/hive/warehouse/what_you_want --input-fields-terminated-by ${hive_char} --lines-terminated-by 'n' --update-key primary_column --update-mode allowinsert</pre>
+<p>보시다시피, bash script로 만들었습니다. hive의 delimiter 때문에 불가피하게 script로 작성했습니다. 복잡해 보여서 그렇지 내용은 단순합니다.</p>
+<ul>
+<li><span style="color: #0000ff;">-P</span> : password를 입력받겠다는 옵션</li>
+<li><span style="color: #0000ff;">--connect</span> : Database의 주소를 넘겨줍니다.</li>
+<li><span style="color: #0000ff;">--table</span> : 여기서 table은 export된 데이타가 저장될 테이블을 뜻합니다. 조금 다른 점은, table이 사전에 있어야 한다는 점입니다. 먼저 만들어 놓고 진행하셔야 하며, 이미 있던 데이타을 update하는지 insert하는지에 대한 부분은 다른 옵션을 통해 전달하게 됩니다.</li>
+<li><span style="color: #0000ff;">-m</span> : mapper의 수</li>
+<li><span style="color: #0000ff;">--export-dir</span> : export를 진행하면서, 소스가 될 데이타를 뜻합니다. 여기서는 hive의 warehouse에 있는 파일을 선택했습니다.</li>
+<li><span style="color: #0000ff;">--input-fields-terminated-by, --lines-terminated-by</span> : 따로 설명이 필요없이, 읽으신데로 구분자에 대한 값입니다. hive의 table에서 가져왔기 때문에 위의 구분자로 설정하였습니다.</li>
+<li><span style="color: #0000ff;">--update-key</span> : key를 선언하게 되면, key값을 기준으로 update를 진행하게 됩니다. 만약, 해당 key가 table에 없다면 기본적으로는 무시하게 됩니다. 이는 다음 옵션으로 결정하게 됩니다.</li>
+<li><span style="color: #0000ff;">--update-mode</span> : updateonly(default)와 allowinsert라는 두 가지 모드가 있습니다. key column에 해당되는 값이 없을 때, UPDATE &amp; INSERT를 결정하는 내용이라고 보시면 되겠습니다. 다만, SQL Server는 아직 제공되지 않습니다.(Mixed update/insert is not supported against the target database yet)</li>
+</ul>
+<h1>Closing...</h1>
+<p>sqoop은 정말 편리한 tool임에는 부정할 수 없습니다. hadoop과 RDBMS간의 가교로서 충분히 활용할 부분이 많습니다. 다만, 이러한 일련의 일들이 수동적으로 진행된다면 너무 귀찮을 수 밖에 없습니다. 이를 해결할 수 있도록, Oozie를 사용하는 방법도 고려하실 수 있겠습니다.</p>
+<h1>Reference</h1>
+<ul>
+<li><a href="http://sqoop.apache.org/docs/1.4.3/SqoopUserGuide.html">Sqoop User Guide (v1.4.3)</a></li>
+<li><a href="http://blog.beany.co.kr/archives/1480">Apache Sqoop 에서 MS SQL Server 연결하기</a></li>
+<li><a href="http://www.microsoft.com/en-us/download/details.aspx?displaylang=en&amp;id=21599">Microsoft SQL Server JDBC Driver 3.0</a></li>
+<li><a href="http://stackoverflow.com/questions/18978591/how-to-use-sqoop-to-export-the-default-hive-delimited-output">How to use sqoop to export the default hive delimited output?</a></li>
+</ul>
+<h1>Troubleshooting</h1>
+<h2>Export 시에, NULL 처리</h2>
+<p>export할 때, 다음과 같은 Error가 발생된다면 --input-null-string, --input-null-not-string의 옵션을 생각하셔야 합니다.</p>
+<pre class="toolbar:2 nums:false lang:default decode:true">Caused by: java.lang.RuntimeException: Can't parse input data: 'N'
+	at optimizedCombination2013.__loadFromFields(optimizedCombination2013.java:684)
+	at optimizedCombination2013.parse(optimizedCombination2013.java:552)
+	at org.apache.sqoop.mapreduce.TextExportMapper.map(TextExportMapper.java:83)
+	... 10 more
+Caused by: java.lang.NumberFormatException: For input string: "N"
+	at java.lang.NumberFormatException.forInputString(NumberFormatException.java:48)
+	at java.lang.Integer.parseInt(Integer.java:449)
+	at java.lang.Integer.valueOf(Integer.java:554)
+	at optimizedCombination2013.__loadFromFields(optimizedCombination2013.java:636)
+	... 12 more</pre>
+<p>이러한 오류 난 배경에는 cat으로 해당 table을 열어 보면 다음과 같은 구조로 되어 있습니다.</p>
+<pre class="toolbar:2 nums:false lang:default decode:true">112680100001121636131000011216NNNNNNNN1
+111216100001268036131000012680NNNNNNNN1
+110000112161268036131121612680NNNNNNNN1</pre>
+<p>저 'N'이 문제가 되는 것 입니다. hive 상에서 select하여 결과를 보면</p>
+<pre class="toolbar:2 nums:false lang:default decode:true ">1	12680	["10000","11216"]	3	61	3	10000	11216	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	1
+1	11216	["10000","12680"]	3	61	3	10000	12680	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	1
+1	10000	["11216","12680"]	3	61	3	11216	12680	NULL	NULL	NULL	NULL	NULL	NULL	NULL	NULL	1</pre>
+<p>다음과 같이 NULL 캐릭터임을 알 수 있습니다. 문제는 sqoop은 이러한 내용은 모른다는데 있습니다. 따라서, sqoop에 --input-null-string, --input-null-non-string을 이용해서 처리해야 합니다.</p>
+<pre class="lang:default decode:true">#!/bin/bash
+
+hive_char=$( printf "x01" )
+
+sqoop export -P --connect "jdbc:sqlserver://server_ip;database=default;" 
+  --username sa --table table_name -m 1 
+  --export-dir /apps/hive/warehouse/what_you_want 
+  --input-fields-terminated-by ${hive_char} 
+  --lines-terminated-by 'n' 
+  --update-key primary_column --update-mode allowinsert 
+  --input-null-string "\N" --input-null-non-string "\N"</pre>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>

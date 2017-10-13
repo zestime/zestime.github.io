@@ -1,0 +1,110 @@
+---
+layout: post
+title: C#에서의 First Class Object
+date: 2014-12-06 09:26:10.000000000 +09:00
+type: post
+published: true
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '1'
+  dsq_thread_id: '4033730230'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h1>First Class ?</h1>
+<p>First Class를 제일 처음 언급한 사람은, 영국의 컴퓨터 과학자 <a href="http://en.wikipedia.org/wiki/Christopher_Strachey">Christopher Strachey </a>입니다. 그가 직접적으로 First Class를 정의하지는 않았습니다. 그의 강의 메모를 바탕으로 만든  <a href="https://www.itu.dk/courses/BPRD/E2009/fundamental-1967.pdf">Fundamental Concepts in Programming Languages</a>라는 논문에서 First Class에 대해 ALGOL을 예로 설명합니다.</p>
+<blockquote><p><strong>3.5.1. First and second class objects.</strong> In ALGOL a real number may appear in an expression or be assigned to a variable, and either may appear as an actual parameter in a procedure call. A procedure, on the other hand, may only appear in another procedure call either as the operator (the most common case) or as one of the actual parameters. There are no other expressions involving procedures or whose results are procedures. Thus in a sense procedures in ALGOL are second class citizens—they always have to appear in person and can never be represented by a variable or expression (except in the case of a formal parameter)</p></blockquote>
+<p>First Class Object에 대한 정의는 정확하게 내려진 바가 없습니다. 그리고 주로 언급되는 내용은 First Class Object 중에서 First Class Function에 대한 이야기입니다. 고로, 오늘은 Wikipedia를 기준으로 그 First Class가 가져야하는 것들에 대해 논해 보겠습니다.</p>
+<h1>First Class Function</h1>
+<h4>Higher-order functions: passing functions as arguments</h4>
+<p>처음 살펴 볼 내용은 higher-order function, 번역하면 고차함수입니다. 고차함수의 정의는 간단합니다. 함수를 매개 변수로 받는 함수를 뜻합니다. 일반적인 literal(값에 해당하는 데이타로 숫자나 문자열)이 아니라, 함수를 받는 경우를 뜻 합니다. 함수가 first-class가 아닌 언어인 경우에는, function pointers 혹은 delegates를 사용하는 경우도 있습니다.</p>
+<p>C#의 예전 버전에서는 제대로 지원하지 못했습니다. 즉, delegate를 통해서만 함수를 넘겨줄 수 있었습니다.</p>
+<pre class="lang:default decode:true">using System;
+
+namespace try_c_sharp
+{
+	public delegate void function1(int i);
+	public delegate void function2(int i);
+
+	public class DelegateSample
+	{
+		public DelegateSample (function1 f, function2 f2)
+		{
+		}
+
+		public int Square(int x)
+		{
+			return x * x;
+		}
+
+		public function1 ToFunc()
+		{
+			return Square; 
+		}
+	}
+}
+</pre>
+<p>보시다 시피, function1과 function2가 같음에도 일반화하기 어려웠습니다. 버전이 2.0로 넘어가면서 Parametric polymorphism을 지원하기 시작했습니다. 즉, generic type을 지원하면서 위와 같은 delegate도 일반화된 generic delegate으로 바뀌게 됩니다.</p>
+<pre class="lang:default decode:true">public DelegateSample (Action&lt;int&gt; f, Func&lt;int, int&gt; f2)
+{
+}
+
+public int Square(int x)
+{
+	return x * x;
+}
+
+public Action&lt;int&gt; ToFunc()
+{
+	return Square; 
+}</pre>
+<h4> Anonymous and nested function</h4>
+<p>익명 함수는 많은 언어에서 제공하고 있습니다. 이러한 익명 함수는 위의 코드에서 Square와 같은 함수를 미리 선언하지 않고도 사용할 수 있도록 해주게 됩니다. 대표적인 경우가 Lambda Expression입니다.</p>
+<p>중첩 함수 같은 경우에는, 하나의 함수 내에서 코드를 Structured하게 표현할 수 있게 해 줍니다. 그러나 OOP를 표방하는 언어에서는 이러한 중첩 구조가 바람직하다고 보지는 않습니다.</p>
+<p>C#에서는 익명 함수가 처음에는 제공되지 않았습니다. 2.0에 추가되었으나 3.0에 추가된 Lambda 식 때문에 ,거의 사용하지 않게 되었습니다.</p>
+<pre class="lang:default decode:true ">public Action&lt;int&gt; ToFunc ()
+{
+	return delegate(int x) {
+		return x * x; // anonymous function
+	}; 
+}
+
+public Action&lt;int&gt; ToFunc ()
+{
+	return x =&gt; x * x; // lambda expression
+}</pre>
+<h4> Non-local variables and closures</h4>
+<p>'로컬 변수가 아닌 변수'라는 것은, 해당 local scope에 정의되지 않은 변수로 주로 중첩 이나 익명 함수에서 접근하는 상위 scope에 존재하는 변수를 뜻 합니다. 다른 말로는, 자유 변수(free variable)을 뜻 합니다. C#에서는 익명 함수에서 Non-local variable에 대한 접근을 지원 합니다.</p>
+<p>Closure란, 함수와 함수를 둘러싼 referencing environment - 함수 내 자유 변수에 대한 참조를 포함하는 - 를 뜻 한다.  Closure를 사용하면, 함수마다 다른 non-local variable에 대한 구성이 가능하다.</p>
+<pre class="lang:default decode:true">static Func&lt;int&gt; Example(int step)
+{
+  int seed = 0;
+  return () =&gt; {seed = seed + step; return seed;};
+}
+
+static void Main()
+{
+  Func&lt;int&gt; example = Example(10);
+  Console.WriteLine (example());  // 10
+  Console.WriteLine (example());  // 20
+}
+</pre>
+<h4>Higher-order functions: returning functions as results</h4>
+<p>앞서 살펴본, closure를 반환할 수 있는지에 대한 내용입니다. 이미, 예제에서 살펴 보신 것처럼, 기본적으로 closure를 지원한다는 것은 당연히, 함수 반환이 가능해야 합니다.</p>
+<h4>Assigning functions to variable</h4>
+<p>함수를 변수에 할당할 수 있는지에 대한 항목입니다. C#은 지금까지 살펴 보신 것처럼, delegate를 통해 함수를 변수에 할당시킬 수 있습니다. delegate에서 사용되는 function signature가 매개 변수와 반환 타입이기 때문에, 여기에 근거하여 generic delegate가 미리 선언되어 있습니다. 앞의 예제에서 보신, Action&lt;&gt;과 Func&lt;&gt;가 그러한 예가 되겠습니다.</p>
+<h4>Equality of function</h4>
+<p>함수의 동등성 비교인데요, 사실 함수의 동등성 비교는 Extensional equality(외연外延적 동등성 - 동일한 INPUT에 대해 OUTPUT이 같은 경우로 비결정성 때문에, 프로그래밍 언어는 제공하지 못함), Intensional equality(내연內延적 동등성 - 함수의 내부가 동일한 경우로 소스 코드나 목적 코드가 동일할 때) 그리고 Reference equality(주로, 해당 함수나 클로저의 주소를 비교)로 나뉠 수 있습니다. 대부분의 프로그래밍 언어는 Reference equality를 제공합니다.</p>
+<h1> C#이 지원하지 못하는 것</h1>
+<h4>Nested function</h4>
+<p>Nested function에 대한 부분은 아까 언급드렸습니다. C 계열의 언어인, C++, C#, Objective-C와 Java의 경우 Nested function은 지원하고 있지 않습니다.</p>
+<h4>Partial Application</h4>
+<p>ML이나 Haskell에 있는 개념으로, 함수를 중첩하거나 분리하는 개념에 대한 이야기 입니다. 헤스켈에서 중요한 개념인 Currying을 살펴 보시면 되겠습니다. 제가 완벽히 이해하고 있지 않기에, 댓글로 알려주시면 감사하겠습니다.</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>

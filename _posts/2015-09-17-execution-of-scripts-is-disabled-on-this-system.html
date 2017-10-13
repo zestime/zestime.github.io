@@ -1,0 +1,81 @@
+---
+layout: post
+title: Execution of scripts is disabled on this system
+date: 2015-09-17 17:26:01.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Computer
+tags:
+- powershell
+- window
+meta:
+  _wpcom_is_markdown: '1'
+  _edit_last: '1'
+  dsq_thread_id: '4137470976'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<p>powershell은 정말이지 정이 안간다. nuget package를 만들 일이 있어서, script를 실행시켰지만 여전히 동작하지 않았다.</p>
+<pre class="lang:default decode:true ">
+PS E:\Workspace\Workbench\CefSharp&gt;.\build.ps1
+이 시스템에서 스크립트를 실행할 수 없으므로 E:\Workspace\Workbench\CefSharp\build.ps1 파일을 로드할 수 없습니다. 자세한
+ 내용은 "get-help about_signing"을 참조하십시오.
+위치 줄:1 문자:2
+
++ . &lt;&lt;&lt;&lt;  .\build.ps1
+    + CategoryInfo          : NotSpecified: (:) [], PSSecurityException
+    + FullyQualifiedErrorId : RuntimeException
+</pre>
+<p>이럴거면, 뭐하러 번역을 한 것인가? 발번역과 불친절함은 넌더리가 난다. 해당 문제는, 대충 영작을 해서 구글링했더니 간단하게 답을 찾을 수 있었다.</p>
+<h2>ExecutionPolicy 실행정책</h2>
+<p>친절하게도 powershell은 듣보잡 sciprt에 대해 실행을 기본적으로 금지 시킨다. 실행 정책이라는게 있어서, 허가되지 않은 script의 동작을 원척적으로 막는 탓이다.</p>
+<h4>Get-ExecutionPolicy</h4>
+<p>현재의, 실행 정책을 보려면 다음과 같이 입력하면 됩니다.</p>
+<pre class="lang:default decode:true ">PS C:\Users\zestime.UBWARE&gt; Get-ExecutionPolicy
+Restricted
+PS C:\Users\zestime.UBWARE&gt; Get-ExecutionPolicy -list
+                    Scope                                 ExecutionPolicy
+                    -----                                 ---------------
+            MachinePolicy                                        Undefined
+               UserPolicy                                        Undefined
+                  Process                                        Undefined
+              CurrentUser                                        Undefined
+             LocalMachine                                       Restricted
+</pre>
+<p>기본적으로 Restricted(제한적)으로 설정되어 있습니다. 이는 script 파일을 실행할 수 없습니다. <em>-list</em>라는 옵션을 주면, 전체 정책을 보여주게 됩니다. Scope의 의미에서 알 수 있듯이, 이러한 정책은 적용 범위에 따라 세분화 될 수 있습니다.</p>
+<h4>Set-ExecutionPolicy</h4>
+<p>실행 정책을 바꿔야만, script를 실행할 수 있습니다.</p>
+<pre class="lang:default decode:true ">PS C:\Users\zestime.UBWARE&gt; Set-ExecutionPolicy RemoteSigned
+
+실행 규칙 변경
+실행 정책은 신뢰하지 않는 스크립트로부터 사용자를 보호해 줍니다. 실행 정책을 변경하면 about_Execution_Policies 도움말
+항목에 설명된 보안 위험에 노출될 수 있습니다. 실행 정책을 변경하시겠습니까?
+[Y] 예(Y)  [N] 아니요(N)  [S] 일시 중단(S)  [?] 도움말 (기본값은 "Y"임):
+
+Set-ExecutionPolicy : 레지스트리 키 'HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PowerShell\ShellIds\Microsoft.PowerShell'
+에 대한 액세스가 거부되었습니다.
+위치 줄:1 문자:20
++ Set-ExecutionPolicy &lt;&lt;&lt;&lt;  RemoteSigned
+    + CategoryInfo          : NotSpecified: (:) [Set-ExecutionPolicy], UnauthorizedAccessException
+    + FullyQualifiedErrorId : System.UnauthorizedAccessException,Microsoft.PowerShell.Commands.SetExecutionPolicyCommand
+</pre>
+<p>액세스 거부가 되었다고 나온다면, powershell을 관리자 권한으로 실행시키기 바랍니다. 위의 예제에서는 <em>RemoteSigned</em>로 설정하였습니다. 몇 가지 정책이 더 있는데, 다음과 같습니다.</p>
+<ul>
+<li>Restricted : 기본 정책, script를 실행할 수 없습니다.</li>
+<li>AllSigned : 신뢰된 게시자의 의한 서명을 필요로 합니다.</li>
+<li>RemoteSigned : 인터넷에서 다운 받은 파일에 대해서만 서명을 필요로 합니다.</li>
+<li>Unrestricted : 서명과 상관없이 실행 가능합니다.</li>
+<li>Bypass : 아무것도 차단하지 않고, 경고나 메시나도 보여주지 않습니다.</li>
+<li>Undefined : 해당 Scope의 정책을 설정하지 않았음을 의미합니다. </li>
+</ul>
+<h2>References</h2>
+<ul>
+<li>[PowerShell says “execution of scripts is disabled on this system.] (http://stackoverflow.com/questions/4037939/powershell-says-execution-of-scripts-is-disabled-on-this-system) from stakoverflow </li>
+<li><code>Get-Help about_exectuion_policies</code> at powershell</li>
+</ul>

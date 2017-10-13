@@ -1,0 +1,73 @@
+---
+layout: post
+title: Vagrant 시작하기
+date: 2013-10-15 12:43:05.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Computer
+tags:
+- vagrant
+- virtual machine
+- virtualbox
+- vm
+meta:
+  _edit_last: '1'
+  dsq_thread_id: '4089642899'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<p>vagrant라는 녀석을 즐겨 사용합니다. 생각보다, 중독되는 경향이 있네요. ^^ 혹시, 주변에 아직 모르시는 분들을 위해서, 간략히 소개해보겠습니다. 소개라는게, 별게 없구여, 아래의 command만 짚고 갈께요.</p>
+<pre class="lang:sh decode:true">&gt; vagrant box add
+&gt; vagrant init
+&gt; vagrant up &amp; halt
+&gt; vagrant ssh</pre>
+<p>정말, 간단하지만 앞으로 너무나도 자주 쓰게 되는 명령어들입니다.</p>
+<h1>1. What is the vagrant?</h1>
+<p>먼저, vagrant가 뭘까요? 가상 개발 환경을 보다 쉽게 사용하기 위한, 마법사 같은 프로그램입니다. VirtualBox 위에서 동작하며, 다른 사람의 virtual machine을 box라 부르며 쉽게 사용할 수 있도록 설계되었습니다. 무엇보다 쓰기 쉽고 Open-Source랍니다.</p>
+<h1>2. Install</h1>
+<p>설치는 다음의 순서로 해주시면 됩니다.</p>
+<ol>
+<li>virtual box 설치 - <a href="https://www.virtualbox.org/wiki/Downloads">https://www.virtualbox.org/wiki/Downloads</a></li>
+<li>vagrant 설치 - <a href="http://downloads.vagrantup.com/">http://downloads.vagrantup.com/</a></li>
+<li>ssh client 설치( putty, 윈도우 환경에만 해당해요. Mac과 Linux는 terminal이 있으니까요)</li>
+</ol>
+<p>설치는 '다음'만 누르면 끝나니까, 각자 알아서 하면 좋겠습니다.(귀찮아요...;)</p>
+<h1>3. Simple manual</h1>
+<h4>1) 박스줍기(adding a new box)</h4>
+<p>설치가 끝났어도, Box가 있어야 겠죠. 폐지 주으라는 애기는 아니고, <a href="http://www.vagrantbox.es/">http://www.vagrantbox.es/</a>에서 보면 box list가 있습니다.. 적당히 필요한 것으로 사용하면 되는데, 다음의 명령어를 이용시면 되겠습니다.</p>
+<pre class="theme:github lang:sh decode:true">&gt; vagrant box add [nickname] [download URL]</pre>
+<p>저의 경우에는</p>
+<pre class="lang:sh decode:true">&gt; vagrant box add presice64 http://files.vagrantup.com/precise64.box</pre>
+<p>이로써, 간단하게 box가 추가되었습니다.. 이젠, VM을 만들어 보져...</p>
+<h4>2) 박스 조립 하기(initialize VM)</h4>
+<p>설치 이후에, 적절한 디렉토리를 추가하셔서, 자신의 가상 머신이 위치할 곳을 결정합니다. 그리고 init을 수행해주면 됩니다. 저는 이렇게...</p>
+<pre class="lang:sh decode:true">&gt; mkdir vagrant-tutorial
+&gt; cd vagrant-tutorial
+&gt; vagrant init</pre>
+<p>init은 말 안해도 알겠지만, 초기화를 했다는 의미입니다. ls 명령어를 실행해보면, Vagrantfile만 보이죠. 그렇습니다. 저 파일이 핵심이죠. 오늘은 디테일하게 파일을 살펴 보지는 않겠지만, 저 파일이 우리의 VM을 가리킨다고 있다고 생각하면, 좋겠네요.</p>
+<h4>3) 박스켜기(Turn on VM)</h4>
+<p>켜는 걸, 'on'이라고 배웠는데, 여기서는 'up'입니다.</p>
+<pre class="lang:sh decode:true">&gt; vagrant up</pre>
+<p>log message가 나타나며, VM이 부팅중이라는 사실을 알려줍니다. 보이지는 않지만, 컴퓨터 안에서 컴퓨터가 켜졌겠거니 생각하면 좋겠네요.</p>
+<p><a href="http://blog.kusweet.com/wp-content/uploads/2013/10/Screen-Shot-2013-10-16-at-2.49.56-PM.png"><img class="alignnone size-full wp-image-451" src="{{ site.baseurl }}/assets/Screen-Shot-2013-10-16-at-2.49.56-PM.png" alt="Screen-Shot-2013-10-16-at-2.49.56-PM" width="684" height="565" /></a></p>
+<h4><span style="font-size: 14px;">4) 박스끄기(Turn off VM)</span></h4>
+<p>켜는 것 만큼 중요한, 끄는 법입니다. 역시나, 'off'는 아니에요.</p>
+<pre class="lang:sh decode:true">&gt; vagrant halt</pre>
+<p>up의 반대, down이 아니라서, 처음에는 못 껐네요. halt 뜻이 그런거니까, 여튼 메모리를 해제하고 프로세스를 죽이게 된다고 믿고 있습니다.</p>
+<h4>5) 박스 안에 들어가기( Connect VM via SSH)</h4>
+<pre class="lang:sh decode:true">&gt; vagrant ssh</pre>
+<p>사실, 박스를 켠 이유는 박스 안에서 무언가를 하기 위해서 였습니다. VirtualBox를 사용할 때 처럼, 추가 어댑터를 작성하거나 fort forwarding에 대한 설정없이 간편하게 SSH로 접속하게 됩니다. 눈치 채셨겠지만, 이미 부팅시에 자동으로 portforwarding이 일어났습니다.</p>
+<p><a href="http://blog.kusweet.com/wp-content/uploads/2013/10/Screen-Shot-2013-10-16-at-2.52.21-PM.png"><img class="alignnone size-full wp-image-452" src="{{ site.baseurl }}/assets/Screen-Shot-2013-10-16-at-2.52.21-PM.png" alt="Screen-Shot-2013-10-16-at-2.52.21-PM" width="684" height="565" /></a></p>
+<h1>4. Reference</h1>
+<ul>
+<li><a href="http://www.vagrantup.com/">http://www.vagrantup.com/</a> - vagrant 공식 사이트입니다. 이런 저런 도움이 되지만, 자세하진 않았어요.</li>
+</ul>
+<h1>5. Closing</h1>
+<p>서두가 필요해서 적어 보았습니다. 혹시나 해서 적은건데. 너무 간단해서 민망하네요.^^</p>
+<p>&nbsp;</p>

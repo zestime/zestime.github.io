@@ -1,0 +1,316 @@
+---
+layout: post
+title: Javascript - The Good Parts
+date: 2015-11-26 16:35:04.000000000 +09:00
+type: post
+published: true
+status: publish
+categories: []
+tags: []
+meta:
+  _wpcom_is_markdown: '1'
+  _edit_last: '1'
+  dsq_thread_id: '4468425891'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h1>Javascript - The Good Parts by Douglas Crockford</h1>
+<h2>1. Good Parts</h2>
+<ul>
+<li>built on some good ideas and bad ones
+<ul>
+<li>Good : functions, loose typing, dynamic objects, and an expressive object literal notation.</li>
+<li>Bad : a programming model based on global variables</li>
+</ul>
+</li>
+<li>Javascript's functions are first class objects with lexical scoping. It is Lisp in C's clothing. This makes Javascript a remarkably powerful language.</li>
+<li>
+<p>Strong typing does not eliminate the need for the careful testing. Loose typing to be liberating. I don't need to form complex class hierarchies.</p>
+</li>
+</ul>
+<h2>2. Grammar</h2>
+<h4>Whitespace</h4>
+<h4>Names</h4>
+<ul>
+<li>one or more letters, digits, or under bars</li>
+<li>No use of reserved words</li>
+</ul>
+<h4>Numbers</h4>
+<ul>
+<li>only one number type</li>
+<li>64bit floating point as same as Java's double</li>
+<li>no integer type, so 1 and 1.0 are the same value</li>
+<li><strong>NaN</strong> is not equal to any value, including itself. You should use <em>isNaN()</em> function</li>
+</ul>
+<h4>Strings</h4>
+<ul>
+<li>Some methods
+<ul>
+<li>toUpperCase()</li>
+</ul>
+</li>
+</ul>
+<h4>Statements</h4>
+<ul>
+<li>the <em>falsy</em> values
+<ul>
+<li>false</li>
+<li>null</li>
+<li>undefined</li>
+<li>The empty string ''</li>
+<li>The number 0</li>
+<li>The number NaN</li>
+</ul>
+</li>
+</ul>
+<h4>Expressions</h4>
+<ul>
+<li>The <strong>||</strong> operator return the value of operand which is truthy.</li>
+</ul>
+<h4>Literals</h4>
+<ul>
+<li>Types
+<ul>
+<li>number literal</li>
+<li>string literal</li>
+<li>object literal</li>
+<li>array literal</li>
+<li>function</li>
+<li>regexp literal</li>
+</ul>
+</li>
+</ul>
+<h4>Functions</h4>
+<ul>
+<li>It has an optional name</li>
+</ul>
+<h2>3. Objects</h2>
+<h4>Object literal</h4>
+<pre>
+var empty_object = {};
+ 
+var stooge = {
+    "first-name": "Jerome",
+    "last-name": "Howard"
+};
+
+var flight = {
+    airline: "Oceanic",
+    number: 815,
+    departure: {
+        IATA: "SYD",
+        time: "2004-09-22 14:55",
+        city: "Sydney"
+}, arrival: {
+        IATA: "LAX",
+        time: "2004-09-23 10:42",
+        city: "Los Angeles"
+    } 
+};
+</pre>
+<h4>Retrieval</h4>
+<ul>
+<li>The <strong>.</strong> notation is preferred for readability.</li>
+</ul>
+<pre>
+stooge["first-name"]            // "Joe"
+flight.departure.IATA           // "SYD"
+
+stooge["middle-name"]           // undefined
+flight.status                       // undefined
+stooge["FIRST-NAME"]            // undefined
+
+var middle = stooge["middle-name"] || "(none)";
+</pre>
+<ul>
+<li><em>undefined</em> will throw a <strong>TypeError</strong> exception. This can be guarded against wit the &amp;&amp; operator.</li>
+</ul>
+<pre>
+flight.equipment                                    // undefined
+flight.equipment.model                          // throw "TypeError"
+flight.equipment && flight.equipment.model  // undefined
+</pre>
+<h4>Reference</h4>
+<ul>
+<li>Objects are passed around by reference. They are never copied.</li>
+</ul>
+<h4>Prototype</h4>
+<ul>
+<li>Every object is linked to a prototype object from which it can inherit properties. </li>
+<li>All objects created from object literals are linked to <em>Object.prototype</em></li>
+<li>If the object lacks the property name, then Javascript attempts to retrive the property value from the prototype obejct.</li>
+<li>If the desired property exists nowhere in the prototype chain, then the result is the <em>undefined</em> value.</li>
+<li>The <strong><strong>proto</strong></strong> property of Object.prototype is an accessor property. It is deprecated in favor of <strong>Obejct.getPrototypeOf()</strong></li>
+</ul>
+<pre>
+var s = {"one": 123};
+var a = Object.create(s);
+// var a = Object.create(s.);
+var b = Object.create(a);
+b.another = 456;
+var c = Object.create(b);
+
+c.__proto__;
+c.__proto__.__proto__;
+
+c.one = 1;
+</pre>
+<h4>Reflection</h4>
+<ul>
+<li>The <strong>typeof</strong> operator can be helpful in determining the type of property.</li>
+</ul>
+<pre>
+typeof flight.number            // 'number'
+typeof flight.status            // 'string'
+typeof flight.toString          // 'function'
+
+flight.hasOwnProperty('number')     // true
+flight.hasOwnProperty('constructor')    // false
+</pre>
+<h4>Enumeration</h4>
+<ul>
+<li>The <strong>for in</strong> statement can loop over all of the property names in an object.</li>
+<li>No guarantee on the order of the names</li>
+</ul>
+<pre>
+for (var name in flight) {
+    if (typeof flight[name] !== 'function') {
+        console.log(name + " : " + flight[name]);
+    }
+}
+</pre>
+<h4>Delete</h4>
+<ul>
+<li>The <strong>delete</strong> operator can be used to remove a property from an object.</li>
+<li>It will not touch any of the objects in the prototype linkage.</li>
+</ul>
+<pre>
+delete c.one;               // true
+
+c.one;
+
+delete c.one;               // true
+
+c.one;
+</pre>
+<h2>4. Functions</h2>
+<p>The best thing about Javascript is its implementation of functions. They are used for code reuse, information hiding, and composition.</p>
+<h4>Function Objects</h4>
+<ul>
+<li>Functions in Javascript are objects.</li>
+<li>Objects are collecitons of name/value pairs having a hidden link to a prototype object.</li>
+<li>Function objects are linked to Function.prototype.</li>
+<li>Every function is created with two additional hidden properties(context, code).</li>
+<li>Every function obejct is created with a <strong>prototype</strong> property. Its value is an object with a constructor property whose value is the function.</li>
+<li>Used like any other value
+<ul>
+<li>Stored in vairables, objects and arrays</li>
+<li>Passed as arguments to functions</li>
+<li>A return value from funtions</li>
+<li>Function can have methods</li>
+</ul>
+</li>
+<li>The thing that is special is that they can be invoked.</li>
+</ul>
+<h4>Function Literal</h4>
+<ul>
+<li>Function objects are created with function literals</li>
+<li>The function name is optional, it used to call recursively itself.</li>
+</ul>
+<pre>
+var variable = function() {
+    // body
+}; // this is a function literal.
+</pre>
+<ul>
+<li>The function object created by a function literal contains a link to that outer context. This is called closure. This is the source of enormous expressive power.</li>
+</ul>
+<h4>Invocation</h4>
+<ul>
+<li>Every function recevives two additional parameters: <em>this</em> and <em>arguments</em></li>
+<li>No runtime error when the number of arguments and the number of parameters do not match</li>
+<li>No type checking on the argument values</li>
+<li>The <em>this</em> value is determined by following cases.</li>
+</ul>
+<h5>The Method Invocation Pattern</h5>
+<ul>
+<li>When a function is stored as a property of an object, we call it a method.</li>
+<li>When a method is invoked, <em>this</em> is bound to that obejct.</li>
+<li>If a refinemnet, it is invoked as a method.</li>
+</ul>
+<pre>
+ var myObject = {
+         value: 0,
+         increment: function (inc) {
+             this.value += typeof inc === 'number' ? inc : 1;
+} };
+myObject.increment( ); 
+document.writeln(myObject.value);           // 1
+myObject.increment(2);
+document.writeln(myObject.value);           // 3
+</pre>
+<ul>
+<li>This very late binding makes functions that use this highly reusable.</li>
+</ul>
+<h5>The Function Invocation Pattern</h5>
+<ul>
+<li>When a function is not the property of an object, then it is invoked as a function.</li>
+<li>The <em>this</em> is bound to the global object</li>
+</ul>
+<pre>
+var add = function (a, b) { return a + b;};
+
+myObject.double = function () {
+    var that = this; 
+    
+    var helper = function () {
+        that.value = add(that.value, that.value);
+    };
+    
+    helper(); // Invoke helper as a function. 
+}; // Invoke double as a method.
+
+myObject.double( ); 
+document.writeln(myObject.getValue()); // 6
+</pre>
+<h5>The Constructor Invocation Pattern</h5>
+<ul>
+<li>The <strong>new</strong> prefix also changes the behavior of the return statement.</li>
+</ul>
+<pre>
+var Quo = function (string) {
+    this.status = string;
+};
+
+Quo.prototype.get_status = function() {
+    return this.status;
+};
+
+var mime = new Quo("confused");
+mime.get_status();
+</pre>
+<ul>
+<li>Functions that are intended to be used with the new prefix are called <em>constructors</em>.</li>
+</ul>
+<h5>The Apply Invocation Pattern</h5>
+<ul>
+<li>Javascript is a functional object-oriented language, functions can have methods.</li>
+<li>The <strong>apply</strong> method lets us construct an array of arguments to use to invoke a function. It also lets us choose the value of <em>this</em>.</li>
+</ul>
+<pre>
+var statusObject = {
+    status: 'A-OK'
+};
+
+var status = Quo.prototype.get_status.apply(statusObject); // status is 'A-OK'
+</pre>
+<h2>5. Inheritance</h2>
+<h2>6. Arrays</h2>
+<h2>7. Regular Expessions</h2>
+<h2>8. Methods</h2>
+<h2>9. Style</h2>
+<h2>10. Beautiful Features</h2></p>

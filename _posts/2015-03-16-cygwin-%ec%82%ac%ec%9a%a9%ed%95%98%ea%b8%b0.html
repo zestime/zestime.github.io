@@ -1,0 +1,109 @@
+---
+layout: post
+title: Cygwin 사용하기
+date: 2015-03-16 19:57:33.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Computer
+tags:
+- apt-cyg
+- cygwin
+- puttycyg
+- zsh
+- 시그윈
+meta:
+  _edit_last: '1'
+  dsq_thread_id: '4042506915'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h1>Introduction</h1>
+<p>오랜만에 Windows에서 개발을 진행하고 있습니다. Visual Studio와 Resharper의 비호아래, 열심히 개발을 하다보니 shell이 미친듯이 그립더군요. 익숙한 것이 무섭듯이, 결국에는 cygwin을 설치하게 되었습니다. 혹시, 도움이 되실까, 간략히 정리했습니다. cygwin - apt-cyg - zsh - puttycyg 으로 살펴 보겠습니다.</p>
+<h1>Installation</h1>
+<p>뭐, 고민할 것도 없이 간단합니다. 홈페이지에서 내려 받아, 설치를 진행하면 됩니다. 재밌는 점은, cygwin에서 사용하는 모든 package는 setup.exe 파일에 의해 진행된다는 점입니다. 즉, cygwin의 setup.exe를 통해서, 새로운 프로그램을 설치하기 때문에, 여타 프로그램처럼 설치하고 지우시면 안되겠습니다.</p>
+<p><img class="alignnone size-full wp-image-734" src="{{ site.baseurl }}/assets/Screen-Shot-2015-03-16-at-5.20.50-pm.png" alt="Screen Shot 2015-03-16 at 5.20.50 pm" width="550" height="393" /></p>
+<p>다음을 눌러 설치를 진행합니다.</p>
+<p><a href="http://blog.kusweet.com/wp-content/uploads/2015/03/Screen-Shot-2015-03-16-at-5.21.59-pm.png"><img class="alignnone wp-image-735 size-full" src="{{ site.baseurl }}/assets/Screen-Shot-2015-03-16-at-5.21.59-pm.png" alt="Screen Shot 2015-03-16 at 5.21.59 pm" width="550" height="393" /></a></p>
+<p>&nbsp;</p>
+<p>root 디렉토리를 설정해야 합니다. 여기서 root의 의미는, linux 환경에서 최상위 디렉토리를 의미합니다. 즉, shell의 환경이 여기서부터 시작됩니다.</p>
+<p><a href="http://blog.kusweet.com/wp-content/uploads/2015/03/Screen-Shot-2015-03-16-at-5.23.36-pm.png"><img class="alignnone size-full wp-image-736" src="{{ site.baseurl }}/assets/Screen-Shot-2015-03-16-at-5.23.36-pm.png" alt="Screen Shot 2015-03-16 at 5.23.36 pm" width="551" height="393" /></a></p>
+<p>Package가 위치할 디렉토리를 설정합니다. 가령, FTP를 설치한다고 하면, 위에서 설정된 경로에 FTP 프로그램을 내려받아 설치하게 됩니다.</p>
+<p><img class="alignnone wp-image-737 size-full" src="{{ site.baseurl }}/assets/Screen-Shot-2015-03-16-at-5.27.34-pm.png" alt="Screen Shot 2015-03-16 at 5.27.34 pm" width="550" height="393" /></p>
+<p>Package를 다운 받을 사이트를 설정합니다. 가까운 곳에서 다운 받는 것이 아무래도 빠를 것 입니다. 한국에 거주중이라면, <a href="http://blog.gaerae.com/2014/06/cygwin-mirrors.html">한국의 미러사이트</a>로 설정합니다. 잘못된 서버를 선택하시면, 느려서 고생하실 수 있습니다.</p>
+<p><img class="alignnone size-full wp-image-738" src="{{ site.baseurl }}/assets/Screen-Shot-2015-03-16-at-5.30.57-pm.png" alt="Screen Shot 2015-03-16 at 5.30.57 pm" width="550" height="393" />가히, 백미라 할 수 있는 Package를 선택하는 화면입니다. 필요하신, 용도에 맞게 package를 선택하여 사용하시면 되겠습니다.</p>
+<ul>
+<li>zsh - The Z-Shell</li>
+<li>git  - git 은 shell 이 편해서...</li>
+<li>vim - emacs로 좋은데, 가볍게 쓸 용도로...</li>
+<li>openssh - 가끔 ssh 붙을 때...</li>
+<li>wget - 웹 서버에서 다운로드 받을려면...</li>
+</ul>
+<p>python은 물론, Editor들도 제공하고 있으니 용도에 맞게 설치하시면 됩니다. 그리고 setup.exe로 언제든지 다시 설치할 수 있기 때문에 부담없이 진행하셔도 됩니다. 한가지 더 부연드릴 점은, 여러 버전이 있는 경우, 특정 버전 선택할 수도 있습니다. 전부다 제공되는 것은 아니고, 필요에 따라 멀티 버전으로 제공되는 경우가 있습니다.</p>
+<p><img class="alignnone size-full wp-image-740" src="{{ site.baseurl }}/assets/Screen-Shot-2015-03-16-at-5.38.27-pm.png" alt="Screen Shot 2015-03-16 at 5.38.27 pm" width="550" height="393" /></p>
+<p>설치가 진행됩니다. 다시, 말씀드리지만 한국의 미러 서버를 이용하셔야, 정신 건강에 좋습니다.</p>
+<h1>Settings</h1>
+<p>설치는 끝이 아니라, 시작이죠. 자, 이제 셋팅을 할 차례입니다.</p>
+<h3>passwd</h3>
+<p>Cygwin은 linux와 다른 유저 시스템을 가지기에, 실제로 passwd와 같은 파일은 없습니다. 하지만, passwd에는 home directory와 shell 대한 설정을 가지고 있으므로 생성하도록 합니다. group 파일도 같이 설정합니다.</p>
+<pre class="lang:zsh decode:true">$ mkpasswd -l -d -p "$(cygpath -H)" &gt; /etc/passwd
+$ mkgroup -l -d &gt; /etc/group</pre>
+<p>이 과정을 통해서, home directory가 Windows의 User 디렉토리로 설정되게 됩니다.</p>
+<h3>apt-cyg</h3>
+<p>setup.exe보다 더 좋은 package 관리 툴이 있습니다. 바로,<a href="https://code.google.com/p/apt-cyg/"> apt-cyg</a>입니다. Ubuntu에서 apt-get과 동일한 역활은 한다고 보시면 되겠습니다.</p>
+<pre class="lang:zsh decode:true">zestime@HANKIYONG-PC ~
+$ wget http://apt-cyg.googlecode.com/svn/trunk/apt-cyg
+
+zestime@HANKIYONG-PC ~
+$ vi apt-cyg
+
+zestime@HANKIYONG-PC ~
+$ chmod +x apt-cyg
+
+zestime@HANKIYONG-PC ~
+$ mv apt-cyg /bin
+
+zestime@HANKIYONG-PC ~
+$ apt-cyg install vim
+Working directory is /setup
+Mirror is http://ftp.daum.net/cygwin
+--2015-03-16 19:04:32--  http://ftp.daum.net/cygwin/x86/setup.bz2
+</pre>
+<p>wget으로 googlecode에서 apt-cyg를 내려 받습니다.  vi와 같은 editor로 열어 보시면,  shell script임을 알 수 있습니다. 중간에 mirror 사이트에 대한 설정 부분이 있는데, 한국의 mirror 사이트로 변경하는 것이 좋겠죠.</p>
+<p><img class="alignnone size-full wp-image-745" src="{{ site.baseurl }}/assets/Screen-Shot-2015-03-16-at-7.10.34-pm.png" alt="Screen Shot 2015-03-16 at 7.10.34 pm" width="553" height="334" /></p>
+<p>앞으로는 apt-cyg를 사용해서, package를 설치할 수 있겠습니다.</p>
+<h3>zsh</h3>
+<p>실은, zsh을 쓰기 위해서 위의 과정들은 지나왔습니다. zsh은 setup.exe나 apt-cyg를 통해서 설치하면 되겠습니다. 그 이후에는, /etc/passwd 파일을 변경해야 합니다. 앞서 말씀드린 것처럼, passwd에는 user별 default shell에 대한 내용이 들어 있습니다. editor를 이용해서, 수정해야 합니다.</p>
+<p><img class="alignnone size-full wp-image-746" src="{{ site.baseurl }}/assets/Screen-Shot-2015-03-16-at-7.18.00-pm.png" alt="Screen Shot 2015-03-16 at 7.18.00 pm" width="553" height="194" /></p>
+<h3>oh-my-zsh</h3>
+<p>위의 설정으로, default shell이 zsh으로 변경되었습니다. 아직, 부족한 점이 있습니다. oh-my-zsh가 없는 zsh는 그야말로 맹물이죠. 자동 설치보다는 수동 설치는 권장합니다. github에 나와있는 설치 스크립트는 다음과 같습니다.</p>
+<pre class="lang:default decode:true">$ git clone git://github.com/robbyrussell/oh-my-zsh.git ~/.oh-my-zsh
+$ cp ~/.zshrc ~/.zshrc.orig
+$ cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc</pre>
+<h1>Go further</h1>
+<h3>puttycyg</h3>
+<p>설치는 위와 같이하면 끝납니다. 사용성에 대한 이야기를 할 차례입니다. cygwin에서 제공되는 terminal은 그 자체로서 훌륭하지만, 우린 더욱 사용하기 좋은 putty를 이용토록 하겠습니다.</p>
+<p><img class="alignnone size-full wp-image-741" src="{{ site.baseurl }}/assets/Screen-Shot-2015-03-16-at-5.43.38-pm.png" alt="Screen Shot 2015-03-16 at 5.43.38 pm" width="595" height="327" /></p>
+<p>좀 더 나은 환경을 위한 선택, putty</p>
+<p><a href="http://blog.kusweet.com/wp-content/uploads/2015/03/Screen-Shot-2015-03-16-at-5.49.38-pm.png"><img class="alignnone size-full wp-image-742" src="{{ site.baseurl }}/assets/Screen-Shot-2015-03-16-at-5.49.38-pm.png" alt="Screen Shot 2015-03-16 at 5.49.38 pm" width="456" height="438" /></a></p>
+<p>특이점은 putty가 아니라, <a href="https://code.google.com/p/puttycyg/">puttycyg</a> 라는 점 입니다. 여기에는 Cygterm이라는 Connection Type이 추가되어 있는 버전입니다. cygwin을 접속할 때는, 위의 Cygterm을 이용하시면 되겠습니다. 혹시, 한글 문제가 있다면, [Windows] - [Translation] 에서 UTF-8으로 변경하시면 되겠습니다.</p>
+<p><img class="alignnone size-full wp-image-743" src="{{ site.baseurl }}/assets/Screen-Shot-2015-03-16-at-5.56.51-pm.png" alt="Screen Shot 2015-03-16 at 5.56.51 pm" width="456" height="438" /></p>
+<h3>putty color themes</h3>
+<p>putty는 오래된 터미널입니다. 우리같이 트렌디한 사람들이 쓰기에는 색이 마음에 들지 않죠. 수채화를 그리는 화가는 아니지만, 마음만은 파스텔톤이라서... 전 <a href="https://www.igvita.com/2008/04/14/custom-putty-color-themes/">igvita-desert.reg </a>라는 color themes을 사용합니다. registry 파일을 실행시키면, session이 추가됩니다. 추가된 세션을 Load하셔서, 앞에서 진행한 Translation 셋팅이나 Connection Type에 대한 설정을 하시고 저장하여 사용하시면 되겠습니다.</p>
+<p><a href="http://blog.kusweet.com/wp-content/uploads/2015/03/Screen-Shot-2015-03-16-at-6.05.49-pm.png"><img class="alignnone size-full wp-image-744" src="{{ site.baseurl }}/assets/Screen-Shot-2015-03-16-at-6.05.49-pm.png" alt="Screen Shot 2015-03-16 at 6.05.49 pm" width="422" height="372" /></a></p>
+<p>훨씬, 보기 좋아졌습니다.</p>
+<h1>Closing</h1>
+<p>Mac을 편애합니다. 이렇게 설치하는게 은근 귀찮은 작업이라, 이쁜 터미널이 제공되는 Mac에 한 표를... ^^</p>
+<h1>References</h1>
+<ul>
+<li><a href="https://cygwin.com/install.html">Cygwin</a></li>
+<li><a href="https://code.google.com/p/puttycyg/">Putty for Cygwin</a></li>
+<li><a href="https://code.google.com/p/apt-cyg/">apt-cyg</a></li>
+<li><a href="https://github.com/robbyrussell/oh-my-zsh">oh-my-zsh from Github</a></li>
+<li><a href="http://blog.gaerae.com/2014/06/cygwin-mirrors.html">Cygwin 한국 미러 사이트</a></li>
+</ul>

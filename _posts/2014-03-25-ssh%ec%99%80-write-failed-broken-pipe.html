@@ -1,0 +1,59 @@
+---
+layout: post
+title: 'SSH와 Write failed: Broken pipe'
+date: 2014-03-25 16:50:56.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Computer
+- Enviornment
+tags:
+- broken
+- disconnected
+- pipe
+- ssh
+- 연결 끊김
+meta:
+  _edit_last: '1'
+  dsq_thread_id: '4021803584'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h1>소개 Intro</h1>
+<p>하둡 관련 작업을 하면서, 심심치 않게 겪는 일중에 하나가 'Write failed: Broken pipe'입니다. 네트워크에 문제이던, 혹은 무응답 상태로 오래 방치되어 발생했던... 여간 피곤한 일이 아니었습니다. 주로, Batch 작업을 하다가 pipe가 잘못되는 경우에는 더 애매한 상황이 되곤 했습니다. 가장 간단한 방법은 Process를 Backgound로 실행시키는 방법이었습니다. 예를 들면 다음과 같습니다.</p>
+<pre class="toolbar:2 nums:false lang:default decode:true">$ nohup tar -xzf some_huge.tar.gz &amp;</pre>
+<p><em>nohup</em>은 Process가 터미널 종료와 상관없이 지속될 수 있도록 해주는 명령어입니다. 이렇게 같이 쓰면, ssh와 상관없이 지속적으로 Process가 동작하게 됩니다. 그런데... 이게 최선인가요?</p>
+<h1>문제 Problem</h1>
+<pre class="toolbar:2 nums:false lang:default decode:true">[hdfs@namenode hive]$ Write failed: Broken pipe
+➜  ~</pre>
+<p>문제는 작업 도중에 저렇게 SSH가 끊나버리는데 있습니다. 특히나, HIVE 배치 작업을 하다보니, 저렇게 끝나버리면, 제가 놀고 있을 때, 컴퓨터도 같이 노는 기현상이 나타나더군요. 제가 노는 건, 다 컴퓨터 덕분인데 말이죠. 그래서, 저 Message의 정체를 밝힐 필요가 있었습니다.</p>
+<h1>해결책 Solution</h1>
+<p>이러한 현상이 나타나는 직접적인 이유는, SSH Server 입장에서 혹은 Client에서 상대편이 죽었는지 아닌지 알아야하기 때문이라고 합니다. 물론, option으로 이러한 값들을 설정해 줄 수 있습니다. 알아야 하는 옵션은 다음과 같습니다.</p>
+<ul>
+<li><strong>Server Side ( sshd_config )</strong>
+<ul>
+<li>ClientAliveInterval<br />
+Server에서 Client로 null 패킷을 보내기 전까지, 얼마를 기다릴지에 대한 시간(초)입니다. 무응답 상태가 발생했을 경우, 이 시간을 기준으로 무응답이라고 판단하게 됩니다.</li>
+<li>ClientAliveCountMax<br />
+만약, ClientAliveInterval이 발생했을 경우, 몇 번의 시도 이후에 연결을 해지할 것인지에 대한 설정값입니다. default는 3으로, ClientAliveInterval이 30이라면 90초 뒤에 연결을 해지하게 됩니다.</li>
+</ul>
+</li>
+<li><strong>Client Side ( config )</strong>
+<ul>
+<li>ServerAliveInterval<br />
+앞서 나온 ClientAliveInterval과 같은 내용이지만, 이번에는 Client 입장에서 Server가 대답하지 않는 경우를 뜻합니다.</li>
+<li>ServerAliveCountMax<br />
+마찬가지로, 무응답의 누적 횟수를 근거로 Disconnect하게 됩니다.</li>
+</ul>
+</li>
+</ul>
+<p>위의 Option을 늘려주면, 당연히 SSH의 연결도 오래 갑니다. 그러나 지나치게 큰 값을 주게 되면, 유령 SSH Client가 발생되게 됩니다. 이런 경우에는 SSH 접근이 시원하지 않다고 할까요, 접근은 되지만 shell이 열리지 않는다면 의심해 볼 수 있겠습니다.</p>
+<h1>Reference</h1>
+<ul>
+<li><a href="http://patrickmylund.com/blog/how-to-keep-alive-ssh-sessions/">How to keep alive ssh sessions</a></li>
+</ul>

@@ -1,0 +1,72 @@
+---
+layout: post
+title: GraphQL  - Introduction
+date: 2017-03-24 01:30:50.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Javascript
+tags:
+- facebook
+- graph
+- graphql
+- javascript
+meta:
+  _wpcom_is_markdown: '1'
+  _edit_last: '1'
+  dsq_thread_id: '5676817844'
+  _wp_old_slug: "%ec%86%8c%ea%b0%9c-graphql"
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<p>금번 프로젝트의 backend를 디자인하면서, 고민하던 사항이 하나 있었습니다. RESTful API를 도출하는 것은 당연한 일이지만, RESTful API가 간혹 낭비적인 느낌이 드는 경우가 많았습니다. 어느 정도의 일반화라는 이름으로, 하나의 Complete Set을 기준으로 작업하는 경우가 많았습니다. 아마, 범용성과 중복을 막기 위한 궁여지책이 아니었나 싶었습니다.</p>
+<h1>GraphQL?</h1>
+<p>그러던 중에, facebook에서 재밌는 프로젝트를 진행하고 있었습니다. 정형화된 API를 이용하는게 아니라, 필요에 맞게 query를 날려서 데이타를 구해보자는 접근입니다. 이름하여, <a href="http://graphql.org/">GraphQL</a>입니다. <em>A query language for your API</em>라는 설명에서 알 수 있듯이, 엄밀히 말해 <strong>언어</strong>입니다. RDBMS에서 사용하는 SQL(Structured Query Language)처럼, API에 query를 수행하는 언어를 고안했습니다. 즉, 새로운 언어를 배워야 한다는 것이죠.</p>
+<h2>Schema</h2>
+<p>데이타를 불러온다는 작업은 실은, 어떤 데이타 있는지가 사전에 명기되어야 합니다. 아시다시피, JavaScript는 Strong Typed Language가 아닙니다. 대충 짜면, 대충 돌아가는 코드를 만들기 쉬운 언어입니다. 이런 언어를 GraphQL에서는 타입을 명시해서 사용하기를 종용합니다. Database Schema같은 것을 상상하시면 되겠습니다. 다만, 그 schema가 JavaScript로 작성되며, 당연한 애기겠지만 query는 작성된 schema 안에서 평가됩니다.</p>
+<pre><code>var GraphQLMessage = new GraphQLObjectType({
+  name: 'Message',
+  fields: {
+    authorName: {
+      type: GraphQLString,
+      resolve: (obj) =&gt; obj.authorName
+    },
+    text: {
+      type: GraphQLString,
+      resolve: (obj) =&gt; obj.text
+    },
+    timestamp: {
+      type: GraphQLInt,
+      resolve: (obj) =&gt; obj.timestamp
+    }
+  }
+});
+</code></pre>
+<p>GraphQLMessage라는 새로운 타입을 정의했습니다. 재밌는 점은 <em>fields</em>를 통해서, type instance가 가져야 할 properties를 정의한다는 점입니다. 그리고 실제 대응되는 값을 구하기 위해서, resolve 함수를 정의하게 됩니다. 여기 즈음에 감이 오셨을지 모르겠습니다만, 여기에 정의되는 type은 database에 상관없이 정의될 수 있습니다. GraphQL 자체로서 하나의 layer로 작동될 수 있다는 점입니다. 가령, 위의 코드에서 authorName은 mongodb에서 가져오고 text는 redis에서 구해오도록 구성할 수 있습니다. front-end에 독립적으로 말이죠.</p>
+<h2>Query vs. Mutation</h2>
+<p>SQL을 애기하면서, 가장 저급한 표현 중에 하나는 CRUD입니다. 단순 작업이라고 비아냥거릴 떄, 결국은 <strong>CRUD</strong>라고 표현들 하시는 분들을 봤습니다. 소프트웨어라는게, Input과 Output이 존재하기에, CRUD정도면 훌륭한거라고 생각했는데 그렇게 애기하시는 분들은 못 본것 같습니다. 어쩃든, CRUD는 Create, Read, Update 그리고 Delete의 준말입니다. GraphQL에는 딱 2가지만 있습니다. Query와 Mutation입니다. 이전 분류를 따르면, Query는 Read에 해당하며, 나머지는 모두 Mutation의 영역입니다.</p>
+<pre><code>query {
+  viewer {
+    message {
+      authorName,
+      timestamp,
+      text
+    }
+  }
+}
+</code></pre>
+<p>SELECT 쿼리를 생각하시면 되겠습니다.(viewer는 schema에 정의된 최상위 타입이며, message는 그 하위에 정의되어 있다고 가정하겠습니다.) 실제 코드는 위의 내용보다는 조금 더 복잡하기에 간략화하여 표현했습니다. 특이한 점은, columns을 명시해야 한다는 점입니다. 앞서 정의한 resolve functions들은 항상 수행되는 것이 아니라, query에 의해 직접적인 호출을 있는 경우에 평가됩니다. 이러한 점이, RESTful API 보다 조금 더 융통성을 발휘하는 부분이라고 볼 수 있겠습니다.</p>
+<h2>마치며...</h2>
+<p>소개 글이라서, RESTful하고 다른 점 정도만 언급하였습니다. 다음 포스팅에서 조금 더 자세하게 살펴 보도록 하겠습니다. 차기 주제는 아마도 다음과 같이 진행될 것 같습니다.</p>
+<ul>
+<li>Schema</li>
+<li>Connection &amp; Paging</li>
+<li>Mutation</li>
+<li>Testing</li>
+<li>GraphQL Client : Relay</li>
+</ul>

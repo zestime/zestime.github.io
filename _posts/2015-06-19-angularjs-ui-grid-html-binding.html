@@ -1,0 +1,96 @@
+---
+layout: post
+title: ui-grid에서 html binding 하기
+date: 2015-06-19 19:21:22.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- AngularJS
+- Javascript
+tags:
+- "$sce"
+- AngularJS
+- ng-html-binding
+- ui-grid
+meta:
+  _edit_last: '1'
+  _wpcom_is_markdown: '1'
+  dsq_thread_id: '4019167774'
+  _wp_old_slug: angularjs-ui-grid%ec%97%90%ec%84%9c-html-binding-%ed%95%98%ea%b8%b0
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<p>요즘, angular world에 빠져 살고 있습니다. 이렇게 블로그를 하는 것도 정말 오랜만이네요. 바쁘다는 핑계로 통 포스팅을 못하고 지냈네요. Soft Skills 에 자극받아, 미루기만 하던 포스팅을 해보려고 합니다.</p>
+<h2>Introduction</h2>
+<p>먼저, 상황을 부연드리겠습니다. angular 기반의 <abbr title="Single Page Application">SPA</abbr>를 제작하고 있습니다. 대부분의 프로젝트가 그러하듯, 여러가지 library를 가져다 사용하고 있습니다. tinymce에서 작성한 글을 ui-grid 상에 표현해야하는 일이 생겼습니다. tinymce는 유명한 wysiwyg이니 별다른 부연이 없어도 될것 같네요. 문제는, angular 상에, tinymce에서 작성한 HTML을 보여주어야 한다는 점이었습니다.</p>
+<h2>ng-bind-html</h2>
+<p>어렵게 생각할 필요 없습니다. 이미, 우리의 대부분의(거의 95%) needs는 이미 누군가의 의해서 개발되어 있습니다. angular에는 내장된 directive가 있습니다. 바로, <a href="https://docs.angularjs.org/api/ng/directive/ngBindHtml">ng-bind-html</a> 이라는 녀석입니다.</p>
+<h4>Attempting to use an unsafe value in a safe context.</h4>
+<p>이건 또 무슨 소리지? 막상, binding을 해보면 위와 같은 오류를 만나게 됩니다. 안전하지 않은 것에 관심없지만, angular는 못하겠다고 하네요. angular source를 열어보면 다음과 같습니다.</p>
+<pre><code class="javascript">  this.$get = ['$injector', function($injector) {
+
+    var htmlSanitizer = function htmlSanitizer(html) {
+      throw $sceMinErr('unsafe', 'Attempting to use an unsafe value in a safe context.');
+    };
+</code></pre>
+<p>htmlSanitizer를 만드는데, 무조건 에러가 나도록 되어 있는 코드를 만난 것입니다. 어떻게 하던, 여기까지 오게 되면 $sceMinErr를 피할 수 없다는 뜻의 코드입니다. 근데, 저 $sce는 뭘까요?</p>
+<h2>$sce (Strcit Contextual Escaping)</h2>
+<p>안전하지 않은 코드를 안전하게 만들기 위해서는,  $sce를 이용해야 합니다. <a href="https://docs.angularjs.org/api/ng/service/$sce#show-me-an-example-using-sce-">예제</a>에서 보는 것 처럼,</p>
+<pre><code class="javascript">self.explicitlyTrustedHtml = $sce.trustAsHtml(
+        '&lt;span onmouseover="this.textContent="Explicitly trusted HTML bypasses ' +
+        'sanitization.""&gt;Hover over this text.&lt;/span&gt;');
+</code></pre>
+<p>$sce.trustAsHtml을 통하여, safe한 코드라는 것을 angular에게 알려주어야 합니다. 이런 번거로운 절차가 있는 것은, 보다 안전하게 html, js, css와 같은 resource를 접근하기 위해서입니다. 만약, 보안상의 이유로 이러한 bind를 사용하고 싶지 않다면, $scmProvier를 통해, disable 시켜주면 되겠습니다.</p>
+<pre><code class="javascript">angular.module('myAppWithSceDisabledmyApp', []).config(function($sceProvider) {
+  // Completely disable SCE.  For demonstration purposes only!
+  // Do not use in new projects.
+  $sceProvider.enabled(false);
+});  
+</code></pre>
+<h2>ng-bind-html in ui-grid</h2>
+<p>지금까지, bind를 열심히 째려본 탓은 grid에 사용하기 위함이었습니다. <a href="http://ui-grid.info/">ui-grid</a>는 ng-grid의 최신 버전입니다. 버전 2.x대에 비해서, 많은 기능들이 바뀌었습니다. 그래도, 근본적인 구조는 동일합니다. ng-bind-html을 사용하기 위해서, columnDefs에 custom template을 선언해주어야 합니다. 예를 들면, 다음과 같습니다.</p>
+<pre><code class="javascript">vm.gridOption = {
+  data: 'vm.data',
+  columnDefs: [
+    {
+      field: "memo", width: '50%', 
+      enableColumnMenu: false, enableSorting: false,
+      cellTemplate: '&lt;div class="ui-grid-cell-contents" title="TOOLTIP"&gt;&lt;p ng-bind-html="grid.getCellValue(row, col)"&gt;&lt;/p&gt;&lt;/div&gt;'
+    },
+    ...
+  }
+</code></pre>
+<p>custom cell template을 정의하였습니다. 보시는 것처럼, 해당 열의 값은 <code>grid.getCellValue(row, col)</code>을 통해서 가져오게 됩니다. 가져온 내용은 당연히, HTML Markup 이기에 위의 코드는 unsafe value 오류가 나게 됩니다. 앞에서 본 $sce를 사용합니다.</p>
+<pre><code class="javascript">  columnDefs: [
+    {
+      field: "memo", width: '50%', 
+      enableColumnMenu: false, enableSorting: false,
+      cellTemplate: '&lt;div class="ui-grid-cell-contents" title="TOOLTIP"&gt;&lt;p ng-bind-html="$sce.trustAsHtml(grid.getCellValue(row, col))"&gt;&lt;/p&gt;&lt;/div&gt;'
+    },
+    ...
+  }
+</code></pre>
+<p>물론, 이렇게 작성해도 아무것도 나오지 않습니다. 여기에는, ui-grid에서 제공하는 scope과 관련이 있습니다. ui-grid 내부에서 사용하는 scope은 외부와 단절되어 있기 때문에, appScopeProvider를 사용해서 접근할 수 있는 함수를 제공합니다.</p>
+<pre><code class="javascript">  appScopeProvider: {
+    trustAsHtml: function (data) {
+      return $sce.trustAsHtml(data);
+    }
+  },  
+  columnDefs: [
+    {
+      field: "memo", width: '50%', 
+      enableColumnMenu: false, enableSorting: false,
+      cellTemplate: '&lt;div class="ui-grid-cell-contents" title="TOOLTIP"&gt;&lt;p ng-bind-html="grid.appScope.trustAsHtml(grid.getCellValue(row, col))"&gt;&lt;/p&gt;&lt;/div&gt;'
+    },
+    ...
+  }
+</code></pre>
+<p>최종적으로 소스는 위와 같은 모양이 되었습니다. 실행시켜 보면, 정상적으로 HTML이 표현되는 것을 보실 수 있습니다.</p>
+<p><a href="http://blog.kusweet.com/wp-content/uploads/2015/06/Screen-Shot-2015-06-19-at-7.14.22-pm.png"><img src="{{ site.baseurl }}/assets/Screen-Shot-2015-06-19-at-7.14.22-pm.png" alt="Screen Shot 2015-06-19 at 7.14.22 pm" width="545" height="120" class="alignnone size-full wp-image-774" /></a></p>
+<h2>Closing</h2>
+<p>국내에는 얼마나 angular-ui 쪽을 사용하는 분이 계시는지 모르겠네요. 관심있으신 분들이 있을 수도 있으니, 당분간의 javascript와 angular 쪽으로 포스팅을 하도록 하겠습니다.</p>

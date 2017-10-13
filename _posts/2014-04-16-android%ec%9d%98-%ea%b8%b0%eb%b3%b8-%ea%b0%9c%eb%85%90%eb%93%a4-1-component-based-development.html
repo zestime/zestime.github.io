@@ -1,0 +1,65 @@
+---
+layout: post
+title: Android의 기본 개념들 - 1. Component Based Development
+date: 2014-04-16 22:50:22.000000000 +09:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- activity
+- android
+- broadcasting receiver
+- cbd
+- content provider
+- intent
+- service
+meta:
+  _edit_last: '1'
+  dsq_thread_id: '4021253032'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h1>0. Introduction</h1>
+<p>좋은 기회가 생겨, 안드로이드에 대해 공부하게 되었습니다. 아는게 미천하지만, 조금씩 정리해 볼까 합니다. 처음 살펴볼 내용은, 안드로이드를 꿰뚫는 기본적인 개념들입니다.</p>
+<h1>1. CBD (Component Based Development)</h1>
+<p>'컴포넌트 기반 개발방법'이라는 조금 오래된 개발 방법론입니다. 프로그래밍을 조금 해보신 경험이 있다면, 컴포넌트가 무엇인지 대충 아시리라 생각됩니다. 간단히 말해, 프로그램을 여러 부품의 조합으로 보자는 접근입니다. 예를 들면, 자동차가 엔진, 차체, 새시로 이루어졌다고 했을 때, 이러한 구성적 접근을 하는 것이 CBD가 되며, 각 구성 요소들은 Component라고 하게됩니다. 이러한 CBD는 실은 SoC(Separation of Concerns)를 강조하는 방법론으로, 재사용성과 느슨한 결합에 초점을 맞춘 설계 방법입니다.</p>
+<p>문제는 Android가 철저하게 CBD를 따르고 있다는 점입니다. CBD의 재밌는 점은, 철저하게 시스템에 의하여 각 Component의 Life Cycle의 결정된다는 점입니다. 즉, User Code에서 Component의 생성이나 제어를 할 수 없는데, 이는 loose coupling을 위해 모두 System에게 넘겨버렸기 때문입니다. 간단히 말씀드려, Class이지만 new와 같은 키워드로 생성할 수 없습니다. 이로 인해, 많은 부분들이 단순화되고 일관적인 접근을 할 수 있게 됩니다.(물론, 군더더가 아예 없는 것은 아닙니다.)</p>
+<h1>2. Components</h1>
+<p>그렇다면, Android에는 어떤 종류의 Component가 존재할까요? Android의 주요 Component는 다음과 같습니다.</p>
+<ul>
+<li>Activity</li>
+<li>Service</li>
+<li>Content Provider</li>
+<li>Broadcast Receiver</li>
+</ul>
+<p>이미, 아시는 분들에게는 너무나도 간단한 개념들입니다만, 모르시는 분들을 위해서 간단히 부연하도록 하겠습니다.(차후에, 제대로 포스팅을 하도록 하죠.)</p>
+<h3>1) Activity</h3>
+<p>Activity는 간단히 말씀드려, View입니다. Android에서 화면 상으로 보여지는 모든 것들은 Activity라고 보시면 되겠습니다. Launcher의 경우에도, Launcher App의 하나의 Activity를 보시는 것에 지나지 않습니다.</p>
+<p>[caption id="attachment_376" align="alignnone" width="384"]<a href="http://blog.yondoni.com/wp-content/uploads/2014/04/google-experience-launcher-on-nexus-4.png"><img class="size-full wp-image-376" alt="google-experience-launcher-on-nexus-4" src="{{ site.baseurl }}/assets/google-experience-launcher-on-nexus-4.png" width="384" height="640" /></a> Launcher App의 하나의 Activity[/caption]</p>
+<p>Android 화면에 무언가를 나타내기 위해서는 무조건 Activity를 통해야 한다고 생각하시면 되겠습니다. 화면에 보여지는 모든 Control들은 View를 상속받아 구성되어지며, Activity를 이러한 View를 화면에 뿌려주는 역활을 하게 됩니다. WinForm 프로그래밍을 해 보셨다면, Form의 일종이라고 생각히면 쉽게 이해하실 것 같습니다.</p>
+<h3>2) Service</h3>
+<p>서비스는 말 그대로, Window Service와 비슷합니다. 즉, Background Process와 같이 동작합니다. 재밌는 것은, Activity와 구별되기 위해서라도, View와 관련된 요소는 전혀 포함되지 않습니다. 즉, 화면을 구성할 수 없습니다. 이런 서비스는 주로, Montoring을 위해서 많이 사용되게 됩니다. 특정 Event 감시나, 혹은 지속적으로 대기해야 하는 프로세스와 같은 형태를 구현하는 경우에 유용합니다. 여기서, 특정 Event라는 것은 서버와 통신을 하는 등의 특별한 경우를 지칭합니다. 일반적인 Event인 전화가 온다거나 화면을 끄는 상황에 대해서는 Broadcasting Receiver를 이용하게 됩니다. Service는 사실 작성하기 어렵습니다. 코드 자체가 어려운 것이 아니라, 좋은 App이 되기 위해서 신경써야 하는 부분이 많다는 이야기입니다. Service가 효율적으로 운용되지 않으면, 배터리 소모를 야기하는 등, 문제의 소지가 많습니다.</p>
+<h3>3) Broadcasting Receiver</h3>
+<p>앞서 언급한 것처럼, 일반적인 Event를 처리하기 위해서 효율적으로 Event를 주고 받는 방법입니다. 만약에, 모두가 Service를 만들어서 Phone의 상황을 감시한다면, Service가 넘쳐나게 되고 이로 인해 Phone의 자원이 낭비될 것입니다. 계속 감시하는 것이 아니라, Event가 발생했을 때 알려주는 구조로 작동한다면 자원을 더욱 효율적으로 사용할 수 있습니다. 맞습니다. Publisher/Subscriber의 관계로 구성하는 것입니다. 예를 들어, 문자가 오면 알려달라고 Callback 함수 같은 걸 메모해 두면, 나중에 문자가 왔을 때 시스템이 메모를 읽어서 알려주는 방법입니다.</p>
+<h3>4) Content Provider</h3>
+<p>Content Provider는 약간 위의 이야기랑은 다른 이야기입니다. App들 간의 Data를 주고 받기 위해, 필요한 Component입니다. 실제로, 주소록을 연동한다거나 갤러리의 사진을 가져오기 위해서는 Content Provider를 통해서 Data를 받아오게 됩니다. 다른 App에게 Data를 제공하기 위해서 구현하게 되는데, 제공할 데이타가 없다면 구현하지 않으셔도 되겠습니다.</p>
+<h1>3. Intents</h1>
+<p>마지막으로, 살펴 볼 녀석은 Intent입니다. Intent를 번역하면 '의도'라는 뜻입니다. 예를 들어, 주소록App의 경우, 주소 리스트에서 하나를 선택하면 상세 주소가 나타납니다. 이러한 '상세 주소를 보여줘'라는 '의도'가 있는 셈입니다. 서로 다른 View이니 당연히 다른 Activity이며, 이러한 Activity간의 이어주는 녀석이 바로 Intent입니다. 이런 Intent가 필요한 이유는, CBD 때문입니다. CBD에서 Component를 직접적으로 생성할 수 없습니다. 시스템에게 우리의 의도를 알려주고, 시스템이 해당하는 Activity를 띄워주도록 되어있기 때문입니다. 이런 Intents에는 3가지가 존재합니다.</p>
+<ul>
+<li><em>Explicit Intent 명시적 인텐트</em> : 특정 class를 지칭하는 경우 입니다. App 내부에서 사용하는 경우에는 class를 알 수 있으므로, 간편하게 이용됩니다.</li>
+<li><em>Implicit Intent 암시적 인텐트</em> : 특정 class를 지칭하는 것이 아니라, 어떤 행동을 하는 Activity를 찾는 경우에 사용하게 됩니다. 당연히, 여러 개가 선택될 수 있으며, 여러 개가 있는 경우에는 사용자에게 어떤 것을 사용할 것인지 묻게 됩니다.(안드로이드 유저라면, 한 번 쯤은 보셨을 것 같네요.)</li>
+<li><em>Broadcasting Intent 브로드캐스팅 인텐트</em> : Broadcasting Receiver를 등록할 때 사용되는 Intent를 가리킵니다. 앞서 말씀드린 것 처럼, Receiver는 Event에 반응하게 되어 있는데, 그 Event 기술할 때 사용합니다.</li>
+</ul>
+<h1>4. Closing</h1>
+<p>지금까지, Android의 기본 개념들을 살펴 보았습니다. 살짝, 개념을 잡을 수 있도록 간략히 기술하였기에, 각각의 Component에 대해 조금 더 심도 있게 살펴 보는 기회를 갖도록 하겠습니다.</p>
+<h1>5. References</h1>
+<ul>
+<li><a href="http://en.wikipedia.org/wiki/Component-based_software_engineering">Component-based software engineering</a> - CBD에 대한 Wikipedia 해설, 영어</li>
+<li><a href="http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern">Publish-Subscribe Pattern</a> - Wikipedia의 게시-구독 패턴 해설, 영어</li>
+</ul>
+<p>&nbsp;</p>

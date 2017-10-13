@@ -1,0 +1,63 @@
+---
+layout: post
+title: Counting a number of line for any file on Bash
+date: 2013-01-17 16:00:35.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Computer
+tags:
+- bash
+- counting
+- loc
+- wc
+meta:
+  _edit_last: '1'
+  dsq_thread_id: '4429733662'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<p><!--:KO--></p>
+<h1>소개</h1>
+<p>가끔 내가 하는 프로젝트가 몇 줄짜리 프로그램인지 궁금할 때가 있다. LoC(Line of Code)가 프로그램을 말하는 것은 아니지만, LoC의 추세는 프로젝트의 방향성을 알 수 있는 척도이다. 갑자기, LoC가 많이 늘어난다면, Smelly Code의 유입이 의심스러운 것이다.</p>
+<h1>준비물</h1>
+<ul>
+<li>Bash shell : Bash는 아름답다.</li>
+<li>find : 찾으려는 파일 리스트를 만들어야 한다.</li>
+<li>wc : line, word, character counting 프로그램이다.</li>
+</ul>
+<h1>결론</h1>
+<p><span class="lang:sh decode:true  crayon-inline">wc -l `find . -type f -name '*.h' -o -name '*.m'`</span></p>
+<p>위의 한 줄이면, 원하는 결과를 얻을 수 있다. 대략, 이런 식으로 나타납니다.<a href="http://blog.kusweet.com/wp-content/uploads/2013/01/Screen-Shot-2013-01-17-at-1.44.48-PM.png"><img class="alignnone wp-image-415 size-full" src="{{ site.baseurl }}/assets/Screen-Shot-2013-01-17-at-1.44.48-PM.png" alt="Screen-Shot-2013-01-17-at-1.44.48-PM" width="979" height="672" /></a></p>
+<p>&nbsp;</p>
+<p>위의 쉘 명령어는 2개의 명령어를 한번에 사용하였습니다.</p>
+<ul>
+<li><strong>find . -type f -name '*.h' -o -name '*.m'</strong>
+<ul>
+<li><strong>-type</strong> : 찾으려는 대상의 type입니다. 여기선, 파일(f)로 찾았지만, 디렉토리(d)등으로 찾으실 수 있습니다.</li>
+<li><strong>-name</strong> : 이름에 대한 패턴을 사용하겠다는 의미입니다. 대소문자 구별을 위해, -iname이라는 옵션도 있습니다.</li>
+<li><strong>'*.h'</strong> : 실제, 이름에 대한 패턴입니다. 정규식을 사용하셔도 됩니다.</li>
+<li><strong>-o</strong> : Logical OR입니다. 즉, 위의 명령은 확장자가 h 혹은 m인 경우를 찾게 됩니다.</li>
+</ul>
+</li>
+<li><strong>wc -l `expression` </strong>
+<ul>
+<li><strong>-l</strong> : line 단위로 count한다는 의미입니다.</li>
+<li><strong>`exp`</strong> : 입력이 될 file list를 정의하는 부분입니다. 그냥, 파일명을 사용하셔도 되나, 여기서 find의 결과를 사용하기 위해서 <strong>`</strong>를 사용해서 명령어를 넘겨 주었습니다.</li>
+</ul>
+</li>
+</ul>
+<p>이렇게, 간단하지만 종종 기억이 안나 애를 먹습니다. ^^;</p>
+<h1>Reference</h1>
+<ul>
+<li>http://stackoverflow.com/questions/4040313/find-file-ending-with-sh-or-bin : find명령어의 OR 사용하기</li>
+<li>http://stackoverflow.com/questions/1412244/use-find-wc-and-sed-to-count-lines : wc에 `exp`를 활용하는 Case</li>
+</ul>
+<p><!--:--><!--:en--></p>
+<h1></h1>
+<p><!--:--></p>

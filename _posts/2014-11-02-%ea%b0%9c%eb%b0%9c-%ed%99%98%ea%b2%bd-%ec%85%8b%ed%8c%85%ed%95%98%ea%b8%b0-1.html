@@ -1,0 +1,247 @@
+---
+layout: post
+title: 개발 환경 셋팅하기 1 - 기본
+date: 2014-11-02 00:50:51.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Mac
+tags:
+- Developper
+- Environment
+- Karabiner
+- mac
+- Seil
+- tmux
+- Vim
+- 개발 환경
+meta:
+  _edit_last: '1'
+  dsq_thread_id: '4020257389'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h4>Introduction</h4>
+<p>미뤄오던 맥의 개발환경을 설치하기로 하였습니다. Yosemite가 출시되면서, 바뀐 점도 있고 해서, 최신 버전에 맞게 개발 환경을 만들어 봅시다. 이 모든 글은, http://fredkelly.net/articles/2014/10/19/developing_on_yosemite.html 을 바탕으로 진행되었습니다.</p>
+<h4>나랑 안맞는 기능들 끄기</h4>
+<p>Mac에서 Default로 제공되는 기능들이 나랑 잘 맞는 건 아닙니다. 일단 몇가지를 꺼보죠.</p>
+<pre class="lang:default decode:true"># 키를 누르고 있을 때, 입력되는 것을 막습니다.
+defaults write -g ApplePressAndHoldEnabled -bool false
+
+# Finder에서 파일 찾기를 할 때, 현재 폴더를 기준으로 찾게 해줍니다.
+# 원래는 맥 전체에서 검색을하죠.
+defaults write com.apple.finder FXDefaultSearchScope -string "SCcf"
+
+# Finder에 하단에 현재 폴더 위치를 같이 표시합니다.
+defaults write com.apple.finder ShowPathbar -bool true
+
+# Finder 하단에 상태 표시줄을 표시합니다. 파일 개수, 총 사이즈가 표시됩니다.
+defaults write com.apple.finder ShowStatusBar -bool true
+
+# 사파리의 Debug 메뉴를 활성화 시킵니다.
+defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
+
+# 컨텍스트 메뉴에, Web Inspector를 추가합니다.
+defaults write NSGlobalDomain WebKitDeveloperExtras -bool true
+
+# Library 폴더를 보이게 합니다.
+chflags nohidden ~/Library</pre>
+<h4>Homebrew 변경 하기</h4>
+<p>package를 관리하는 프로그램을 설치합니다. port도 많이 사용하지만, Homebrew를 선택했습니다.</p>
+<pre class="lang:default decode:true "># 먼저, brew를 설치합니다. 다
+$ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+# brew가 잘 설치되었는지, 확인을 합니다.
+$ brew doctor
+
+# cask를 설치해 봅니다.
+$ brew install caskroom/cask/brew-cask</pre>
+<h4>zsh 설치하기</h4>
+<p>언젠가부터, bash를 쓰는 사람들이 별로 없더군요. 다들, zsh으로 넘어갔습니다. zsh가 편하니까, 당연한건가요?</p>
+<pre class="lang:default decode:true"># brew를 이용해서, 간단하게 설치
+$ brew install zsh
+
+# oh-my-zsh는 zsh를 더욱 사용하기 쉽게 만들어줍니다.
+$ curl -L http://install.ohmyz.sh | sh</pre>
+<p>&nbsp;</p>
+<h4> Vim를 최신 버전으로</h4>
+<p>필요하다면, Vim도 최신 버전으로 판올림을 해 줍니다. Vundle도 같이 설치하겠습니다. Vundle은 Vim의 Plug-in 관리 도구입니다.  자세한 내용은 https://kldp.org/node/125263를 참조 하시면 되겠습니다.</p>
+<pre class="lang:default decode:true"># 최신 버전의 vim을 설치합니다.
+$ brew install vim
+
+# vundle을 설치합니다.
+$ git clone https://github.com/gmarik/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+</pre>
+<p>.vimrc는 원래 입맛에 맞게 쓰는 거지만, 없으시다면 다음의 내용을 참고하세요. 잘하시는 분들은, github에 올려 놓고 쓰시더라구여... 저는 훔쳐왔어요.</p>
+<pre class="lang:default decode:true ">set nocompatible              " be iMproved, required
+filetype off                  " required
+
+" highlighting
+set relativenumber
+syntax on
+set background=dark
+set cursorline
+
+" tabbing
+set expandtab
+set shiftwidth=2
+set softtabstop=2
+
+" folding settings
+set foldmethod=indent
+set foldnestmax=10
+set nofoldenable
+set foldlevel=1
+
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+" let Vundle manage Vundle, required
+Plugin 'gmarik/Vundle.vim'
+Plugin 'altercation/vim-colors-solarized'
+Plugin 'airblade/vim-gitgutter'
+Plugin 'kien/ctrlp.vim'
+
+" All of your Plugins must be added before the following line
+call vundle#end()            " required
+filetype plugin indent on    " required
+
+colorscheme solarized
+let g:solarized_termcolors=256</pre>
+<p>위의 스크립트로 .vimrc를 생성합니다. vim을 실행시켜 보면, 당연히, 잘 안됩니다. vim 내에서, <em>:BundleInstall</em> 을 실행시켜서 plug-in을 마저 설치해주셔야 합니다.</p>
+<h4>tmux 설치하기</h4>
+<p>tmux는 간단히 표현하면, 향상된 screen이다. 이런 류의 프로그램은 Terminal을 작업 환경을 좀 관리하기 쉽게 해준다. 적어도, 서버가 재시작되기 전까지는 이전의 작업 내용을 독립된 세션으로 이어갈 수 있도록 해주는 역활을 한다. Terminal 작업이라는게, 사실 여러 목적으로 인해 다중 환경을 구성하게 되고 이렇게 만들어진 작업 공간을 매번 생성하는 일은 번거롭다. 그런 어려움을 해결하기 위해서 우리는 이런 프로그램을 이용하는 것이다. 자세한 설명은, <a href="http://nodeqa.com/nodejs_ref/99">http://nodeqa.com/nodejs_ref/99</a> 를 참고하시기 바랍니다.</p>
+<pre class="lang:default decode:true"># 일단, 설치를 해야겠죠
+$ brew install tmux
+
+# tmux와 Mac OSX 문제 해결을 위해 사용 https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard
+$ brew install reattach-to-user-namespace</pre>
+<p>&nbsp;</p>
+<p><span style="line-height: 1.5;">reattch-to-user-namespace는 정말로 유용한 프로그램입니다. tmux를 사용하면서 Mac OSX에서 작동하지 않는 pbpaste와 pbcopy를 위해, 꼭 설치해야 하는 프로그램입니다.</span></p>
+<pre class="lang:default decode:true "># Start new session
+new-session
+
+# Set prefix to Ctrl-Space
+unbind C-b
+set -g prefix C-Space
+bind Space send-prefix
+
+# https://github.com/ChrisJohnsen/tmux-MacOSX-pasteboard
+set-option -g default-command "reattach-to-user-namespace -l zsh"
+# uncomment for copy/paste functionality
+#bind C-c run "tmux show-buffer | reattach-to-user-namespace pbcopy"
+#bind C-v run "reattach-to-user-namespace pbpaste | tmux load-buffer - &amp;&amp; tmux paste-buffer"
+
+# Use vi keys
+set -gw mode-keys vi
+
+# 256 colour support
+set -g default-terminal "screen-256color"
+
+# Show activity in background windows
+setw -g monitor-activity on
+
+# Start window/pane numbers from 1
+set -g base-index 1
+set -g pane-base-index 1
+
+# Set window titles
+set -g set-titles on
+
+# Switching panes
+bind h select-pane -L
+bind j select-pane -D
+bind k select-pane -U
+bind l select-pane -R
+
+# resize panes
+bind-key -r J resize-pane -D 5
+bind-key -r K resize-pane -U 5
+bind-key -r H resize-pane -L 5
+bind-key -r L resize-pane -R 5
+
+# Fixes for ssh-agent
+set -g update-environment "SSH_ASKPASS SSH_AUTH_SOCK SSH_AGENT_PID SSH_CONNECTION"
+
+# 1.9 open new panes in $PWD
+bind '"' split-window -c "#{pane_current_path}"
+bind % split-window -h -c "#{pane_current_path}"
+bind c new-window -c "#{pane_current_path}"
+
+# Status bar
+set -g status-bg black
+set -g status-fg white
+set -g status-interval 10
+set -g status-left-length 50
+set -g status-left "#[fg=green][#I:#P #W] #(whoami)@#(hostname -s)"
+set -g status-right "#[fg=colour45]%a %d/%m %H:%M#[fg=default]"
+
+# last window
+bind m last-window</pre>
+<p>이 파일은 서두의 Freddy의 블로그에서 제시된 내용입니다. 마지막에 이전 윈도우에 대한 키만 추가했습니다.</p>
+<h4>VirtualBox, Vagrant 설치하기</h4>
+<p>작업 환경의 분리를 위해서 반드시 필요한 프로그램이죠. <a href="https://www.virtualbox.org/wiki/Downloads">VirtualBox</a>로 가상 환경을 구성하고, <a href="https://www.vagrantup.com/downloads.html">Vagrant</a>를 설치해서 terminal에서 쉽게 가상 환경을 이용할 수 있도록 구성합니다.</p>
+<h4>CapsLock 변경하기</h4>
+<p>&nbsp;</p>
+<p>caps lock를 ctrl키로 변경해서 사용하겠습니다. 물론, terminal에서만 사용할 생각입니다. 과정은 생각보다 복잡한데, <a href="https://pqrs.org/osx/karabiner/index.html.en">karabiner</a>와 <a href="https://pqrs.org/osx/karabiner/seil.html.en">seil</a>이 필요합니다.</p>
+<ol>
+<li>[System Preferences] - [Keyboad] 에서 'Modifier Keys'에서 Caps Lock 키를 <em>No Action</em> 으로 변경합니다.</li>
+<li>Seil을 이용해서, Caps Lock의 Key Code를 PC Application Key인 110번으로 교체합니다.</li>
+<li>Karabiner를 열어, <em>Application key to CapsLock</em>에 체크합니다.</li>
+<li>그리고, [Misc &amp; Uninstall] 탭으로 이동해, <em>Open private.xml </em>버튼을 이용해, xml 파일을  엽니다. 파일을 아래의 내용으로 교체합니다.
+<pre class="lang:default decode:true">&lt;?xml version="1.0"?&gt;
+&lt;root&gt;
+  &lt;replacementdef&gt;
+    &lt;replacementname&gt;CAPS_IS_CONTROL_APPS&lt;/replacementname&gt;
+    &lt;replacementvalue&gt;TERMINAL, ITERM2, VI, EMACS&lt;/replacementvalue&gt;
+  &lt;/replacementdef&gt;
+  &lt;replacementdef&gt;
+    &lt;replacementname&gt;WINDOWS_KEY_APPS&lt;/replacementname&gt;
+    &lt;replacementvalue&gt;VirtualBoxVM&lt;/replacementvalue&gt;
+  &lt;/replacementdef&gt;
+
+  &lt;appdef&gt;
+    &lt;appname&gt;ITERM2&lt;/appname&gt;
+    &lt;equal&gt;com.googlecode.iterm2&lt;/equal&gt;
+  &lt;/appdef&gt;
+
+  &lt;appdef&gt;
+    &lt;appname&gt;EMACS&lt;/appname&gt;
+    &lt;equal&gt;org.gnu.Emacs&lt;/equal&gt;
+  &lt;/appdef&gt;
+
+  &lt;appdef&gt;
+    &lt;appname&gt;VirtualBoxVM&lt;/appname&gt;
+    &lt;equal&gt; org.virtualbox.app.VirtualBoxVM &lt;/equal&gt;
+  &lt;/appdef&gt;
+
+  &lt;item&gt;
+    &lt;name&gt;Caps Lock is Command in terminal applications&lt;/name&gt;
+    &lt;identifier&gt;private.appdef&lt;/identifier&gt;
+    &lt;only&gt;{{ CAPS_IS_CONTROL_APPS }}&lt;/only&gt;
+    &lt;autogen&gt;--KeyToKey-- KeyCode::PC_APPLICATION, KeyCode::CONTROL_L&lt;/autogen&gt;
+  &lt;/item&gt;
+  &lt;item&gt;
+    &lt;name&gt;Changed Command, Option to Option in VirtualBox&lt;/name&gt;
+    &lt;identifier&gt;private.appdefwindows&lt;/identifier&gt;
+    &lt;only&gt;{{ WINDOWS_KEY_APPS }}&lt;/only&gt;
+    &lt;autogen&gt;--KeyToKey-- KeyCode::COMMAND_L, KeyCode::OPTION_L&lt;/autogen&gt;
+    &lt;autogen&gt;--KeyToKey-- KeyCode::OPTION_L, KeyCode::COMMAND_L&lt;/autogen&gt;
+    &lt;autogen&gt;--KeyToKey-- KeyCode::OPTION_R, KeyCode:: PC_APPLICATION &lt;/autogen&gt;
+  &lt;/item&gt;
+&lt;/root&gt;</pre>
+<p>간단한 내용입니다. iTerm2, emacs에 대해서, PC Application Key를 Control 키로 대체한다는 내용입니다. [Change Key]에서 Reload XML을 통해, 추가된 옵션에 체크합니다.</li>
+</ol>
+<h4>Atom 설치하기</h4>
+<p>Sublime Text도 좋습니다. 자주 사용하는 Tool인데, 이번에는<a href="https://atom.io/"> Atom</a>으로 넘아가고 싶어요. 어차피 가끔 사용하는 Editor라 큰 무리는 없을꺼에요. 대세를 따르는 인생이니까, 자자, 설치해서 차근차근 사용해보도록 하죠.</p>
+<h4>Browser 설치하기</h4>
+<p>우리는 좋아하는 브라우저가 적어도 하나 이상은 있는 사람들입니다. 하지만, 제품은 누구든지 사용할 수 있어야 하니까, 모든 브라우저가 필요합니다. Safari는 당연히 있으니까, Firefox와 Chrome 을 설치합니다. IE는 어떻하죠? <a href="https://www.modern.ie/en-us/virtualization-tools#downloads">modern.IE </a>를 통하면, 우리도 사용해 볼 수 있습니다. 앞의 VirtualBox를 건너 뛰지만 않으셨다면 말이죠.</p>
+<h4>Closing...</h4>
+<p>대충, 필요한 어플리케이션을 설치해 봤습니다. 사실, 중간 중간 크게 다루어야 할 어플리케이션도 있었지만, 오늘만 날인가요. 혹시, 궁금하시면 더 리뷰해보도록 하겠습니다. 감사합니다.</p>
+<p>&nbsp;</p>

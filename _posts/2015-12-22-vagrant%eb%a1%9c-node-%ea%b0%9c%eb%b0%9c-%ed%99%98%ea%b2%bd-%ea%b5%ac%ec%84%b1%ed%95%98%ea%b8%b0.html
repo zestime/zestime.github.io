@@ -1,0 +1,137 @@
+---
+layout: post
+title: vagrant로 node 개발 환경 구성하기
+date: 2015-12-22 13:35:52.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Linux
+tags: []
+meta:
+  _wpcom_is_markdown: '1'
+  _edit_last: '1'
+  dsq_thread_id: '4424133840'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h2>Intro</h2>
+<p>vagrant를 이용해서, 작업 공간을 구성하는 방법에 대해서 살펴보겠습니다. 주 사용 환경이 오염되거나 Collision 같은 문제의 소지가 있다면, Virtual Machine을 이용하여 실행 환경을 분리할 수 있습니다. 다만, 지나친 분리는 오히려 불편을 유발하기에, 오늘 살펴볼 내용은 vagrant를 이용하여, 개발 편의적 가상 환경을 구성하는 방법에 대해서 살펴 보겠습니다.</p>
+<h2>Before...</h2>
+<p>당연한 말씀이지만, VirtualBox를 필수로 설치하셔야 합니다. 그리고 <a href="https://www.vagrantup.com/downloads.html">vagrant</a>를 설치합니다. 정상적으로 설치되었다면, -v으로 버전을 확인해 봅니다.</p>
+<pre>
+> vagrant -v
+Vagrant 1.8.0
+</pre>
+<h2>box</h2>
+<p>아시다시피, vagrant는 box를 기반으로 동작합니다. box는 윈도우 ISO 이미지 같은 것이라고 생각하시면 되겠습니다. 다만, 윈도우 ISO는 설치가 필요하지만, box는 설치된 하드 드라이브의 이미지라고 볼 수 있겠습니다. 즉, box만 있으면 설치 과정 없이 해당 OS를 바로 사용할 수 있습니다. 많은 분들이 이미 쓸만한 box를 미리 작업해 두셨습니다. 필요한 box는 <a href="https://atlas.hashicorp.com/boxes/search">여기</a>에서 찾을 수 있습니다. box의 설치는 다음과 같습니다.</p>
+<pre>
+# 설치된 box 확인
+> vagrant box list  
+There are no installed boxes! Use `vagrant box add` to add some.
+
+# 'ubuntu/trusty64'라는 box 설치하기
+> vagrant box add ubuntu/trusty64
+==> box: Loading metadata for box 'ubuntu/trusty64'
+...
+==> box: Successfully added box 'ubuntu/trusty64' (v20151217.0.0) for 'virtualbox'!
+</pre>
+<h2>init</h2>
+<p>설치된 box를 이제 직접 사용해 보겠습니다. 새로운 폴더를 만들고, <code>vagrant init</code> 명령으로 <em>Vagrantfile</em>을 생성합니다. <em>Vagrantfile</em>은 VM(Virtual Machine)에 대한 설정(Configuration을 담고 있는 파일입니다.)</p>
+<pre>
+> vagrant init
+A `Vagrantfile` has been placed in this directory. You are now
+ready to `vagrant up` your first virtual environment! Please read
+the comments in the Vagrantfile as well as documentation on
+`vagrantup.com` for more information on using Vagrant.
+</pre>
+<p><code>vagrant init hashicorp/precise64</code>와 같이, box의 이름을 같이 주셔도 됩니다. box을 이름을 주게 되면, 생성되는 Vagrantfile의 <code>config.vm.box</code>에 주어진 값이 설정될 뿐입니다.</p>
+<h2>Vagrantfile</h2>
+<p>VM을 사용하는데, 필수적인 부분은 설정할 사항들이 많다는 점입니다. 하나의 머신에서 2개의 OS가 동작하기에, 서로 간의 데이타 연동이나 외부에서의 접근같은 부분들을 설정할 필요가 있습니다.</p>
+<h4>config.vm.box</h4>
+<p>사용하려는 box를 설정합니다. 어떤 box를 사용하는지 기입합니다. 만약, init 명령시에 box 이름을 주었다면 이미 설정되어 있습니다.</p>
+<h4>config.vm.network</h4>
+<p>한 번은 꼭 설정할 필요가 있는 network입니다. port forwarding은 물론, 특정 IP 할당과 같은 일을 할 수 있습니다. VirtualBox를 기준으로 설정할 수 있는 모든 network setting은 여기에서도 가능합니다. 저의 경우에는, 포트 포워딩을 할 예정이므로 다음과 같이 설정합니다.</p>
+<pre>
+config.vm.network "forwarded_port", guest:8080, host:18080
+</pre>
+<p>위의 설정은, guest OS(VM으로 돌아갈 OS)의 8080 포트를 host OS(바탕이 되는 OS)의 18080 포트로 접근할 수 있도록 해 줍니다.</p>
+<h4>config.vm.synced_folder</h4>
+<p>guest OS는 host OS와 전혀 다른 Disk를 사용합니다. 엄연히 분리되어 있는 OS이기에, 서로의 연결 고리가 없습니다. 소스코드와 같은 공동으로 사용할 파일들은 어떻게 해야 할까요? 두 곳에 다 복사하고 싱크를 맞춰야 할까요? 양자간의 sharing folder의 역활을 하는 것이, synced_folder입니다.</p>
+<pre>
+config.vm.synced_folder "../workbench/angular-tdd", "/vagrant_data"
+</pre>
+<p>눈치채셨겠지만, host OS에 있는 angualr-tdd라는 폴더가 guest OS의 vagrant_data에 mount되게 됩니다. 원 소스 멀티 OS인 셈입니다.^^</p>
+<h4>config.vm.provision</h4>
+<p>여러 머신에 동일한 GuestOS를 만든다고 할 때, Vagrantfile만 가지고 손 쉽게 동일한 설정을 할 수 있음을 눈치채셨을 것 같습니다. 지금까지 소개한 기능은 VM의 hardware적인 설정이라면, provision은 software에 대한 설정이라고 할 수 있습니다. box 자체는 bare에 가깝기에, 운용하려는 환경에 맞게 필수 소프트웨어를 설치해야만 합니다.(물론, 이를 다 설치해서 docker로 배포할 수도 있겠습니다만...)</p>
+<pre>
+ config.vm.provision "shell", inline: <<-SHELL
+    sudo apt-get update
+    sudo locale-gen en_GB.UTF-8
+    sudo -u vagrant mkdir /home/vagrant/tmp
+    sudo apt-get install -y nodejs npm
+    sudo npm install -g bower gulp karma
+    sudo ln -s /usr/bin/nodejs /usr/bin/node
+ SHELL
+</pre>
+<h3>In my case</h3>
+<p>저의 경우에는, 다음과 같이 설정하였습니다.</p>
+<pre>
+Vagrant.configure(2) do |config|
+  config.vm.box = "ubuntu/trusty64"
+
+  config.vm.network "forwarded_port", guest: 8080, host: 18080
+  config.vm.network "forwarded_port", guest: 8081, host: 18081
+
+  config.vm.synced_folder "../../workbench/angular_tdd", "/vagrant_data"
+
+  config.vm.provision "shell", inline: <<-SHELL
+    sudo apt-get update
+    sudo locale-gen en_GB.UTF-8
+    sudo -u vagrant mkdir /home/vagrant/tmp
+    sudo apt-get install -y nodejs npm
+    sudo ln -s /usr/bin/nodejs /usr/bin/node
+    sudo npm install -g bower gulp karma
+  SHELL
+end
+</pre>
+<h2>up</h2>
+<p>설정을 마쳤으면, 이제 실행할 차례입니다. 실행은 간단합니다. <code>vagrant up</code>이라고 입력하면, VM이 수행하는데 필요한 일들을 진행하게 됩니다.</p>
+<pre>
+> vagrant up
+Bringing machine 'default' up with 'virtualbox' provider...
+==> default: Importing base box 'ubuntu/trusty64'...
+...
+==> default: Forwarding ports...
+    default: 8080 (guest) => 18080 (host) (adapter 1)
+    default: 8081 (guest) => 18081 (host) (adapter 1)
+    default: 22 (guest) => 2222 (host) (adapter 1)
+...
+==> default: Mounting shared folders...
+    default: /vagrant => /Users/kp/workspace/vagrant/trusty
+
+> 
+</pre>
+<p>실행을 마치면, 다시 프롬프터로 돌아오게 됩니다. 실행되고 있는 지 확인하는 방법은 <code>vagrant status</code>를 이용하는 방법입니다.</p>
+<pre>
+> vagrant status
+Current machine states:
+
+default                   running (virtualbox)
+</pre>
+<p>vagrant에 의한 실행은, headless VM(화면이 제공되지 않는 Virtual Machine)이기에 어딘가에서 돌고 있다고 믿을 수 밖에 없습니다.^^ 기억하셔야 하는 내용은 <code>halt</code>(VM 종료), <code>destroy</code>(VM 삭제)가 되겠습니다.</p>
+<h2>ssh</h2>
+<p>실제로, Guest OS에 진행하기 위해서는 ssh를 사용해야 합니다. 위의 port forwarding에서 설정하지 않았던 22 port가 자동적으로 2222로 바인딩된 연유이기도 합니다. 가상의 서버에 접근하듯 ssh를 통해서, 해당 Guest OS를 사용합니다.</p>
+<pre>
+> vagrant ssh
+Welcome to Ubuntu 14.04.3 LTS (GNU/Linux 3.13.0-74-generic x86_64)
+
+vagrant@vagrant-ubuntu-trusty-64:~$
+</pre>
+<p>위와 같은 메세지를 만나실 수 있습니다. 이미, 필요한 package들은 provision을 통해서 설치가 되었기에, 사용만 하시면 되겠습니다.</p>
+<h2>End...</h2>
+<p>Study 모임에서, Window 환경에서 Node 운영이 어려워, 격리된 환경을 구성해 보았습니다.</p>

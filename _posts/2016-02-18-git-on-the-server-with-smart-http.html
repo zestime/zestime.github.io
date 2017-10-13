@@ -1,0 +1,92 @@
+---
+layout: post
+title: Git on the server with Smart HTTP
+date: 2016-02-18 14:02:55.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Computer
+tags:
+- git
+- git server
+- smart http
+- visual studio
+meta:
+  _wpcom_is_markdown: '1'
+  _edit_last: '1'
+  dsq_thread_id: '4589217333'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h2>Before...</h2>
+<p>모처럼 C#으로 개발할 일이 생겼습니다. Visual Studio 2015를 설치하고, git 저장소에 접속하려고 하는데 <code>The SSH protocol is not supported</code>라는 메세지가 나왔습니다. shell에서는 아무런 문제없이 사용하던 저장소였는데, Visual Studio랑 연동이 안되는 것이 었습니다. 조금 찾아 보니, Visual Studio는 SSH를 자체를 지원하지 못한다고 하네요. 그래서, HTTP로 접근 가능 하도록 update-server-info를 이용해서 HTTP 접근이 가능하도록 조치했습니다. 그랬더니, 이제는 <code>early EOF</code> 오류를 보이기 시작했습니다. 결론적으로 말씀드리면, Visual Studio는 <strong>Smart HTTP</strong>에 대한 접근만 허용한다고 합니다. 그냥 HTTP는 안되고 <strong>Smart HTTP</strong>만 된다는 것인데, 그게 뭐죠?</p>
+<h2>Smart HTTP</h2>
+<p>Smart HTTP란, git-http-backend라고 일컫는 CGI Script를 이용한 HTTP 통신을 뜻합니다. git-http-backend는 git이 설치될 때, git-core같은 폴더에 위치하고 있습니다. 이를, apache와 같은 web server에 올려서, 제공하면 되겠습니다.</p>
+<h2>Settings</h2>
+<h3>directory &amp; initialize</h3>
+<p>저장소를 꾸릴 위치를 지정해야겠죠. 또한 적절한 권한도 주어야 합니다. <code>/opt</code> 하위에 위치 시킬 생각이고, <code>estimation</code>이라는 프로젝트를 만들어 보겠습니다.</p>
+<pre><code>(by admin or sudo)
+$ mkdir /opt/git 
+$ cd /opt/git
+$ git init --bare estimation
+$ chown -R _www:_www /opt/git
+</code></pre>
+<p>관리자 권한이 필요한 일이라서, sudo로 작업하서야 합니다. 내용은 간단한데,</p>
+<ul>
+<li><strong>git init --bare</strong> : git repository를 생성하는 명령어 입니다. <strong>--bare</strong>는 평소 .git 의 내용이 상위 폴더에 저장된다고 생각하시면 되겠습니다. server에서는 직접적인 소스 작업을 할 필요가 없기 때문에, bare level로 만들게 됩니다.</li>
+<li><strong>chown -R _www:_www</strong> : 소유자와 그룹을 지정합니다. <strong>_www</strong>는 mac에서의 web 계정입니다.</li>
+</ul>
+<h3>install apache</h3>
+<p>apache가 필요로하는데, linux같은 경우에는 <code>apt-get</code>으로 설치하면 되겠습니다. 저의 경우에는 mac-mini였는데, mac은 이미 apache을 가지고 있습니다. System Preperences(환경 설정)에서 Sharing(공유)에 들어가시면, web sharing이라는 게 있습니다.(el capitan에는 안보이네요.) 체크를 활성화 시키면, 사실은 <code>apachectl start</code>명령(<code>service apache2 start</code> in linux)을 수행하는 것과 같습니다.</p>
+<h3>httpd.conf</h3>
+<p>apache를 사용하시면, httpd.conf를 통해 설정을 하게 됩니다. smart HTTP를 제공하기 위해서, git-http-backend를 사용하려면 당연히 conf파일을 수정해야 합니다. 다만, 오염의 우려가 있으니, <code>/etc/apache2/others/</code>에 별도의 conf 파일을 만들도록 하겠습니다. git.conf를 작성하기 전에, httpd.conf도 조금 수정되어야 합니다. 다음의 mod를 허용시켜주셔야 합니다. 주석만 풀어주시면 됩니다.</p>
+<p><code>cgi, alias, env, rewrite</code></p>
+<h3>git.conf for apache</h3>
+<p>git.conf를 작성할 차례입니다.</p>
+<pre><code>SetEnv GIT_PROJECT_ROOT /opt/git
+SetEnv GIT_HTTP_EXPORT_ALL
+</code></pre>
+<p>먼저, 환경 변수를 설정합니다. git 저장소의 root 폴더를 설정합니다. <code>GIT_HTTP_EXPORT_ALL</code>은 git-http-backend가 모든 repository를 접근할 수 있다는 뜻 입니다. 그렇지 않은 경우에는,</p>
+<pre><code>/opt/git/path/to/repository.git/git-daemon-export-ok
+</code></pre>
+<p>처럼, 처리해 주어야만 사용할 수 있습니다.</p>
+<p>그런 다음에는 CGI 스크립트를 등록합니다.</p>
+<pre><code>ScriptAlias /git/ /Applications/Xcode.app/Contents/Developer/usr/libexec/git-core/git-http-backend/
+</code></pre>
+<p>윈도우라면, <code>C:/Program Files/Git/libexec/git-core/git-http-backend.exe/</code>이런 식이 될 것 입니다.</p>
+<p>이후에는, Rewrite mod에 대한 내용을 작성합니다. 이는, URI에 대한 처리를 담고 있습니다.</p>
+<pre><code>RewriteEngine On
+RewriteCond %{QUERY_STRING} service=git-receive-pack [OR]
+RewriteCond %{REQUEST_URI} /git-receive-pack$
+RewriteRule ^/git/ - [E=AUTHREQUIRED]
+</code></pre>
+<p>URI에 git-receive-pack이 포함되어 있다면, 인증이 필요함을 설정하고 있습니다. 마지막으로, <code>&lt;Files&gt;</code> 디렉티브를 이용해서 git-http-backend을 설정합니다.</p>
+<pre><code>&lt;Files "git-http-backend"&gt;
+    AuthType Basic
+    AuthName "Git Access"
+    AuthUserFile /opt/git/.htpasswd
+    Require valid-user
+    Order deny,allow
+    Deny from env=AUTHREQUIRED
+    Satisfy any
+&lt;/Files&gt;
+</code></pre>
+<p><strong>.htpasswd</strong>라는 파일을 만들어서 허용된 리스트를 관리하는 아주 간단한 인증을 넣었습니다. 여기에 속한 사람만이 commit을 할 수 있게 되는 셈입니다. <strong>.htpasswd</strong>를 만드는 방법은 아주 간단합니다.</p>
+<pre><code># -c : a option of creating file
+$ htpasswd -c /opt/git/.htpasswd newUser 
+</code></pre>
+<h2>Closing</h2>
+<p>이상, 아주 간단한 Smart HTTP를 지원하는 git을 구성했습니다.<br />
+git.conf의 전문은 아래와 같습니다.</p>
+<p>[gist id="250bc083bcefbfec54de"]</p>
+<h2>References</h2>
+<ul>
+<li><a href="http://stackoverflow.com/questions/2085402/what-does-git-update-server-info-do">What does git update-server-info do?</a></li>
+<li><a href="https://git-scm.com/book/en/v2/Git-on-the-Server-Smart-HTTP">Git-on-the-Server-Smart-HTTP</a></li>
+<li><a href="https://developer.apple.com/library/prerelease/mac/documentation/Darwin/Reference/ManPages/man1/git-http-backend.1.html">git-http-backend in Mac</a></li>
+</ul>

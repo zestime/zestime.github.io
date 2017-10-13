@@ -1,0 +1,50 @@
+---
+layout: post
+title: Type Convert using Generic Type
+date: 2014-07-14 08:09:51.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- C#
+tags:
+- c#
+- convert
+- generic type
+- type parameter
+meta:
+  _edit_last: '1'
+  dsq_thread_id: '4213823245'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h1>Convert는 귀찮아!</h1>
+<p>Static Typing Language에서는 Compile Time에 적절한 Type이 결정되어야 합니다. 따라서, 적절한 Type임을 보장하기 위해서, 개발자는 Casting을 해야만 합니다. 그런데, 이게 생각보다 귀찮은 작업입니다.</p>
+<p>형변환은 주로, 값을 object에서 특정 type으로 변환하는 경우에 발생됩니다.예를 들어, 다음과 같이 object로 사용되는 value에 접근하는 경우입니다.</p>
+<pre class="lang:c# decode:true">DataRow row = table.Rows[0];
+string name = Convert.ToString(row["Name"]);
+int amount = Convert.ToInt32(row["Amount"]);</pre>
+<p>boxing과 unboxing에 대한 성능 문제를 꺼내지 않더라도, 이러한 코드는 좋은 코드라고 하기에는 어렵습니다. 이런 상황을 극복하려는 노력은 꽤 오래되었습니다.</p>
+<h1>Adding new methods</h1>
+<p>가장 간단한 방법은, Helper Method를 추가하는 방법입니다. 이러한 접근은 물론, 공통된 부분을 따로 분리해서 처리하기에 상당히 좋은 디자인이라 볼 수 있습니다.  예를 들면, 다음과 같은 형태로 사용하게 됩니다.</p>
+<pre>DataRow row = table.Rows[0];
+RowHelper rowex = New RowHelper(row);
+string name = rowex.ToString("Name");
+int amount = rowex.ToInt32("Amount");</pre>
+<p>혹은, 다음과 같은 식형태 입니다.</p>
+<pre>DataRow row = table.Rows[0];
+string name = Convert.Row(row["Name"]).ToString();
+int amount = Convert.Row(row["Amount"]).ToInt();</pre>
+<p>변환에 드는 코드를 한쪽으로 모아둔 것은 물론 좋은 일입니다. 그 API를 사용하는 입장에서는 별반 달라진 것이 없다고 볼 수 있습니다. 여전히 각각의 형변환은 개별적으로 처리되고 있으며, 지원하는 Type이 늘어날 수록 개별 Method가 증가되어야 합니다.</p>
+<h1>Type Parameter</h1>
+<p>그러던 차에, C#에 Type Parameter가 생겼습니다. 아까 전에, Method 이름을 통해 구별하던 코드가 조금 더 유연해지는 순간입니다. 간단하게 생각하면, 그 이름을 하나의 매개 변수로 처리하게 되었다는 뜻 입니다. 일단, 코드를 살펴 보면...</p>
+<pre>DataRow row = table.Rows[0];
+string name = Convert.Row&lt;string&gt;(row["Name"]);
+int amount = Convert.Row&lt;int&gt;(row["Amount"]);</pre>
+<p>보다 간결해졌습니다. 하나의 Method를 이용하여, 대응하는 형변환이 가능해진 것 입니다.</p>
+<h1>마치며...</h1>
+<p>조금 더 나아가면, LINQ와 ORM Framework를 이용해서, 위의 형변환 자체를 할 필요가 없게 됩니다. 여기서는, Type Parameter에 대한 소개 정도로 이해해 주시면 고맙겠습니다.</p>

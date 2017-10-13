@@ -1,0 +1,101 @@
+---
+layout: post
+title: 하둡(Hadoop) 시작하기
+date: 2014-02-14 17:14:02.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Computer
+- Hadoop
+tags:
+- BigTable
+- hadoop
+- HDFS
+- M/R
+- MapReduce
+- Sandbox
+- 맵리듀스
+- 하둡
+meta:
+  _edit_last: '1'
+  dsq_thread_id: '4025164130'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h1>하둡(Hadoop) 시작하기</h1>
+<p><a href="http://hadoop.apache.org/"><img title="Scalable Distributed Computing" src="{{ site.baseurl }}/assets/hadoop-logo.jpg" alt="Hadoop" /></a></p>
+<p>빅 데이타(Big Data) 열풍에 우리 회사도 피해가진 못했습니다. 갑자기, 저도 Hadoop을 하게 되었네요. Hadoop을 시작하는 분들을 위해서, 간단한 삽질기 정도로 봐주시면 되겠습니다.</p>
+<p>&nbsp;</p>
+<h1>What is 'Hadoop'?</h1>
+<p>왜 Hadoop 로고에는 노란 코끼리가 있을까요? Hadoop이 코끼리 장난감이니까요. 엥? 개발자인 더그 컷팅의 이야기는 들어 보셨나요. Udacity에서 '<a href="https://www.udacity.com/course/ud617">Intro to Hadoop and MapReduce</a>' 1 강을 보시면, 인터뷰 장면이 있어요. 아들 장난감에서 시작된 이야기와 아들이 자랑스러워 한다는 이야기를 하더군요.</p>
+<p>이는 2003년으로 거슬러, '<a href="http://scholar.google.co.kr/scholar?hl=en&amp;q=MapReduce&amp;btnG=&amp;as_sdt=1%2C5&amp;as_sdtp=">MapReduce: Simplified Data Processing on Large Clusters</a>'라는 논문으로 시작됩니다. 2006년에 이르러 '<a href="http://scholar.google.co.kr/scholar?hl=en&amp;q=bigtable&amp;btnG=&amp;as_sdt=1%2C5&amp;as_sdtp=">Bigtable: A Distributed Storage System for Structured Data</a>'으로 무르익게 됩니다. 이는 다시, 2008년에 Hadoop을 출현시키게 되었고, BigData라는 커다란 흐름을 타고 순항하게 되었습니다. 이러한 이야기를 언급드린 것은, Hadoop을 이해함에 있어서도 동일하게 앞의 논문이 크게 작용하기 때문입니다.</p>
+<h2>Map/Reduce</h2>
+<p>Map/Reduce는 고차함수로 불리며, Functional Language에서는 보편적인 개념입니다. 함수와 리스트를 인자로 받아, Map은 각 인자에 함수를 적용시키는 역활을 하고 Reduce는 리스트를 함수의 인자로 사용하는데 함수의 결과를 다시 함수를 인자로 사용하게 됩니다.</p>
+<pre class="theme:vs2012 toolbar:2 lang:lisp decode:true">(map inc '(1 2 3 4 5))
+;; =&gt; (2 3 4 5 6)
+
+(reduce + '(1 2 3 4 5)
+;; =&gt; 15</pre>
+<p>즉, map은 또 다른 list를 생성하게 되고, reduce는 list를 취합하는 성격이 있습니다. 예를 들어, 단어를 세는(WordCount) 프로그램을 만든다고 하면, map은 단어 별로 분리하는 역활을 하고 reduce를 각 단어 별로 합산하는 역활을 수행하게 됩니다.</p>
+<h2>Map/Reduce Clustering</h2>
+<p>Clustering은 없던 개념이 아니라, 여러 대를 묶어서 하나 일을 할 수 있는 환경을 일컫습니다. Map/Reduce를 Clustering 환경에서 사용하자는 것이, 앞서 언급했던 '<a href="http://scholar.google.co.kr/scholar?hl=en&amp;q=MapReduce&amp;btnG=&amp;as_sdt=1%2C5&amp;as_sdtp=">MapReduce: Simplified Data Processing on Large Clusters</a>'논문의 내용입니다. 즉, map과 reduce를 하나의 PC에서 처리하는 것이 아니라, 병렬로 처리하는 것이 그 골자가 되겠습니다. 예를 들어. 아메리카노를 5잔 만드는데, 하나의 커피 머신이 아니라 5개의 커피 머신으로 뽑는다면 1잔을 뽑는 시간과 비슷하게 걸리게 됩니다. 너무나도 당연한 이야기죠.</p>
+<h2>HDFS and BigTable</h2>
+<p>그러나, 현실은 녹록치 않습니다. 컴퓨터가 하는 일은 커피를 만드는 일과는 다르니까요. 컴퓨터가 일하기 위해서는 input이 필요합니다. 즉, 무언가를 주어야하는데, 5대의 PC가 동일하게 모든 자료를 가진다면 엄청난 낭비입니다. 그렇다고 혼자 다 가지고 있다면 일처리가 더딜 수 밖에 없습니다. 이러한 가운데 있는 것이 BigTable입니다. 기존의 File System은 Clustering에 적합하지 않기 때문에, 새로운 형태의 자료 구조가 필요했습니다. Hadoop은 이를 HDFS(Hadoop Distribute File System)을 통해서 제공하게 됩니다. 그래서 HDFS는 기존의 File System과는 사뭇 다른 느낌을 주게됩니다.</p>
+<h1>당신은 누구...</h1>
+<p>Hadoop은 거대한 시스템 체계를 가지게 됩니다.(물론, 작게 시작해도 됩니다.) Hadoop을 사용하려면, 다음의 일을 염두에 두셔야 합니다. 두서없는 환경에서는 물론, 겸직할 수도 있겠지만, 관리자와 사용자를 분리하여 접근하시는 것이 업무를 나누고 효율적인 도입에 도움이 됩니다.</p>
+<ul>
+<li>Administrators (관리자)
+<ul>
+<li>설치</li>
+<li>시스템 모니터링 및 관리</li>
+<li>시스템 튜닝</li>
+</ul>
+</li>
+<li>End User (사용자)
+<ul>
+<li>Map/Reduce 프로그램 개발</li>
+<li>Workflow 관리</li>
+</ul>
+</li>
+</ul>
+<h1>어디서 부터...</h1>
+<p>일단, 환경을 갖추는 일자체도 시간이 많이 걸리게 됩니다.(차후에 다루겠습니다.) 그 보다는, 일단 하둡이 어떠한 시스템인지 알 수 있도록 VM을 이용하여 접해 보시기를 추천드립니다. Hadoop과 관련된 유명한 회사로는 Cloudera(클라우데라), HortonWorks(호튼웍스), MapR(맵알)이 있습니다. Hadoop을 이루는 기술들은 open source 이기에, 각 회사별로 배포판을 만들어 운용되고 있습니다. Cloudera에서 나오는 <a href="http://www.cloudera.com/content/cloudera/en/products-and-services/cdh.html">CDH</a>, HortonWorks에서 제공하는 <a href="http://hortonworks.com/products/hdp/">HDP</a>가 그 예가 되겠습니다. 이러한 배포판의 특징은 버전 간 호환성에 대해 어느정도 검증이 진행하여 안정성을 확보하였다고 볼 수 있습니다. 또한 자사의 배포판을 홍보하기 위해서 Virtual Machine을 제공해 주고 있습니다. 이를 이용하면, 간편하게 접할 수 있답니다.</p>
+<p><a href="http://hortonworks.com/products/hortonworks-sandbox/">http://hortonworks.com/products/hortonworks-sandbox/</a></p>
+<p>위의 링크는 HDP의 Sandbox의 링크입니다. 개발 환경의 오염을 방지하고자, VirtualBox에서 Import Appliance를 사용해서, 해당 이미지를 Local에 위치시킵니다. 이제부터는 Hadoop의 세상으로 접근하게 되는 거죠! 이미를 실행시키기 전에 다음의 셋팅이 필요합니다.</p>
+<ul>
+<li>Host-only adapter 추가하기<br />
+HOST에서 VM에 접근하기 위해서, 필요합니다.(VM의 NAT와 Host-only 이렇게 2개읜 LAN을 사용하게 됩니다.)</li>
+<li>Ram Size 조정하기</li>
+</ul>
+<p>VM을 실행시키면, Hadoop에서 사용되는 대부분의 Tool과 함께 작동되게 됩니다. SSH를 이용해서 접근하는데 이 때에는, Host-only로 설정한 LAN의 IP를 사용하면 됩니다. 이후에는, Hortonworks의 tutorial 이나 아래의 강좌를 따라해 보시길 추천드립니다.</p>
+<p>Cloudera도 마찬가지로 진행하실 수 있습니다. <a href="https://www.cloudera.com/content/support/en/downloads.html">Download</a> 페이지에 가시면 하단에 'Cloudera QuickStart VM'을 이용하시면 되겠습니다.(<a href="http://go.cloudera.com/vm-download">VM download link</a>) 개인적으로는 Cloudera가 시장에 더욱 적극적인 행보를 보이는 것으로 판단됩니다.</p>
+<h1>Reference</h1>
+<ul>
+<li>Papers
+<ul>
+<li><a href="http://scholar.google.co.kr/scholar?hl=en&amp;q=MapReduce&amp;btnG=&amp;as_sdt=1%2C5&amp;as_sdtp=">MapReduce: Simplified Data Processing on Large Clusters</a></li>
+<li><a href="http://scholar.google.co.kr/scholar?hl=en&amp;q=bigtable&amp;btnG=&amp;as_sdt=1%2C5&amp;as_sdtp=">Bigtable: A Distributed Storage System for Structured Data</a></li>
+</ul>
+</li>
+<li>Tutorials
+<ul>
+<li><a href="http://hortonworks.com/tutorials/">Get Started with Hadoop from Hortonworks</a></li>
+<li><a href="http://hadoop.apache.org/docs/r0.18.3/mapred_tutorial.html">MapReduce(WordCount) from Apache</a></li>
+</ul>
+</li>
+<li>Courses
+<ul>
+<li><a href="https://www.udacity.com/course/ud617">Intro to Hadoop and MapReduce - How To Process Big Data<br />
+</a>Cloudera에서 제공하고, 무료로 들을 수 있는 강의</li>
+<li><a href="http://www.informit.com/store/hadoop-fundamentals-livelessons-video-training-9780133392821">Hadoop Fundamentals LiveLessons (Video Training)<br />
+</a>Addison-Wesley Professional에서 제공하고, 안타갑게도 유료입니다. 저는 이 강의로 공부했네요</li>
+</ul>
+</li>
+</ul>
+<p><span class="openbook_wrapper1"><span class="openbook_cover1"><a href="http://openlibrary.org/books/OL24243585M/Hadoop"><img title="View this title in Open Library" src="{{ site.baseurl }}/assets/6391722-M.jpg" alt="Hadoop" /></a></span><span class="openbook_title1"> <a title="View this title in Open Library" href="http://openlibrary.org/books/OL24243585M/Hadoop">Hadoop: The Definitive Guide</a></span><span class="openbook_author1"><a title="View this author in Open Library" href="http://openlibrary.org/authors/OL6810899A/Tom_White">Tom White</a>; O'Reilly 2009</span><span class="openbook_links1"><a title="View this title at WorldCat" href="http://worldcat.org/isbn/0596521979">WorldCat</a>•<a title="View this title at LibraryThing" href="http://librarything.com/isbn/0596521979">LibraryThing</a>•<a title="View this title at Google Books" href="http://books.google.com/books?as_isbn=0596521979">Google Books</a>•<a title="Search for the best price at BookFinder" href="http://www.bookfinder.com/search/?st=xl&amp;ac=qr&amp;isbn=0596521979">BookFinder</a></span><span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rfr_id=info%3Asid%2Fblog.yondoni.com%3AOpenBook&amp;rft.genre=book&amp;rft.btitle=Hadoop&amp;rft.isbn=0596521979&amp;rft.au=Tom+White&amp;rft.pub=O%26%23039%3BReilly&amp;rft.date=2009"> </span></span></p>
+<p><span class="openbook_wrapper1"><span class="Z3988" title="ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Abook&amp;rfr_id=info%3Asid%2Fblog.yondoni.com%3AOpenBook&amp;rft.genre=book&amp;rft.btitle=Hadoop&amp;rft.isbn=0596521979&amp;rft.au=Tom+White&amp;rft.pub=O%26%23039%3BReilly&amp;rft.date=2009">3판까지 나왔고, 국내 번역서도 있습니다. </span></span></p>

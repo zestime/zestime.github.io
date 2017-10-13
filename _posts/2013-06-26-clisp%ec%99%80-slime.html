@@ -1,0 +1,65 @@
+---
+layout: post
+title: CLISP와 slime
+date: 2013-06-26 18:00:05.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Computer
+tags:
+- clisp
+- emacs
+- lisp
+- prelude
+- quicklisp
+- slime
+meta:
+  _edit_last: '1'
+  dsq_thread_id: '4109772981'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h1>Introduction</h1>
+<p>요즘, '만들면서 배우는 리스프 프로그래밍(Land of LISP)'을 보고 있어요. 처음에는 REPL로 예제를 따라하다, 도저히 불편해서 개발 환경을 찾아 보았죠. 그렇게 찾은 것이...</p>
+<p><strong>CLISP + emacs 24 + Prelude + quicklisp + slime</strong></p>
+<p>이라는 조합이 나왔습니다.</p>
+<p>과정은 상당히 간단하고, 색상 테마도 적용되는 등 바로 신세계로 갈 수 있다.</p>
+<h1>Install</h1>
+<ol>
+<li>당연하지만, emacs가 있어야 합니다. <a title="Emacs for Max OSX" href="http://emacsformacosx.com" target="_blank">GNU Emacs For Mac OSX</a> 에서 emacs를 다운로드 합니다.</li>
+<li>그리고, <a title="Prelude" href="http://batsov.com/prelude/" target="_blank">Prelude</a>를 설치합니다. 설정을 간편하게 해주는 확장 기능이라고 생각하시면 될거 같아요.</li>
+<li>Clisp를 설치합니다. 여러 방법이 있으니, 편하신 방향으로 하시면 됩니다.</li>
+<li>quicklisp를 다운받습니다.<br />
+curl -O http://beta.quicklisp.org/quicklisp.lisp<br />
+clisp -i quicklisp.lisp<br />
+위의 명령으로 다운 받은 파일을 Load합니다. REPL에서<br />
+(quicklisp-quickstart:install)<br />
+을 실행시킵니다. 안내에서 보시는 바와 같이,<br />
+(ql:add-in-init-file)<br />
+명령으로, 항상 quicklist가 로드되게 할 수 있습니다.</li>
+<li>이제는 slime을 설치하셔야 합니다. 이는 quicklisp으로 간단하게 진행하실 수 있습니다.<br />
+(ql:quickload "quicklisp-slime-helper")<br />
+실행시키면, 자동으로 slime이 설치됩니다.</li>
+<li>emacs에서 C-x C-m 으로 slime을 실행시키면, scbl을 찾게 됩니다. 이는 personal/personal.el 파일을 만들어, slime default lisp을 변경하셔야 합니다.<br />
+(setq slime-default-lisp 'clisp)<br />
+라고 추가합니다.(설치하시면, 해당 파일이 없는 경우가 있습니다. 만드셔서, 추가하시면 됩니다.)</li>
+</ol>
+<p>장황하지만, 간단하게 설치하실 수 있습니다.</p>
+<p>&nbsp;</p>
+<h1>Trouble Shooting</h1>
+<ul>
+<li>M-x slime-mode 가 보이지 않아요<br />
+~/.emacs.d/prelude-modules.el파일을 열어 common-lisp에 대한 주석을 제거합니다.</li>
+</ul>
+<p>&nbsp;</p>
+<h1>Reference</h1>
+<ul>
+<li>Setting up for Lisp on OSX - http://abizern.org/2013/03/31/setting-up-for-lisp-on-os-x/</li>
+<li>Prelude - http://batsov.com/prelude/</li>
+<li>Common Lisp와 Emacs, 그리고 slime 셋팅하기 - http://lisp-korea.wikispaces.com/IDE+for+Lisp</li>
+</ul>

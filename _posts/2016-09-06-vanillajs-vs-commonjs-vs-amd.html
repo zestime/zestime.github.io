@@ -1,0 +1,64 @@
+---
+layout: post
+title: Vanilla JS vs. Common JS vs. AMD
+date: 2016-09-06 18:45:23.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Javascript
+tags:
+- AMD
+- common js
+- vanilla js
+meta:
+  _wpcom_is_markdown: '1'
+  _edit_last: '1'
+  dsq_thread_id: '5122956024'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h2>Introduction</h2>
+<p>요즘, Marjin Haverbeke의 <a href="https://www.amazon.com/Eloquent-JavaScript-Modern-Introduction-Programming/dp/1593272820">Eloquent JavasSript</a>를 읽고 있습니다. 10. MODULES를 읽다가, 정리하고 싶었던 내용이 나왔기에, 각각에 대한 주석을 달아 봅니다. 사실, 블로그나 책을 보다 보면, 자주 언질이 나왔던 내용인데 대충 흘리듯이 지나치나면서, 언젠가 정리를 해야지 하면서 차일 피일 미뤘네요.</p>
+<h3>VanillaJS</h3>
+<p>바닐라JS에 대해서 이해하고 싶다면, 일단 <a href="http://vanilla-js.com/">공홈</a>부터 가야합니다.</p>
+<blockquote><p>
+Vanilla JS is a fast, lightweight, cross-platform framework<br />
+for building incredible, powerful JavaScript applications.</p></blockquote>
+<p>대문에 떡하니, 적어둔 글귀에 따르면 Vanilla JS는 빠르고 가벼우며 호환성이 좋은 프레임워크입니다. Download 섹션에서 필요한 내용을 선택하고 버튼을 누르면 동적으로 필요한 모듈만 포함된 라이브러리를 다운 받을 수 있습니다. 다만, 어떤 선택을 하시든 0 byte 파일이 다운됩니다. 사이트의 문제일 수도 있지만, 스크롤을 조금 더 내려서 Vanilla JS의 사용 예제를 살펴 봅니다. 어디선가 많이 본 듯한 API이며 문법입니다. 속도 비교 섹션을 보면, Vanilla JS가 얼마나 우수한지 알 수 있습니다. 유명한 라이브러리와는 비교가 안될 정도로 빠른 속도를 가집니다. 이렇게 우수한 성능의 자바스크립트 라이브러리가 문법은 기존의 자바스크립트와 같다니 놀랍지 않습니까?</p>
+<p>조금 더 살펴보기 위해서, 하단의 Further Reading 섹션에 있는 Documentation 링크를 확인하시면 더욱 놀라운 결과를 얻을 수 있습니다. 네, 맞습니다. MDN의 JavaScript를 보여줍니다. 링크가 잘못된게 아니라, 그게 Vanilla JS 입니다.</p>
+<p>Vanilla JS는 Anti-framework이라고 볼 수 있습니다. 순수한 JavaScript 사용 부흥 운동 같은 셈입니다. 사실, 자바스크립트만으로도 대부분의 일을 할 수 있기에, 굳이 라이브러리로 속도를 저해하고 코드를 복잡하게 만들지 않으려는 노력이라고 생각하시면 되겠습니다.</p>
+<p>한줄 요약 - Vanilla JS는 plain javascript without any frameworks.</p>
+<h3>CommonJS</h3>
+<p>CommonJS라고 말할 때는, Common에 주목할 필요가 있습니다. Common은 공통이라는 뜻이니, 브라우저간의 공통적인 JavaScript를 뜻하는 걸까요? 브라우저간의 자바스크립트가 다르다는 것은 있을 수 없는 일이죠.(EcmaScript 표준 문서에 따라 작성한 컴파일러이기에, 브라우저 API가 다를 수는 있어도 언어 자체가 달라서는 문제가 있겠죠.) Common 이라고 했던 것은 Server를 뜻했습니다. 지금은 NodeJS로 대변하는 Server Side JavaScript의 할아버지격이라고 생각하시면 되겠습니다.(Isaac Z. Schlueter, the author of npm) NodeJS 환경의 개발이지만, 통상적으로 CommonJS라고 불려졌기 때문에, 아직도 그 이름이 남아 있다고 생각하시면 되겠습니다.</p>
+<p>CommonJS가 언급되는 경우 중, 하나는 CommonJS가 모듈을 불러왔던 방식때문입니다. Browser에서는 당연히 다른 프레임워크나 모듈을 사용하기 위해서 <code>&lt;SCRIPT&gt;</code> 태그를 사용합니다. 하지만, Server Side는 그렇게 사용할 수 가 없었습니다. 그래서 고안되었던 것은 <code>require()</code> 구문이었습니다. require라는 전역 함수를 사용해서 필요한 라이브러리를 호출해서 사용했던 것이죠. 이러한 스타일은 여전히 NodeJS에도 남아 있으며, 이를 두고 CommonJS Style이라고 언급합니다.</p>
+<h3>AMD</h3>
+<p>AMD는 인텔사와 호각을 이루고 싶어하는 CPU 제작 회사가 아닙니다. AMD는 Asynchronous Module Definition을 약자입니다. 해석해 보면, '비동기적 모듈 정의 방식'으로 볼 수 있겠습니다. 브라우저에서 모듈을 호출하는 방식은 주로 ``태그를 사용하는 방식입니다. 이러한 방식은 당연히 언급된 모든 라이브러리를 불러와야 하기 때문에, 느려질 수 밖에 없습니다. 이러한 문제점을 해소하고자, 최소한 것들만 먼저 불러오고, 나머지 부분들은 필요로 하는 경우에 수행되도록 하는 것이 AMD방식입니다. 아래와 같이 <code>define()</code>이라는 함수를 통해, 모듈간의 의존성과 수행 시점을 결정하게 됩니다.</p>
+<pre><code class="javascript">define(["weekDay", "today"], function(weekDay, today) {
+  console.log(weekDay.name(today.dayNumber()));
+});
+</code></pre>
+<p>이러한 호출 방식은, requireJS나 기타 라이브러리에서도 제공하지만, Vanilla JS를 기반으로 구현한다면 다음과 같다.</p>
+<pre><code class="javascript">(function(i, s, o, g, r, a, m) {
+  i['GoogleAnalyticsObject'] = r;
+  i[r] = i[r] || function() {
+    (i[r].q = i[r].q || []).push(arguments)
+  }, i[r].l = 1 * new Date();
+  a = s.createElement(o),
+    m = s.getElementsByTagName(o)[0];
+  a.async = 1;
+  a.src = g;
+  m.parentNode.insertBefore(a, m)
+})(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+</code></pre>
+<p>초간단 AMD를 구현한 예제입니다. 보기가 조금 힘들어서 그렇지, 짧은 구문이라 쉽게 이해도 쉬운 것 같습니다. 간단히 설명하자면, 매개변수로 브라우저의 주요 객체와 주소 및 프로퍼티 이름을 받습니다. 그리고 script Element를 동적으로 만들고 주어진 주소로 셋팅합니다. 만들어진 element를 script 태그들 사이에서 제일 앞에 위치시킵니다.<br />
+물론, 중복되는 호출을 막고, 재사용되는 모듈의 형태를 가지기 위해서는 더욱 많은 코드가 필요하지만, 저것만으로도 충분히 작동하는 코드임에는 틀림이 없습니다. 간단한 코드임에도, 코드를 짧게 만들 수 있는 많은 팁도 내포하고 있기에, Code Golf에 좋아 보이네요. :)</p>
+<h2>Reference</h2>
+<ul>
+<li><a href="http://vanilla-js.com/">Vanilla JS</a></li>
+<li><a href="http://requirejs.org/docs/whyamd.html">Why AMD? on RequireJS</a> </li>
+</ul>

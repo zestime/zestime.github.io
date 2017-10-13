@@ -1,0 +1,57 @@
+---
+layout: post
+title: MVC와 MVP
+date: 2013-10-22 13:27:12.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Computer
+tags: []
+meta:
+  _edit_last: '1'
+  dsq_thread_id: '4043118178'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h1>0. Introduction</h1>
+<p>MVC라는 말을, 넘치도록 듣는 바람에 아무도 그 뜻을 모르는 분이 없을 거라 생각합니다. 웹은 으래 mvc라는 통념이 있을 정도입니다. 그리고, mobile쪽에서도 그 구분을 분명히하는 framework를 제공하고 있으니, 대부분 분들이 익히 잘 알고 있는 대중적인 개념으로 자리잡았다고 볼 수 있겠습니다. 저도 2007년에 cakePHP를 하면서 처음 접했습니다. 그 때는 효과성보다 규칙이 엄격해 난감한 적이 많았던 기억이 있습니다. 최근에 MVP에 대한 논의를 하면서, 이론적 학습이 선행되지 않아 남의 Code를 담습한 기억이 있습니다. 그래서라도, MVC를 좀 더 자세히 알아 볼까 합니다.</p>
+<h1>1. Model View Controller (MVC)</h1>
+<p>1970년에 나온 개념입니다. 맥킨토시로 유명한 제록스(Xerox Parc)에서 그 컨셉이 나왔으며, 80년대 들어서 smalltalk-80에 적용되었다고 합니다. 세상에는 역시 똑똑한 사람이 많다는 사실을 또 실감하네요. 당시, mvc는 다음과 같이 정의 되었습니다.</p>
+<ul>
+<li><strong>Controller</strong> - Model의 상태를 변경하기 위한 명령을 전달하는 역활을 합니다. 동시에, View를 변경시킬 수도 있습니다.</li>
+<li><strong>Model</strong> - Model은 data, business rules, logic등을 포합니다. 상태가 변경될 때 마다, View와 Controller에게 알려주어야 하는 의무가 있습니다.</li>
+<li><strong>View</strong> - Model로 부터 정보를 가져와 유저에게 보여주는 역활을 합니다.</li>
+</ul>
+<p>어떠신가요? 전통적인 MVC에서 대부분의 일은 Model이 하게 되고, Controller는 이름 그대로 Model과 View의 제어를 하게 됩니다. 이를 그림으로 나타내면...</p>
+<p>[caption id="" align="alignnone" width="200"]<a href="http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller"><img src="{{ site.baseurl }}/assets/200px-MVC-Process.svg.png" alt="" width="200" height="220" /></a> MVC Processes from Wikipedia[/caption]</p>
+<p>상당히, 깔끔하고 심플한 구조입니다. 각자의 책임이 명확하게 이루어져 있습니다. 그러나 Clinet의 구조가 복잡해짐에 따라, 위의 구조로서는 한계가 나타나기 시작합니다. 동시에, MVC가 진화되는 배경이 됩니다.</p>
+<h1>2. Model View Presenter (MVP)</h1>
+<p>자동화된 test와 separation of concerns(관심의 분리)를 위한 디자인 패턴입니다. MVP에서는 각각을 다음과 같이 정의합니다.</p>
+<ul>
+<li>Model - data를 정의하는 interface입니다.</li>
+<li>View - data를 보여주거나 유저의 명령을 전달하는 수동적인 interface입니다.</li>
+<li>Presenter - model과 view 사이에서, data를 가져오거나 가공하여 view에 전달하는 역활을 합니다.</li>
+</ul>
+<p>Presenter의 Logic의 정도에 따라서, 2개로 구분되어 집니다. Passive View와 Supervising Controller가 그것입니다.</p>
+<h4>1) Passive View<img class="alignright" title="Passive View" src="{{ site.baseurl }}/assets/Download?ProjectName=Claymore&amp;DownloadId=106762" alt="Passive View" width="267" height="329" /></h4>
+<p>모든 일이 Presenter에 의해서 이루어 집니다. 유저가 어떤 이벤트를 발생시키면, View는 아무것도 하지 않습니다. 다민, Presenter에게 알려주는 역활만 하게 됩니다. 이후, Presenter가 View의 상태를 변경하는 구조가 됩니다.</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<h4>2) Supervising Controller<img class="alignright" title="Supervising controller" src="{{ site.baseurl }}/assets/Download?ProjectName=Claymore&amp;DownloadId=106763" alt="Supervising controller" width="285" height="330" /></h4>
+<p>Passive View보다는 약간 더 자유로운 구조입니다. View나 Model이 약간의 interaction과 event를 허용하는 구조가 됩니다. 우측에서는 data-binding을 예를 들었는데요, Presenter를 거치지 않고, View-Model간의 Interaction을 허용했다고 볼 수 있습니다. Web-based architectures와 같이, View에서 특정 명령을 수행해야만 하는 구조라면, 이 패턴이 좀 더 적절하다고 합니다.</p>
+<h1>3. Reference</h1>
+<ul>
+<li><a href="http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller">http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93controller</a> - MVC?</li>
+<li><a href="http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter">http://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter</a> - MVP?</li>
+<li><a href="http://claymore.codeplex.com/wikipage?title=DOC_UNDERSTAND_MVP_PATTERN&amp;referringTitle=Documentation">http://claymore.codeplex.com/wikipage?title=DOC_UNDERSTAND_MVP_PATTERN&amp;referringTitle=Documentation</a> - Understand MVP pattern</li>
+<li><a href="http://blog.vuscode.com/malovicn/archive/2007/10/25/model-view-presenter-mvp-design-pattern-close-look-part-1-supervising-controller.aspx">http://blog.vuscode.com/malovicn/archive/2007/10/25/model-view-presenter-mvp-design-pattern-close-look-part-1-supervising-controller.aspx</a> - Supervising Controller</li>
+<li><a href="http://blog.vuscode.com/malovicn/archive/2007/11/04/model-view-presenter-mvp-design-pattern-close-look-part-2-passive-view.aspx">http://blog.vuscode.com/malovicn/archive/2007/11/04/model-view-presenter-mvp-design-pattern-close-look-part-2-passive-view.aspx</a> - Passive View</li>
+</ul>
+<p>&nbsp;</p>
+<p>&nbsp;</p>

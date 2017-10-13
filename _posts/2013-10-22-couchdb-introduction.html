@@ -1,0 +1,62 @@
+---
+layout: post
+title: CouchDB Introduction
+date: 2013-10-22 11:23:51.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Database
+tags:
+- couchdb
+- database
+- dbms
+- mongodb
+- nosql
+- rdbms
+meta:
+  _edit_last: '1'
+  dsq_thread_id: '4038443198'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h1>Introduction</h1>
+<p>업무 상, CouchDB에 대한 이해가 필요한 일이 생겼습니다. 간단히, CouchDB에 대해 정리해 보겠습니다.</p>
+<h1>What is CouchDB</h1>
+<p><img class="alignright" alt="" src="{{ site.baseurl }}/assets/couch.png" width="320" height="360" /> 맞습니다. 카우치(Couch)는 쇼파를 뜻합니다. 그래서 로고(logo)도 오른쪽과 같이 쇼파에 누군가가 기대어 있는 모습니다. 쇼파 디비라, 이게 무슨 뜻일까요?</p>
+<p>CoucbDB는 쉬운 사용과 웹을 완전히 감싸는 DB를 목적으로 개발되었습니다. No SQL이며, JSON Document형태로 데이타를 저장합니다. Map/Reduce와 HTTP API는 Javascript로 접근하게 됩니다. 2005년에 첫 릴리즈가 나왔으며, 2008년에 아파치 프로젝트가 됩니다.</p>
+<p>관계형 DB와는 다르게 CouchDB는 Table에 Data를 저장하지 않습니다. Data를 개별적인 JSON Document로 생각하고 저장합니다. 즉, Scheme free가 되겠습니다. 특징을 꼽아 보면, 다음과 같습니다.</p>
+<ul>
+<li>Written in : Erlang</li>
+<li>Main point : DB consisency, ease of use</li>
+<li>License : Apache</li>
+<li>Protocol : HTTP/REST</li>
+<li>Bi-directional replication</li>
+<li>VIews : embedded map/reduce</li>
+<li>Previous versions of documents are available</li>
+</ul>
+<p>다음의 사용에 좋다고 합니다.</p>
+<ul>
+<li>가끔 변경건이 발생되는 축적 데이타</li>
+<li>Data의 Version 정보가 중요한 경우</li>
+</ul>
+<p>그리고 눈여겨 보아야 할 점은, REST 방식이라는 점입니다. 어떤 Client던지, 손쉽게 접근할 수 있도록 HTTP/REST를 지원하는 것이죠. Driver가 언어나 환경에 종속적이라는 점을 생각해 볼 때, 상당한 장점이 됩니다.</p>
+<h1>MongoDB vs CouchDB</h1>
+<p>CouchDB를 애기하면서, 가장 많이 비교되는 DB가 MongoDB인 것 같습니다. 팀에서도 Mongo와의 차이에 대해서 많은 애기가 있었습니다. <a href="http://openmymind.net/2011/10/27/A-MongoDB-Guy-Learns-CouchDB/">http://openmymind.net/2011/10/27/A-MongoDB-Guy-Learns-CouchDB/</a> 에 따르면 다음의 차이가 있다고 합니다.</p>
+<h3>Protocol</h3>
+<p>앞에서 이미 애기했지만, MongoDB는 custom binary protocol을 사용합니다. 즉, Driver가 제공되어야만 사용할 수 있는 셈입니다. CouchDB는 HTTP/REST라고 말씀드렸습니다. 물론, MongoDB를 HTTP/REST로 씌울 수도 있습니다.</p>
+<h3>Organization</h3>
+<p>CouchDB의 컨셉은 간단합니다. '문서를 저장한다.' 즉, 문서 저장소의 역활이빈다. 그에 반해 MongoDB는 문서를 직접적으로 저장하기 보다는 그러한 저장소를 관리하는 형태입니다. 하나의 레이어가 더 있는 셈이죠.</p>
+<h3>Querying</h3>
+<p>MongoDB의 경우에는 'find'라는 명령으로 query를 하게 됩니다. 이는 RDBMS에서 SELECT ... WHERE과 별반 다르지 않습니다. 그러나, CouchDB는 조금 다르게 작동합니다. View에 대해서만 Query를 할 수 있으며, View는 MapReduce를 사용해서 만들어져야 합니다.</p>
+<p>&nbsp;</p>
+<h1>Reference</h1>
+<ul>
+<li><a href="http://en.wikipedia.org/wiki/CouchDB">http://en.wikipedia.org/wiki/CouchDB</a> - 정의 및 역사</li>
+<li><a href="http://kkovacs.eu/cassandra-vs-mongodb-vs-couchdb-vs-redis">http://kkovacs.eu/cassandra-vs-mongodb-vs-couchdb-vs-redis</a> - 다른 DB와의 비교</li>
+<li><a href="http://openmymind.net/2011/10/27/A-MongoDB-Guy-Learns-CouchDB/">http://openmymind.net/2011/10/27/A-MongoDB-Guy-Learns-CouchDB/</a> - MongoDB와 CouchDB간의 비교</li>
+</ul>

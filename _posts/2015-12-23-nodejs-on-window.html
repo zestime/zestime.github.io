@@ -1,0 +1,67 @@
+---
+layout: post
+title: Nodejs on Window
+date: 2015-12-23 11:25:20.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Javascript
+tags:
+- nodejs
+- window
+meta:
+  _wpcom_is_markdown: '1'
+  _edit_last: '1'
+  dsq_thread_id: '4426816000'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<p>node를 이용한 app을 만드는 경우, 꼭 OSX여야 하는 것은 아닙니다.(물론, 저는 OSX에서 하고 있습니다.^^ 제 취향 ㅋㅋ) Window에서 개발 시에 마주치는 어처구니들을, 삽질 예방 차원에서 간단히 정리했습니다.</p>
+<h2>Install</h2>
+<p>일단, node를 설치합니다.</p>
+<h4>nodejs latest</h4>
+<ul>
+<li><a href="https://nodejs.org/en/download/">download</a></li>
+</ul>
+<p>우리는 트렌드세터, 최신 버전을 설치합니다.</p>
+<h4>python 2.7.x</h4>
+<ul>
+<li><a href="https://www.python.org/downloads/">download</a></li>
+</ul>
+<p>node-gyp 문서에 따르면, 2.7.10이 좋다고 합니다. 저는 사정없이 2.7.11로 최신 버전을 설치했습니다. python을 설치하고 환경 변수로 <strong>PYTHON</strong>을 잡아 주셔야 합니다. 그래야, node가 PYTHON을 사용할 수 있겠죠. 다만, 환경 변수를 작성하 실 때에는 <em>'C:\Python27\python.exe'</em>와 같이, 실행할 파일로 설정합니다.</p>
+<h4>Git for windows</h4>
+<ul>
+<li><a href="https://git-scm.com/download/win">download</a></li>
+</ul>
+<p>git없이는 살기 어려운 세상이 다가오고 있습니다. 더구나, <strong>git bash</strong>는 오아시스같은 존재입니다.</p>
+<h2>Console</h2>
+<p>Window command-line은 정말, 쓰고 싶지 않습니다. 익숙한 shell 명령어는 들어 먹질 않고, zshell은 수준은 아니더라도 bash정도는 받쳐줘야 하는데 그마저도 어의치 않습니다. 그래서, 모든 작업은 <strong>git bash</strong>에서 할 생각입니다. 그렇지만, 못생긴건 여전하니 console emulator를 설치합니다.</p>
+<ul>
+<li><a href="http://sourceforge.net/projects/conemu/">ConEmu</a></li>
+<li><a href="http://cmder.net/">cmder</a></li>
+</ul>
+<p>둘 중에 아무거나 끌리는 녀석을 설치하면 됩니다. 둘 다 거의 비슷한 UI를 제공하고 있습니다. Startup task를 <strong>{Bash::Git bash}</strong>으로 설정하시면, 새로 실행하거나 tab을 추가 시킬 때에도 bash shell을 이용할 수 있습니다.</p>
+<h2>Trouble shooting</h2>
+<h3>ls - ??????</h3>
+<p>한글에 대해서, ??????라고 표시되는 경우가 있습니다. <em>--show-control-chars</em>라는 옵션을 주어 해결할 수 있습니다. alias로 잡으면 되는데, <code>~/.bashrc</code>에 다음을 추가합니다.(파일이 없다면, 생성하시면 됩니다.)</p>
+<pre>
+alias ls='ls --color --show-control-chars'
+alias ll='ls -l'
+alias la='ls -al'
+</pre>
+<h3>vi - syntax highlighting</h3>
+<p>git bash에서는 간단히 사용할 수 있도록 vim을 제공하고 있습니다. <code>C:\Program Files\Git\share\vim\vim74\syntax</code>에서 확인 해보면, syntax가 몇 가지 제공되지 않습니다. <a href="http://www.vim.org/download.php#pc">vim for window</a>을 설치하여, syntax를 복사하면 되겠습니다. 저의 경우에는, <code>C:\Program Files\Vim\vim74\syntax</code>의 내용을 <code>C:\Program Files\Git\share\vim\vim74\syntax</code>으로 복사였습니다.</p>
+<h3>vi - .vimrc</h3>
+<p>뭐, 이건 너무 당연한 거라... <code>~/.vimrc</code> 파일에 자신의 설정을 적어 둡니다. 예를 들면, 다음과 같습니다.</p>
+<pre>
+syn on
+set ts=2
+set ai
+set enc=utf8
+</pre>
+<p>syntax를 항상 적용시고, tab size는 2로 잡았으며, Auto Indent를 켰습니다. 마지막으로, 문서의 encoding은 UTF-8으로 설정하였습니다.</p>

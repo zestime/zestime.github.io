@@ -1,0 +1,106 @@
+---
+layout: post
+title: Libraries at Angular Projects
+date: 2016-06-24 19:31:49.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- AngularJS
+tags:
+- angualr-ui
+- angular
+- AngularJS
+- javascript
+- library
+- ui-bootstrap
+- ui-grid
+- ui-route
+meta:
+  _wpcom_is_markdown: '1'
+  _edit_last: '1'
+  dsq_thread_id: '4978787290'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h2>About Angular...</h2>
+<p>어쩌다 보니, 팔자에도 없던 angular를 거의 2년 가까이 사용하고 있습니다. 워낙, 좋은 튜토리얼이나 자료가 많기에 굳이 하나를 더 보탤 필요를 느끼지 못해, 포스팅은 안하고 살았는데... 문득, 돌이켜 보니 이런 저런 library에 대한 소개라도 남기는 것이 의미 있겠다는 생각을 했습니다. 그러니까, 번역글이나 튜토리얼보다는 angularjs를 사용하거나 도입하는데 가늠할 수 있도록 정리하고자 합니다. 업무로 제작한 프로그램은 실제 데스크탑 어플리케이션을 대체하려는 목적이었기에 부피나 범주가 꽤 큰 프로젝트였습니다. 그래서 사용된 library도 엄청나게 많았습니다. :)</p>
+<h2>오늘 살펴볼 Libraries</h2>
+<p>원래, Window Application을 제작된 기존 프로그램이 있었습니다. 사용자 경험의 전제이자 출발점이 Desktop Application인 셈이죠. 거기서 시작된 요구 사항들과 시간의 힘이랄까, 점차 쌓이더군요. 간단히 분류를 하려니, 애매해서 angular에 종속적인 녀석들과 아닌 녀석들로 구분해서 정리했습니다.</p>
+<h3>irrelevant Angular</h3>
+<p>먼저 살펴볼 내용은 angular와 상관없는 녀석들입니다. 언제든지 도움이 될 수 있는 녀석들이죠. 흐흐흐</p>
+<ul>
+<li>lodash : 좋죠. 좋다는 말밖에는... map과 reduce로 시작되는 FP(Functional Programming)을 성능으로나 사용성으로나 잘 만들어진 library입니다. underscore와 비슷하죠.</li>
+<li>pdfmake : 출력을 위한 pdf파일을 생성 도구</li>
+<li>moment : JavaScript의 시간 관리 히어로</li>
+<li>breezejs : client DAO를 관리하기 위해서 적용, 배가 배꼽보다 큰 느낌...(?)</li>
+<li>tinyMCE : Rich Text를 제공하기 위해서 선정한 WYSIWYG. 제공하는 events가 다양해서, costomize하기 좋았음</li>
+<li>jqPlot : 차트 라이브러리, 다만 jQuery 기반인데, 같이 사용함.</li>
+<li>font-awesome : 자잘한 아이콘은 font-AWESOME으로</li>
+<li>NanumBarunGothic : 동적 PDF 만들 때, 필요해서 전체적으로 사용</li>
+</ul>
+<h3>On the Angualr</h3>
+<ul>
+<li>UI Bootstrap : bootstrap의 angular version, 뷰의 기저에 해당</li>
+<li>UI Route : URI를 추상화하여 관리하는 routing lib.</li>
+<li>UI Grid : angular 위에 구현된 Grid</li>
+<li>angular ui tree : 단순한 트리가 아님, 여러 곳에 사용 가능하며 간단한 Grid도 대체 가능</li>
+<li>UI Select : 검색 가능한 예쁜 dropbox control.</li>
+<li>angular-bootstrap-contextmenu : 우클릭에서 사용할 컨텍스트 메뉴</li>
+<li>AngularJS-Toaster : 사용자에게 줄 토스트를 만들기 위해</li>
+<li>Angular Elastic : 자동으로 길이 조절되는 textbox를 원한다면...</li>
+<li>Angular-scorll : scroll 이벤트 처리하기 위해서</li>
+<li>Angular Hotkeys : 단축키를 처리하기 위한 lib.</li>
+<li>Angulartics : 사용자 경험을 수집하러, GA(Google Analytics)를 사용하려면</li>
+</ul>
+<p>하나씩 조금 더 친절하게 살펴 보겠습니다.</p>
+<h2>소회</h2>
+<h3><a href="https://lodash.com/">lodash</a></h3>
+<p>lodash가 없는 세상은 암흑이죠. underscore와 비슷하다고 많이들 애기하지만, 성능상 좋다고 stackoverflow에 답변글이 있습니다. 그리고, funtional programming language에서 사용하시던 map과 reduce의 인자 순서가 다릅니다. 이를 보완한 lodash.fp.js도 있습니다. 인자 순서가 왜 중요한지는 주변의 FP(Functional Programming)빠에게 물어보시면 되겠습니다.<br />
+Javascript로 FP를 하는데 있어, 중요한 library입니다. 조금 익숙해지시면 코드가 훨씬 간결하고 우아해 질 수도 있습니다. :)</p>
+<h3><a href="http://pdfmake.org/#/">pdfmake</a></h3>
+<p>Front에서 pdf를 만듭니다. 처음에 보고 한 줄기 광명처럼 느껴졌습니다. CEF(Chrome Embedded Framework)에서 출력을 제대로 지원하지 않기에, 이 방법으로 프로젝트를 진행할 수 있었습니다. 다만, 자체적인 Document Structure를 가지기에, Data 변환 작업이 수반되게 됩니다. 또, <code>vfs_font.js</code>라고 font 파일을 제공해 주어야 합니다. 특히나, 한글로 출력물을 만들기 위해선, 원하시는 폰트를 <code>vfs_font.js</code>으로 넘겨줘야 하죠. 한글 폰트가 꽤 크기에 부담스러운 작업일 수도 있습니다.</p>
+<h3><a href="http://momentjs.com/">moment</a></h3>
+<p>Javascript는 Date 관련 제공되는 API가 많이 부족합니다. 이러한 결핍이 코드를 산으로 보내게 되는데, 이 때 구원군이 moment입니다. 꽤 체계적이고 다양한 API set을 제공하기에, 시간을 다루는 일 따위는 엄청 쉽고 편한한 일로 생각되기도 합니다. moment 객체와 date 간의 형변환이 자주 발생되기 때문에, 가끔 닭짓같다는 생각이 들기도 합니다.</p>
+<h3><a href="http://www.getbreezenow.com/">breezejs</a></h3>
+<p>ClientDAO를 처리하기 위해서 도입했습니다. 당시에, PluralSight의 angular 강의를 찾다가, "Building Apps with Angular and Breeze"이라는 강의만 보지 않았어도... 존 파파 아저씨의 인상에 넘어갔다는 생각을 했을 때는, 이미 건널 수 없는 강을 지난 다음이었습니다. :) 모델 관리에 특화되어 있습니다. 학습 곡선은 다소 있으나, model define과 event 처리 같은 부분은 꽤 손쉽게 사용할 수 있습니다. Customization Level도 꽤 제공해 주었기에, CEF 위에서 잘 사용했던 것 같습니다.</p>
+<h3><a href="https://www.tinymce.com/">tinyMCE</a></h3>
+<p>자칭, 'The Most Advanced WYSIWYG'입니다. 요구 사항 중에, 특정 키워드에 대해서 자동으로 다른 Context로 대체되는 건이 있었는데, event가 세세하게 나뉘어 있는 덕분에 쉽게 해결할 수 있었습니다. tinyMCE를 직접적으로 사용하지는 않았고 <strong>directive</strong>로 만들어서 사용했는데, <a href="https://github.com/angular-ui/ui-tinymce">ui-tinymce</a>가 도움이 되었습니다. 특정 customization을 하기 위해서는 이 wrapper을 직접적으로 수정해야 하는데, 어떻게 수정할지 좋은 가이드 역활을 한다고 보는게 맞겠습니다.</p>
+<h3><a href="http://www.jqplot.com/">jqPlot</a></h3>
+<p>jQuery기반의 유명한 차트 라이브러리, jqPlot입니다. Angualr지만, 가감히 차트를 위해 jQuery도 같이 사용하고 있습니다. 기간도 오래되고 자료도 많아서, 사용하는데 별 어려움은 없었던 것 같습니다. 제가 궁금한 것은, StackOverflow에는 똑같이 있었던 점이 무척 신박했네요. 약간 무거운 감은 있습니다만, customization 수준은 정말 높았습니다.</p>
+<h3><a href="http://fontawesome.io/">font-awesome</a></h3>
+<p>아시는 분들은 다 아시는.. 그리고 이렇게 마음이 좋은 사람이 있다는 사실에 감사하게 만드는 Font-Awesome입니다. 무료 Dingbat으로 생각하시면 되겠습니다. View를 구성할 때, 텍스트가 아닌 간단한 Symbol로 의미를 전달하고 싶을 때, 찾게 되는 녀석입니다. 물론, 명확하게 의미가 구분되어야 한다면 디자이너에게 아이콘을 요청하는게 좋겠습니다. 폰트이기 때문에, 크기에 의한 계단 현상 같은 것도 없으며, 단일톤이기에 깔끔한 느낌이 주기도 합니다.</p>
+<h3><a href="https://github.com/hiun/NanumBarunGothic">Nanum Barun Gothic</a></h3>
+<p>나눔 바른 고딕입니다. 앞서 언급한 ,pdfmake에서 출력물을 만들 때 사용합니다. 사이즈가 크다는 것은 비밀입니다.</p>
+<h3><a href="http://angular-ui.github.io/bootstrap/">UI Bootstrap</a></h3>
+<p><em>(bower에서는 anuglar-bootstrap입니다.)</em></p>
+<p>이제부터는 본격 Angular 관련 라이브러리 입니다. bootstrap은 워낙 유명해서, 다들 아실 거라 생각됩니다. bootstrap 자체는, jQuery에 종속적이고, angular는 angular 나름의 DOM 조작하는 방법을 제공하기에, 2개의 library를 사용하는 것은 overkill입니다. jQuery의 의존성을 떨어 뜨리고, angular를 바탕으로 제작된 bootstrap이 ui-bootstrap이 되겠습니다. 단순히, Convert만 한게 아니라서, angular directive로 사용하기 쉽게 되어 있습니다. 버전이 지나면서, configuration 제공 수준도 많아져서 더욱 사용하기 편리해졌습니다. 자체 template을 가지고 있지만, github의 코드를 바탕으로 손 쉽게 변경 시킬 수 있습니다.</p>
+<h3><a href="https://github.com/angular-ui/ui-router">UI Router</a></h3>
+<p><em>(bower에서는 angular-ui-route입니다.)</em></p>
+<p>SPA(Single Page Application)에서 routing 관리는 생각보다 귀찮은 일입니다. routing에 따라 view와 controller가 결정되어야 하고, 페이지간의 매개 변수 및 이벤트 처리등 해야할 일이 많습니다. 거기에, URI라도 바뀌면 귀찮은 일은 배가 되기 쉽상입니다. 여기서 탈출하는 법은 ui-router를 이용하는 법입니다. 사용하면서, '이게 있을까?' 싶었던 API는 이미 다 있었습니다. :) 페이지 변경시에 매개 변수 가공 및 이벤트 캔슬... 제공안하던게 없었던 것 같습니다. Abstract 상태도 제공해서, 하위 상태들을 만들 수 있었던 점도 좋았습니다. 저는 메뉴에 대한 Object Array를 정의해서, UI-Router에서는 간단히 등록한 하고 사용하도록 처리했었습니다.</p>
+<h3><a href="http://ui-grid.info/">UI Grid</a></h3>
+<p>가히, 정교하게 잘 만들어진 그리드라고 할 수 있습니다. 수준이 보통 높은게 아닙니다만, 사용하기에 다소 어려운 점도 사실입니다. tutorial이 잘 되어 있는 편이라, 쉽게 이용 가능했던 것 같습니다. grid라는게 option도 많고 configuration도 길어지기 쉬워서, 코드상에서 관리가 어려웠던게 사실입니다. 그럼에도 불구하고 좋은 성능을 보여주며 제공되는 기능도 많습니다. 정렬부터 검색, 컬럼 길이나 위치 저장, Row Customization도 제공하고, cell의 수정 여부와 표시와 같은 희한한 기능도 제공합니다. 유념해야 할 특징 중에 하나는 모든 열을 DOM에 만드는 것이 아니라, 필요한 순간에만 그리도록 되어 있습니다. 즉, row가 많지 않다면 아래에 있는 ui tree를 이용하는 것이 더 유리할 수도 있습니다.</p>
+<h3><a href="http://angular-ui-tree.github.io/angular-ui-tree/">angualr ui tree</a></h3>
+<p>맞습니다. 트리입니다. 트리의 특성의 customization의 레벨이 높습니다. 완전 다른 느낌으로도 만들 수 있으며, template에서 사용할 수 있는 변수들도 제공됩니다. table을 바탕으로 만들게 되면, 그냥 grid와 같습니다. 또한, 코드는 공부하기에 너무 좋았던 것으로 기억됩니다. template을 완전히 작성해야 단점이 있지만, directive에 template을 제공하실 생각이라면 좋은 교제가 될 것으로 생각됩니다. 제공되는 이벤트는 적지만, 사실 template을 마음대로 작성하기에 이벤트가 있을 필요도 없겠죠.</p>
+<h4><a href="https://github.com/marklagendijk/angular-recursion">angular-recursion</a></h4>
+<p>사실, ui tree를 사용하지 않고, 간단히 구현해보려고 했으나... 쉽지 않더라구여... 트리의 특성 중에 하나는 recursive한 directive의 구현인데, 거기서부터 막히는 바람에....ㅠㅠ 사실, <a href="https://github.com/marklagendijk/angular-recursion">angular-recursion</a>으로 간단하게 구현할 수 있습니다. directive의 compile 속성을 공부하기에 좋은 코드입니다.</p>
+<h4><a href="http://angular-ui.github.io/ui-select/">UI Select</a></h4>
+<p>데스크탑에서 늘 말많던 콤보를 대체하기에 최고의 컨트롤이었습니다. 콤보가 검색도 되고, 알아서 필터링도 되고.. 정말 좋은 컨트롤이 아닐 수가 없습니다. 기존의 콤보는 다 쓰레기였다고 비웃듯이, 수려함을 자랑합니다. 사실, jQuery때 부터 있던 컨트롤의 angular 버전입니다. 좋은 컨트롤이지만, 사용하기에는 약간 불편했습니다. 그럴 수 밖에 없는 것이, 컨트롤 자체가 복잡하고 List의 Item에 대한 Template을 설정하는 등, 신경써야하는 부분이 꽤 있습니다.</p>
+<h4><a href="https://github.com/Templarian/ui.bootstrap.contextMenu">angular-bootstrap-contextmenu</a></h4>
+<p>마우스 우클릭을 하는 경우에, 보여줄 Context Menu입니다. 어찌보면, 데탑 사용자의 경험일 수 있는 부분입니다. 모바일에서는 우클릭을 못하니까요. :) 어찌되었든, 그리드와 같이 다양한 기능의 가교 역활을 하는 컨트롤에 사용되었습니다. 우클릭시, 하위 메뉴(Nested Menu)도 제공하고, 각 메뉴 Enable/Disable에 대한 함수도 설정할 수 있는등 모자람없이 사용할 수 있었습니다.</p>
+<h4><a href="https://github.com/jirikavi/AngularJS-Toaster">AngularJS-Toaster</a></h4>
+<p>요즘 같은 세상에, 토스트 없는 어플리케이션은 없겠죠. '저장 완료', '검색 결과 없음'과 같은 사용자에게 알려주어야 할 내용에 대해서 트스트를 띄워서 알려주도록 했습니다. 간편하게 이용할 수 있어서 좋았던 것 같습니다.</p>
+<h4><a href="http://monospaced.github.io/angular-elastic/">Angular Elastic</a></h4>
+<p>jQuery에 있던 자동으로 길어지는 textarea를 구현한 녀석입니다. 구현이 어렵지는 않으나, angular를 사용하는 이상, angular스럽게 elastic을 사용해줬습니다.</p>
+<h4><a href="http://oblador.github.io/angular-scroll/">Angular-scorll</a></h4>
+<p>Scroll 관련 이벤트를 처리하기 위해서 사용했습니다. bootstrap에서 스크롤에 따라 우측에 메뉴가 active되는데, 이런 것을 구현해주는 라이브러리입니다. 특정 지점으로 스크롤은 물론, 현재의 스크롤의 위치를 바탕으로 특정 DOM을 활성화시키는 것도 가능합니다. 물론, 애니메이션적인 요소도 같이 줄 수 있습니다.</p>
+<h4><a href="http://chieffancypants.github.io/angular-hotkeys/">Angular Hotkeys</a></h4>
+<p>데탑 환경의 꽃은 단축키입니다. 키 하나로 슈슈슝~ 물론, KeyEvent를 직접 조작하기에는 페이지별로 다른 단축키를 처리하기에 좋지 않아서, Hotkeys를 사용했습니다. 바인딩된 키들을 열람할 수 있는 도움말 페이지도 자동으로 제공됩니다. 또한, 모든 페이지에서 동일하게 적용되는 키와 특정 URI 적용되어야 하는 키를 나눠서 처리할 수도 있습니다. ui-router랑 같이 붙여서 편하게 사용했던 것 같습니다.</p>
+<h4><a href="http://angulartics.github.io/">Angulartics</a></h4>
+<p>Angualr를 바탕으로하는 어플리케이션에서, 사용자 로그를 수집해서 전송할 수 있도록 만들어진 라이브러리입니다. GA(Google Analytics)를 물론이며 십 여가지의 다른 로그 수집 회사들도 지원합니다. 가져다 쓰는 것도 엄청 간단합니다.</p>
+<h2>Closing</h2>
+<p>이런 나열이 무슨 의미가 있을까 싶기는 했으나... 약간의 경험을 보태어 놓음으로서, 선택이나 판단에 도움이 되었으면 좋겠습니다. 혹시나, 더 자세히 다뤘으면 하는 라이브러리가 있으시면 질문해 주세요. 아는 범위 내에서 포스팅을 해 보도록 하겠습니다.</p>

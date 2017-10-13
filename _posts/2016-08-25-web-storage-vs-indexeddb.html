@@ -1,0 +1,63 @@
+---
+layout: post
+title: Web storage vs. indexedDB
+date: 2016-08-25 15:02:33.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- HTML5
+tags:
+- html5
+- indexeddb
+- localStorage
+- sessionStorage
+- web storage
+meta:
+  _wpcom_is_markdown: '1'
+  _edit_last: '1'
+  dsq_thread_id: '5095585666'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h2>Introduce</h2>
+<p>Web app에서 데이타를 임시 저장해야 하는 일이 생겼다. Client side에서 간단하게 데이타를 가지고 있고 싶기에, 이전에 봤었던 indexedDB가 생각났다. 간단하게 데이타를 넣어서 사용하면 되는데, index를 설정하란다. 이름에서 알 수 있듯이 indexed라는 뜻은, index를 가진다는 뜻이다. 내가 저장하려는 데이타가 대단한 것도 아니고, 조회하는 경우에는 전체가 필요하기에 index 따위는 필요 없는 경우였다. 이런, indexedDB를 쓰는게 아니었나?</p>
+<h2>Web storage &amp; indexedDB</h2>
+<p>애초의 시작은 쿠키였다. 쿠키자체의 제약을 뛰어 넘고자, 위의 기술이 제안되었다. 간단히 살펴보자면, Web storage는 쿠키의 개량판이고 indexedDB는 client-side의 NoSQL 정도라고 볼 수 있다.<br />
+<strong>Web storage</strong>는 쿠키가 가지고 있던 문제점을 극복하고자 고안되었다. 크게는 관리 주체에 따라, localStorage, sessionStorage 그리고 globalStorage가 존재한다. localStorage의 경우에는 도메인에 종속적이라 브라우저 탭 간에 공유가 가능하다. sessionStorage는 해당 세션에만 유효하게 되므로, Web App의 중간 데이타를 사용하기에 좋다.(globalStorage는 구현된 브라우저가 없다.) 쿠키 데이타가 가지고 있던 4KB의 제약은, 크롬의 경우에는 localStorage가 5MB정도 바뀌었다.(파이어폭스의 경우, sessionStorage는 메모리가 지원 가능한 범위라고 한다.)</p>
+<p>이에 반해, indexedDB는 web storage에 비해 대량의 데이타를 다루기 위해서 제공된다. 이름에서 알 수 있는 것 처럼, index를 설정할 수 있게 되는데, 대량의 데이타의 검색 효율성을 위해 제공되는 것이다. 첫 인상은 기타 NoSQL과 비교해도 손색이 없어 보였다. transaction, unique index와 같은 database에서 기대하던 기능들이 제공된다. 거기에, 모든 명령은 비동기에 대한 API를 제공토록 되어 있습니다.즉, 지연으로 인한 성능 문제는 고민할 필요가 없습니다. 많은 event들이 제공되고 있기에, 어렵지 않게 운용하실 수 있습니다. (혹시나 해서, WebSQL에 대한 spec은 deprecated 되었습니다. )</p>
+<h2>Comparison</h2>
+<p>이 포스트를 작성한 가장 큰 이유는, 그 누군가도 둘에 대한 고민을 가질 것 같기 때문입니다. 각 특징을 나열해 보도록 하겠습니다.</p>
+<ul>
+<li>Web Storage
+<ul>
+<li>작은 데이타들에 적합</li>
+<li>key - value 구조</li>
+<li>string으로 취급(타입 구분 없음)</li>
+<li>synchronous API(동기)</li>
+<li>대부분 5 ~ 10MB 까지 지 </li>
+<li>지원하는 브라우저: IE 8+, Chrome 4+, Firefox 3.5+, Opera 10.50+, and Android 2.1+</li>
+</ul>
+</li>
+<li>indexedDB
+<ul>
+<li>대용량 데이타</li>
+<li>synchronous , asynchrous API 제공</li>
+<li>타입(Date) 지원</li>
+<li>최대 50MB 까지(모바일의 경우, 5MB 이상 사용하려면 권한 필요)</li>
+<li>지원하는 브라우저: IE 10+, Chrome 23+, Firefox 10+, Opera 15+, and Android 4.4+</li>
+</ul>
+</li>
+</ul>
+<p>참고하셔서, 목적에 맞게 사용하시면 될 것 같습니다.</p>
+<h2>References</h2>
+<ul>
+<li><a href="http://programmers.stackexchange.com/questions/219953/how-is-localstorage-different-from-indexeddb">How is localStorage different from indexedDB?</a></li>
+<li><a href="http://developer.mozilla.org/en/docs/Web/API/Window/localStorage">Window.localStorage in MDN</a></li>
+<li><a href="https://html.spec.whatwg.org/multipage/webstorage.html#dom-localstorage">Specifications - Web Storage</a></li>
+<li><a href="http://www.html5rocks.com/en/tutorials/offline/quota-research/">Working with quota on mobile browsers</a></li>
+</ul>

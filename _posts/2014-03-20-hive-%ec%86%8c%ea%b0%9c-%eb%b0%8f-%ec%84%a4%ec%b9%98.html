@@ -1,0 +1,116 @@
+---
+layout: post
+title: Hive 소개 및 설치
+date: 2014-03-20 17:20:18.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Computer
+- Hadoop
+tags:
+- hadoop
+- hive
+- install
+- 설치
+- 하둡
+- 하이브
+meta:
+  _edit_last: '1'
+  dsq_thread_id: '4022108552'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h1><img class="alignnone" src="{{ site.baseurl }}/assets/hive_logo.png?version=1&amp;modificationDate=1389812323000&amp;api=v2" alt="" width="325" height="312" /></h1>
+<h1>소개 Intro</h1>
+<p>Hive는 SQL on Hadoop 프로젝트입니다. 간단히 말해서, SQL을 이용하여, Map/Reduce 작업을 수행하겠다는 이야기입니다. 생각보다 유용하고 쓰기에 좋아서, 소개드립니다.</p>
+<h1>하이브란? Hive?</h1>
+<p>앞서 말씀드린 것처럼, Hive는 SQL을 지원합니다. 정확히는, SQL이 아니라 <strong>HiveQL</strong>을 지원합니다. 일반적인 SQL과 비슷하나, HDFS위에서 작동하기 때문에 필요한 요소들이 추가되었다고 보시면 되겠습니다. SQL을 다루신 분이라면, 어렵지 않게 익힐 수 있습니다. 먼저, hive QL을 설치해야 합니다. 설치 과정은 쉽습니다.</p>
+<h1>설치 Install</h1>
+<h2>1. Package 설치</h2>
+<p>저는 HDP의 Package를 이용했습니다. 다음과 같죠.</p>
+<pre class="toolbar:2 nums:false lang:default decode:true"># 먼저, yum에 저장소를 추가합니다. 이미, 있다면 SKIP
+
+$ wget -nv http://public-repo-1.hortonworks.com/HDP/centos6/2.x/updates/2.0.6.1/hdp.repo -O /etc/yum.repos.d/hdp.repo
+
+$ yum install hive hcatalog</pre>
+<p>yum을 이용해서 간단하게 처리했습니다.</p>
+<h2>2. Log 폴더 설정</h2>
+<pre class="toolbar:2 nums:false lang:default decode:true"># Hive의 Log 폴더의 환경 변수를 설정합니다. 예를 들면,
+# export $HIVE_LOG_DIR=/var/log/hive
+$ mkdir -p $HIVE_LOG_DIR;
+
+# 적절한 권한이 필요하죠. $HIVE_USER는 hive service를 실행시키는 user를 뜻합니다. 예를 들면,
+# export $HIVE_USER=hive
+# export $hadoop_GROUP=hadoop
+$chown -R $HIVE_USER:$HADOOP_GROUP $HIVE_LOG_DIR;
+$chmod -R 755 $HIVE_LOG_DIR;</pre>
+<p>Log가 쌓일 폴더에 Hive Service를 실행시키는 user가 접근하는데 문제 없도록 조치합니다.</p>
+<h2>3. hive-site.xml</h2>
+<p>이제는 hive 설정 파일을 수정할 차례입니다. 생각보다 복잡하지 않습니다. <em>/etc/hive/conf</em>에 위치하고 있습니다. 해당, 폴더에는 hive-site.xml 파일 이외에도, hive-default.xml이라는 파일이 있습니다. 이 파일은 hive-site.xml의 설정값은 default 값과 설명을 담고 있으므로, 참고하시면 좋습니다. hive-default.xml을 직접적으로 수정하지 않고, hive-site.xml을 통해서 option 값을 변경하게 됩니다.</p>
+<pre class="toolbar:2 nums:false lang:xhtml decode:true">&lt;property&gt;
+ &lt;name&gt;javax.jdo.option.ConnectionURL&lt;/name&gt;
+ &lt;value&gt;jdbc:mysql://${MySQL ServerName}:3306/$database.name?createDatabaseIfNotExist=true&lt;/value&gt;
+&lt;/property&gt;
+&lt;property&gt;
+ &lt;name&gt;javax.jdo.option.ConnectionUserName&lt;/name&gt;
+ &lt;value&gt;${DBUserName}&lt;/value&gt;
+ &lt;description&gt;Enter your MySQL credentials. &lt;/description&gt;
+&lt;/property&gt;
+&lt;property&gt;
+ &lt;name&gt;javax.jdo.option.ConnectionPassword&lt;/name&gt;
+ &lt;value&gt;${DBUserPass}&lt;/value&gt;
+ &lt;description&gt;Enter your MySQL credentials. &lt;/description&gt;
+&lt;/property&gt;
+&lt;property&gt;
+ &lt;name&gt;hive.metastore.uris&lt;/name&gt;
+ &lt;value&gt;thrift://${metastore server name}:9083&lt;/value&gt;
+&lt;/property&gt;</pre>
+<p>저의 경우에는, mysql을 사용했기 때문에, ConnectionURL을 위와 같이 설정했습니다. 그리고 Database User &amp; Pass를 넘겨주는 구문이고, 마지막은 metastore에 대한 주소입니다. 저의 경우에는, 모두 'namenode'라는 서버에 설치하였기에, 모두 'namenode'라고 적어주었습니다.</p>
+<h2>4. Directories on HDFS</h2>
+<p>HDFS에도 hive가 사용할 폴더를 만들어 줘야 합니다.</p>
+<pre class="toolbar:2 nums:false lang:default decode:true"># Login as $HDFS_USER
+$ hadoop fs -mkdir -p /user/$HIVE_USER
+$ hadoop fs -chown $HIVE_USER:$HDFS_USER /user/$HIVE_USER
+
+# Login as $HDFS_USER
+$ hadoop fs -mkdir -p /apps/hive/warehouse
+$ hadoop fs -chown -R $HIVE_USER:$HDFS_USER /apps/hive
+$ hadoop fs -chmod -R 775 /apps/hive
+
+# Login as $HDFS_USER
+$ hadoop fs -mkdir -p /tmp/scratch
+$ hadoop fs -chown -R $HIVE_USER:$HDFS_USER /tmp/scratch
+$ hadoop fs -chmod -R 777 /tmp/scratch</pre>
+<p>위와 같이 진행하면, hive가 사용할 directory들이 생성됩니다.</p>
+<h2>5. Run hive</h2>
+<p>실행은 다음과 같이 합니다. 아래의 구문은 hive를 서비스 형태로 동작시키는 구문입니다.</p>
+<pre class="toolbar:2 nums:false lang:default decode:true">$ hive --service metastore
+
+# hive shell로 진입합니다.
+$ hive</pre>
+<p>&nbsp;</p>
+<h1>Command Line Interface (CLI)</h1>
+<p>이제 살펴볼 부분은, Hive CLI입니다. hive를 사용하는데 조금 더 편하게 사용하는데 유용한 정보라고 보시면 됩니다.</p>
+<h2>1. 콘솔에서 바로 쿼리 실행하기</h2>
+<blockquote><p>hive -e '&lt;query-string&gt;'</p></blockquote>
+<p>Query를 간단히 Command line에 입력하여, 그 결과를 Stdout으로 출력하게 됩니다. 예를 들면, 다음과 같은 모습입니다. Table 리스트를 출력하는 예입니다.</p>
+<pre class="toolbar:2 nums:false lang:default decode:true ">$ hive -e 'show tables;'
+
+14/03/20 17:07:31 INFO Configuration.deprecation: mapred.input.dir.recursive is deprecated. Instead, use mapreduce.input.fileinputformat.input.dir.recursive
+...
+...
+table1
+table2
+Time taken: 0.662 seconds, Fetched: 2 row(s)</pre>
+<h2>2. 여러 쿼리를 담고 있는 파일로 실행하기</h2>
+<blockquote><p>hive -f &lt;filepath&gt;</p></blockquote>
+<p>여러 개의 query를 실행시키는 경우에는, 하나의 파일에 담아 위의 명령으로 실행시키는 것이 편합니다. 연속적으로 쿼리를 실행시켜 주기 때문에, Batch작업으로 사용하기 좋습니다.</p>
+<h2>3. Hive Shell</h2>
+<p>-e나 -f를 붙이지 않고, hive를 실행하는 경우에는, shell로 진입하게 됩니다. mysql과 비슷한 console shell이 작동하게 됩니다. 이 shell을 이용하여 구문을 작성하고, 작성된 구문은 파일로 만들어 -f 옵션으로 동작시키거나 oozie(hadoop workflow management tool)을 이용하여 사용하게 됩니다.</p>
+<h1>마치며... Conclusion</h1>
+<p>Hive는 필수적입니다. Pig와 우열을 가리긴 어렵지만, 데이타를 가공하는 입장에서는 둘 중에 직관적인 표현이 가능한 쪽을 이용해야 한다고 봅니다. 여러개의 중접된 Join으로 표현하려는 데이타를 난해하게 하는 것 보다는, Pig와 같은 언어를 이용하는 것이 오히려 직관적인 경우도 있습니다. Pig에 대해서는 언제 한번 살펴보도록 하겠습니다. 일단, Hive는 조금 더 보도록 하겠습니다.</p>

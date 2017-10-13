@@ -1,0 +1,50 @@
+---
+layout: post
+title: Spinner using CSS3
+date: 2016-09-06 11:01:45.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- HTML5
+tags:
+- css
+- example
+- keyframe
+- reload
+meta:
+  _wpcom_is_markdown: '1'
+  _edit_last: '1'
+  dsq_thread_id: '5568447133'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h2>Introduction</h2>
+<p><a href="https://www.pluralsight.com/courses/add-dev-console-to-your-app-with-javascript-increase-productivity">Increase Productivity Add a Dev Console to Your App with JavaScript</a>강의를 보고 있습니다.(짧아서 금방 볼 수 있다는 점이 좋았습니다.^^;) 제목에서 알 수 있듯이, 웹 어플리케이션에 콘솔 창을 만들어서 이런 저런 명령어를 처리할 수 있도록 만들어 보는 강좌입니다. 사실, 개발환경에서는 아무렇지 당연한듯 제공되는 기능이지만, 사용자 어플리케이션에도 적용한다면 더욱 훌륭한 UX를 제공할 수 있을 것 같습니다.</p>
+<p>콘솔 명령어를 처리하는 중에, 서버의 반응이 오래 걸리는 경우가 있습니다. 가령, 지연되어서 무응답 상태가 나타날 수 있겠죠. 그런 경우에, 사용할 수 있는 간단한 Spinner(대기 화면에서 빙글빙글 돌아가며, 시간을 끄는 녀석)를 구현한 예제가 있는데, 생각보다 간단해서 여기에 정리해 봅니다. 다들, 알고 계실 수도 있겠네요.</p>
+<h2>Animation in CSS</h2>
+<p>CSS를 사용해서 Animation을 정의할 수 있습니다. 통상적으로 보게 되는 Reloading 화면은 무언가가 화면에서 뱅글뱅글 돌아가는 형태입니다. 이러한 Animation을 먼저 정의해야 합니다. <em>@keyframes</em>을 이용해서 규칙을 정의합니다.</p>
+<pre><code class="CSS">@keyframes spin
+{
+  to { transform : rotate(360deg); }
+}
+</code></pre>
+<p>내용은 그냥 360도를 회전하는게 끝입니다. 이렇게 <strong>spin</strong>이라는 규칙을 정의했고, 실제 이 규칙을 사용할 클래스를 선언할 차례입니다.</p>
+<pre><code class="CSS">.busy{
+  width: 24px;
+  height: 24px;
+
+  border-radius: 50%;
+  border-top: 2px solid blue;
+  border-right: 2px solid transparent;
+
+  animation: spin .8s linear infinite;
+}
+</code></pre>
+<p><strong>busy</strong>라는 클래스를 정의했습니다. 앞서 @keyframes으로 선언한 애니메이션을 사용할 때에는 <strong>animation</strong>이라는 속성을 사용합니다. 자세한 내용은 MDN의 <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/animation">animation</a>에서 확인할 수 있습니다. 위의 내용은, spin이라는 animation을 0.8초에 걸쳐서 일관된 속도로(linear) 계속 반복(infinite)하도록 설정했습니다.</p>
+<p>재밌는 점은 <em>radius</em>를 50%를 주었다는 점입니다. 이렇게 되면, 거의 반원에 가깝게 그려집니다. 또 한 가지 점은, 우측 선을 투명으로 잡았다는 점입니다. 우측을 투명으로 잡았기 때문에, 위쪽과 우측이 만나는 경계가 굵게 표시되게 됩니다.</p>
+<p>위의 코드의 실제 코드는 <a href="http://jsbin.com/bebifigowu/1/edit?html,css,output">jsbin</a>에서 확인할 수 있습니다. 한 가지 주의하실 점은, 브라우저 호환성입니다. MDN의 <a href="https://developer.mozilla.org/en-US/docs/Web/CSS/@keyframes">@keyframes</a>에서 볼 수 있듯이, IE는 10부터 가능합니다.</p>

@@ -1,0 +1,129 @@
+---
+layout: post
+title: AWS - 리눅스 파티션 확장하기(Expanding a Linux Partition)
+date: 2014-03-10 19:52:49.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Computer
+tags:
+- Amazon Web Service
+- AWS
+- linux
+- Linux Partition
+- 리눅스
+- 아마존 웹 서비스
+- 파티션 확장
+meta:
+  _edit_last: '1'
+  dsq_thread_id: '4024434377'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h1>Intro</h1>
+<p>EC2를 만들었는데, 분명 50GB로 생성했더니 6GB가 고작입니다. 사기인가? 아님, Local Storage처럼 사리진 것인가? 고민이 될 수 밖에 없습니다. 우리의 나머지 공간은 어디로 갔을까요.</p>
+<p>아마존의 <a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/storage_expand_partition.html" target="_blank">'Expanding a Linux Partition'</a>을 참고하였습니다.</p>
+<h1>사이즈 체크 Check size</h1>
+<p>일단, Linux 파티션의 사이즈를 확인해야 합니다.</p>
+<pre class="toolbar:2 nums:false lang:sh decode:true">[ec2-user@hdpmaster ~]$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/xvda1        6G  5.0G    1G  83% /
+none            7.4G     0  7.4G   0% /dev/shm
+[ec2-user@hdpmaster ~]$
+[ec2-user@hdpmaster ~]$ lsblk
+NAME    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+xvda    202:0    0  100G  0 disk
+└─xvda1 202:1    0    6G  0 part /
+[ec2-user@hdpmaster ~]$</pre>
+<ul>
+<li><strong>df</strong> : partition의 size를 확인하는 명령어입니다. h 옵션은 보기 좋게, 메가 혹은 기가 단위로 표현해 줍니다.</li>
+<li><strong>lsblk</strong> : block device의 list를 보여주는 명령어입니다. 주로, disk가 표현되며, 그 하위에 partition들이 표현됩니다.</li>
+</ul>
+<p>위에서 보시다시피, 100G짜리 disk에서 고작 6G만 사용하고 있습니다. 우리가 해야 할 일은, 저 디스크를 전부 다 사용하는 것입니다.</p>
+<h1>사전 작업 Preparation</h1>
+<p>당연한 이야기지만, 현재 mount된 disk를 동적으로 변경할 수는 없습니다. 그러니까, 현재 사용중인 상태에서는 size를 변경해서는 안됩니다. 위의 예에서 알 수 있듯이, '/'(root) 영역은 unmount도 불가능합니다. Instance가 켜져 있다면, 사용중이라서 size를 변경할 수 없습니다. 그렇다고 끈다면, 변경할 수 있을까요? 당연히, 안되겠죠. PC라면 어떻게 했을까요? 친구집 PC에 우리 disk를 보조 disk로 붙여서 접근하는 방법이 있을 것입니다. AWS상에는 친구가 없는데 어떻하죠? 간단합니다. 새로 Instance를 하나 만들면 됩니다. 혹은 사용중인 다른 Instance에 해당 volume을 attach하여 진행합니다.</p>
+<ol>
+<li>Root에 mount되어 있으므로, Instance를 stop시키고 detach합니다.</li>
+<li>꼭 해야하는 것은 아니지만, snapshot을 만듭니다. 이런 작업은 partition이 통째로 날리기 쉽기 때문에, backup하고 진행하는 것이 좋습니다.</li>
+<li>다른 Instance(없다면 간단히 만들어도 됩니다.)에 1번의 volume을 attach합니다. 이 때에는 stop이 아니어도 상관없습니다. running 중에도 attach volume이 가능합니다.</li>
+</ol>
+<h1>확장 하기 Expand a partition</h1>
+<ol>
+<li>SSH로 해당 Instance에 접속합니다.</li>
+<li>먼저, disk의 상태를 확인합니다.
+<pre class="toolbar:2 nums:false lang:default decode:true">[ec2-user ~]$ lsblk
+NAME    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+xvda    202:10   0    6G  0 disk
+└─xvda1 202:11   0    6G  0 part /
+xvdf    202:80   0  100G  0
+└─xvdf1 202:81   0    6G  0</pre>
+<p>맞습니다. 단순히, attach를 했기 때문에, mount 정보도 없습니다. xvdf가 확장하려는 volume이 되겠습니다.</li>
+<li><strong>parted</strong> 라는 명령어를 사용합니다. <strong>parted</strong>는 partition을 추가, 삭제 그리고 수정할 수 있는 utility입니다.
+<pre class="toolbar:2 nums:false lang:sh decode:true" title="parted 이용하기"># sudo를 이용해서, 해당 disk로 접근합니다
+[ec2-user@hdpmaster ~]$ sudo parted /dev/xvdf
+GNU Parted 2.1
+Using /dev/xvdf
+Welcome to GNU Parted! Type 'help' to view a list of commands.
+
+# 먼저, unit을 sector단위로 변경합니다.
+(parted) unit s
+
+# 'p'를 이용해서, partition의 상태를 봅니다.
+(parted) p
+Model: Xen Virtual Block Device (xvd)
+Disk /dev/xvda: 209715200s
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+
+Number  Start  End         Size        Type     File system  Flags
+ 1      1920s  15000000s  15000000s  primary  ext4
+
+# 위의 하나있는 1번 파티션을 삭제합니다.
+(parted) rm 1
+
+# 파티션을 새롭게 만드는데, 명령어는 'mkpart 시작섹터 타입 사이즈'로 넘겨줍니다.
+# 위의 파티션 정보를 참고하여 입력하면 됩니다.
+# 간혹, warning이 뜨는 경우에는 가볍게 무시합니다.(Ignore)
+(parted) mkpart 1920s primary 100%
+
+# 정상적으로 진행되었는지, 'p'명령어를 이용해서 파티션의 상태를 확인합니다.
+(parted) p
+Model: Xen Virtual Block Device (xvd)
+Disk /dev/xvda: 209715200s
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+
+Number  Start  End         Size        Type     File system  Flags
+ 1      1920s  209715199s  209713280s  primary  ext4
+
+# 정상적으로 사이즈가 확장되었습니다. 종료합니다.
+(parted) q</pre>
+<p>이로써 새로운 파티션을 가지게 되었습니다.</li>
+<li>detach하기 전에, 정상적으로 File System이 작동하는지 점검할 필요가 있습니다.
+<pre class="toolbar:2 nums:false lang:sh decode:true"># 해당, partition 이름으로 접근해야 합니다.
+[ec2-user@hdpmaster ~]$ sudo e2fsck -f /dev/xvdf1
+e2fsck 1.42.3 (14-May-2012)
+Pass 1: Checking inodes, blocks, and sizes
+Pass 2: Checking directory structure
+Pass 3: Checking directory connectivity
+Pass 4: Checking reference counts
+Pass 5: Checking group summary information
+/: 31568/524288 files (0.4% non-contiguous), 266685/2096635 blocks</pre>
+<p>간혹, superblock이 이상하다는 메세지와 함께 정상적으로 종료되지 않는 경우가 있습니다. 이럴 때에는 3번의 시작 섹터를 잘못 기입하여 발생되는 경우가 있으므로, 3번을 다시 수행해 보도록 합니다.</li>
+<li> EC2 Management Console에서, 해당 volume을 detach시킵니다. 수정된 partition이 mount된 상태가 아니므로, force detach를 진행하셔도 상관없습니다.</li>
+<li>이제, 본가로 돌아갈 시기입니다. detach된 volume을 이제는 원래의 instance에 attach 시킵니다. 이 때, 주의할 점은 mount 지점은 <strong>/dev/sda1</strong>이어야 합니다. 해당 지점은 Root 영역으로 예약되어 있습니다.</li>
+<li>Instance를 Start해서, 다시 df 명령어를 이용하여 정상적으로 partition이 확장되었는지 확인합니다.</li>
+</ol>
+<h1>Conclusion</h1>
+<p>어렵지는 않지만, 처음에는 조금 당황했던 내용입니다. 구글링하여 찾았던, resize2fs를 이용한 방법과 fdisk를 이용한 수정이 모두 적용되지 않았습니다. 어떤 연유인지는 모르겠으나, AWS에서 공식적으로 제공되는 방법만이 적용가능했습니다. 비슷한 일이 있다면, 도움이 되어 시간이 아끼시길 바랍니다.</p>
+<h1> Reference</h1>
+<ul>
+<li><a href="http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/storage_expand_partition.html" target="_blank">Expanding a Linux Partition</a></li>
+<li><a href="http://stackoverflow.com/questions/11014584/ec2-cant-resize-volume-after-increasing-size">EC2 Can't resize volume after increasing size - resize2fs 와 fdisk를 이용한 방법</a></li>
+</ul>
+<p>&nbsp;</p>

@@ -1,0 +1,61 @@
+---
+layout: post
+title: 안드로이드에서 화면 녹화하기(KitKat, ADB)
+date: 2014-08-12 06:05:01.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Android
+tags:
+- adb
+- android
+- screeenrecord
+- 안드로이드
+- 화면녹화
+meta:
+  _edit_last: '1'
+  _oembed_f95d13b2cc75d59f274ec20ed076e4fd: <iframe width="474" height="356" src="http://www.youtube.com/embed/wPdbBsK_5po?feature=oembed"
+    frameborder="0" allowfullscreen></iframe>
+  _oembed_519e5d9e1144073ba2ef98b773882903: <iframe width="604" height="453" src="http://www.youtube.com/embed/wPdbBsK_5po?feature=oembed"
+    frameborder="0" allowfullscreen></iframe>
+  _oembed_time_519e5d9e1144073ba2ef98b773882903: '1410591395'
+  _oembed_c2c9c3c1b2da56a4be61edb637da5633: <iframe width="750" height="563" src="https://www.youtube.com/embed/wPdbBsK_5po?feature=oembed"
+    frameborder="0" allowfullscreen></iframe>
+  _oembed_time_c2c9c3c1b2da56a4be61edb637da5633: '1439204983'
+  dsq_thread_id: '4025818520'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<p>안드로이드 관련 블로그를 쓰다 보면, 참 말로 적는다는게 쉽지 않은 경우가 많습니다. 특히, UI와 관련된 요소에 대해 설명하는 글은 白問不如 一見(백문이 불여 일견)이라는 말처럼, 보여주는 것이 훨씬 쉽게 다가가게 됩니다.</p>
+<p>그럼 어떻게 보여줄 수 있을까?</p>
+<p>안드로이드 자체에서 제공되는 기능을 이용하여 화면을 녹화시켜 보도록 하겠습니다. 오늘 사용할 프로그램은 adb라는 프로그램인데, Android Debug Bridge의 약자입니다. 안드로이드 개발환경을 구축하셨다면 \\android-sdk\platform-tools 에 위치하고 있습니다. 화면 녹화는 adb의 명령을 사용하면 손쉽게 가능합니다.</p>
+<pre class="lang:default decode:true">% adb shell screenrecord --time-limit 10 /sdcard/name_you_want.mp4</pre>
+<p>상당히 간단한 명령어 입니다. 이렇게 쉽게 캡쳐를 진행할 수 있습니다. 기억하셔야 할 옵션으로는 다음이 있습니다.</p>
+<ul>
+<li>--time-limit<br />
+기록할 시간을 입력합니다. 초 단위로 입력하게 되는데, 기본값이자 최대 시간은 3분입니다.</li>
+<li>--bit-rate<br />
+저장할 동영상의 품질을 결정합니다. 4Mbps로 저장하게 되는데, 올리면 됩니다.</li>
+<li>--size &lt;WidthxHeight&gt;<br />
+1280x720과 같이 줄 수 있다고 합니다. 명시하지 않으면, Mobile Device의 해상도를 따라 갑니다.</li>
+<li>--rotate<br />
+화면을 90도로 회전할 필요가 있을 때 사용되는데, 아직 불안정합니다.</li>
+<li>--verbose<br />
+로그를 화면에 출력하게 됩니다.</li>
+<li>--help<br />
+사용법을 알려줍니다. 위의 내용이 영어로 설명되어 있습니다.</li>
+</ul>
+<p>&nbsp;</p>
+<p>다음은 제가 테스트로 만들어 본 영상입니다.</p>
+<p>http://www.youtube.com/watch?v=wPdbBsK_5po</p>
+<p>화면에서 보시는 바와 같이, 개발자 옵션에서 보이는 터치에 옵션을 주시면 영상 제작시 훨씬 이해하기 좋아집니다. ( Setting - Developer Options - Show touches )</p>
+<h1>참고</h1>
+<ul>
+<li><a href="http://developer.android.com/tools/help/adb.html">Android Debug Bridge</a></li>
+<li><a href="http://www.cnet.com/how-to/how-to-record-your-screen-on-android-4-4-kitkat/">How to record your screen on Android 4.4 KitKat</a></li>
+</ul>

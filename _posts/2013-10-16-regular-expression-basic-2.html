@@ -1,0 +1,148 @@
+---
+layout: post
+title: 'Regular Expression Basic #2 - 쓰기'
+date: 2013-10-16 12:50:04.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Computer
+tags:
+- regex
+- regular expression
+- 정규표현식
+meta:
+  _edit_last: '1'
+  dsq_thread_id: '4137542378'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<p>어제는 Regex는 맛만 봤는데요. 오늘은 조금 더 나아가 보도록 하겠습니다. 지난 시간에 다룬 내용은, 주로 searching에 맞춰져 있었습니다. 우리는 왜 searching을 하죠? 예, 수정하기 위해서 입니다.</p>
+<h1>0. 사건의 발단</h1>
+<p>무의식적으로 우리는 Copy &amp; Paste에 익숙해져 있습니다. 하지만, 모든 일을 Ctrl-C, Ctrl-V로 해결하기란 정말 어려운 일입니다. 좀 더 편하고 세련된 방법을 찾아야 하지 않을까요? 스스로를 지키기위해서, 우린 조금 더 효과적인 방법으로 반복적인 일을 처리해야 합니다.</p>
+<h1>1. Replace</h1>
+<pre class="theme:vs2012 toolbar:1 decode-attributes:false lang:xhtml decode:true">&lt;h1&gt;George Orwell&lt;/h1&gt;
+&lt;h2&gt;Life&lt;/h2&gt;
+&lt;h3&gt;Early years&lt;/h3&gt;
+&lt;h4&gt;Before an elementray school&lt;/h4&gt;
+&lt;h4&gt;In elementray school&lt;/h4&gt;
+&lt;h4&gt;In middle school&lt;/h4&gt;
+&lt;h4&gt;In high school&lt;/h4&gt;</pre>
+<p>간단한 HTML입니다. Heading Tag(h1, h2, h3 ...)를 모두Paragraph Tag(P)로 변경한다고 생각해 보세요. 우리는 어떻게 할까요? 아마, 열심히 화살표를 눌러 커서를 변경하고 하나씩 수정해 갈 것 입니다. 작업 시간은 text의 길이의 비례하겠죠. 그리고 중간 중간에 실수들이 있을 것 입니다. 전 그 실수들이 너무 싫었어요. 그리고 이 일은 저보다 잘하는 친구에게 맡기고 싶었죠. 그게 Regex 였습니다.</p>
+<p>Replace는 일반 적인 치환과 똑같습니다. 우리가 MS office에서 '바꾸기'를 통해, 글자를 바꾸는 것과 동일합니다. 치환에는 [searching string]과 [replace with]가 필요합니다. 단순하게 replace를 한다면 우린, 4번을 해야합니다. [searching string]이 'h1', 'h2', 'h3', 'h4'으로 다르기 때문입니다.  잠깐, 왜 다르죠? 그리고, 'h1', 'h2', 'h3', 'h4' 이들 사이의 연관성을 표현해 볼 수 는 없을까요? 저들은 이런 특징이 있죠.</p>
+<ul>
+<li>h로 시작한다</li>
+<li>1,2,3,4와 같은 숫자가 온다</li>
+</ul>
+<p>이를 Regex로 표현하면, /h[1234]/가 되겠죠. 줄여 쓰면, /h[1-4]/가 됩니다. 그래서 간단하게 다음과 같이 처리할 수 있습니다.</p>
+<pre class="theme:vs2012 toolbar:1 lang:js decode:true">var text = "..." # the above HTML code
+var pattern = /h[1-4]/g; # regex syntax in Javascript
+var replace = "p"
+var output = text.replace(pattern, replace);</pre>
+<p>위와 같이, 처리하면 간단하게 모든 h로 시작되는 태그를 변경할 수 있습니다.</p>
+<h1>2. Special Characters (특수 문자들)</h1>
+<p>C언어의 식별자(Identifier)의 규칙이 뭔지 기억나세요? 컴파일러 시간에 줄곧 애기했던 기억이 있습니다만, "언더스코어(_)와 영문자로 시작하되 숫자를 그 뒤에 붙일 수 있다."정도가 됩니다. 그렇다면 이는 다음과 같이 표현할 수 있겠죠.</p>
+<pre class="theme:vs2012 toolbar:2 nums:false lang:default decode:true">[a-zA-Z0-9_] # 소문자, 대문자, 숫자, 그리고 underscore(_)</pre>
+<p>그런데, 매번 이런 저렇게 치려면 얼마나 귀찮겠습니까... 그래서 이미 선언된 글자 셋들이 있습니다. 이들은 생각보다 유용하므로, 알아 두시면 편해집니다.</p>
+<ul>
+<li>d - 숫자들</li>
+<li>D - 숫자가 아닌 글자들</li>
+<li>s - 공백 문자들(space, tab, form feed, line feed, carrage return)</li>
+<li>S - 공백 문자가 아닌 글자들</li>
+<li>w - 프로그래밍 식별자([a-zA-Z0-9_])</li>
+<li>W - 식별자 글자 셋을 제외한 글자들</li>
+<li>n - 숫자를 사용하는 경우, 캡쳐한 그룹을 의미(나중에 설명드릴께요)</li>
+</ul>
+<p>이외에도, 유용한 특수 문자들이 많으니, 꼭 찾아 보시기 바랍니다. 유의할 점은 언어마다 조금씩 구현된 방식이 달라서, 특수 문자들이 다르다는 점입니다. 편의를 위한, 특수 문자들이 있다는 정도만 알고 계시다가, 해당 언어에 맞게 찾아 쓰시면 되겠습니다.</p>
+<p>앞의 예제는 다음과 같이 고쳐 쓸 수 있겠죠.</p>
+<pre class="theme:vs2012 toolbar:2 nums:false lang:default decode:true">var pattern = /hd/g; # 숫자를 직접적으로 쓰지 않았기에 간편하고, 이후에도 문제의 소지가 적습니다.</pre>
+<h1> 3. Replace by Groups (그룹을 사용한 치환)</h1>
+<p>이번에는 조금 더 재밌는 예제를 다루어 보겠습니다. 가끔, SQL의 마수에 놀아날 때가 있습니다. 예를 들면, 텍스트 파일을 던져 주고는 Table에 Insert를 해야하는 경우 같은 것이죠. 이를 빨리 처리하기 위한 방법에는, 여러가지가 있습니다. 그러나, 지금 애기할 것은 text manuplation(텍스트 조작)입니다.</p>
+<h4>1) 쿼리 노가다</h4>
+<p>텍스트 파일에는 다음의 정보가 들어 있습니다.</p>
+<pre class="toolbar:1 lang:default decode:true">#이름,가격,제조사|차종|분류|,등급,배기량,마력,연비
+지프 랭글러 언리미티드,5290만원,지프|SUV|중형,2.8 디젤,2776cc,9.2 km/l
+현대 엑센트 세단,1111만원,현대|세단|소형,1.4 가솔린,1368cc,14 km/l
+닛산 쥬크,2690만원,닛산|SUV|소형,1.6 가솔린,1618cc,12.1 km/l
+람보르기니 가야르도 쿠페,32400만원,람보르기니|쿠페|중형,5.2 가솔린,5204cc,6.2 km/l
+현대 더 뉴 아반떼,1395만원,현대|세단|준중형,1.6 가솔린,1591cc,14 km/l
+벤츠 A클래스,3490만원,벤츠|해치백|소형,1.8 디젤,1796cc,18 km/l</pre>
+<p>각 값들은 쉼표(,)로 구분되어 있으며, 해당 값이 가리키는 의미는 첫째 줄에 표시되어 있습니다. 이 text 파일을 기반으로 아래의 'Cars'라는 Table에 INSERT해야 합니다.</p>
+<table width="504" border="0" cellspacing="0" cellpadding="0">
+<colgroup>
+<col span="7" width="72" /> </colgroup>
+<tbody>
+<tr>
+<td width="72" height="22">이름</td>
+<td width="72">제조사</td>
+<td width="72">차종</td>
+<td width="72">분류</td>
+<td width="72">등급</td>
+<td width="72">연비</td>
+<td width="72">가격</td>
+</tr>
+<tr>
+<td height="22"></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>결과적으로, 우리는 다음의 쿼리가 필요합니다.</p>
+<pre class="theme:vs2012 toolbar:2 nums:false lang:default decode:true">INSERT Cars VALUES ('지프 랭글러 언리미티드', '지프', 'SUV', '중형', '2.8 디젤', 9.2, 5290)
+INSERT Cars VALUES ('현대 엑센트 세단', '현대', '세단', '소형', '1.4 가솔린', 14, 1111)
+INSERT Cars VALUES ('닛산 쥬크', '닛산', 'SUV', '소형', '1.6 가솔린', 12.1, 2690)
+INSERT Cars VALUES ('람보르기니 가야르도 쿠페', '람보르기니', '쿠페', '중형', '5.2 가솔린', 6.2, 32400)
+INSERT Cars VALUES ('현대 더 뉴 아반떼', '현대', '세단', '준중형', '1.6 가솔린', 14, 1395)
+INSERT Cars VALUES ('벤츠 A클래스', '벤츠', '해치백', '소형', '1.8 디젤', 18, 3490)</pre>
+<h4>2) Regex 작성하기</h4>
+<p>지난 post에서 보신 바와 같이, 작은 것부터 시작합니다. 처음에는 이름부터 잡습니다.</p>
+<pre class="theme:tomorrow toolbar:2 nums:false lang:default decode:true">^[^,]+ # ^ - 줄의 처음,
+       # [^,] - 쉼표가 아닌 글자,
+       # + - 한 자 이상</pre>
+<p>그 다음에는, 가격이 위치합니다. 가격을 잡기 위해서,</p>
+<pre class="theme:vs2012 toolbar:2 nums:false lang:default decode:true">^[^,]+,[0-9]+만원 # , - 원문에서 구분자로 사용된 쉼표(,)
+                 # [0-9] - 숫자를 잡기 위해서 0부터 9까지
+                 # + - 한 자 이상
+                 # 만원 - 위에 단위로 '만원'으로 끝났기 postfix로 간주</pre>
+<p>이제, 이름과 가격을 잡았지만, 출력해 보면 해당 문자열이 모두 출력되는 것을 알 수 있습니다. 우리는 쉼표나 '만원' 같은 부분은 필요없기에, Group으로 묶습니다. 이를 두고, Capturing groups이라고 합니다.</p>
+<pre class="theme:vs2012 toolbar:2 nums:false lang:default decode:true">^([^,]+),([0-9]+)만원 # 괄호()로 필요한 부분을 묶었습니다.</pre>
+<p>이렇게 해서, 출력해 보면 아까와 다른 결과를 보실 수 있습니다. 검색된 문자열 외에, 캡쳐된 문자열이 구분되어 표시되는 것을 보실 수 있습니다. 괄호로 만든 그룹은 나중에 치환할 때 $1, $2 이런 식으로 사용하게 됩니다. 즉, 위의 Regex에 의하면, $1이 '이름', $2는 '가격'을 의미하게 되는 것 입니다.</p>
+<h4>3) 완성하기</h4>
+<p>그리하여, 최종적으로 다음과 같은 javascript를 보게 됩니다.</p>
+<pre class="theme:github toolbar:1 lang:default decode:true">var text = "지프 랭글러 언리미티드,5290만원,지프|SUV|중형,2.8 디젤,2776cc,9.2 km/ln현대 엑센트 세단,1111만원,현대|세단|소형,1.4 가솔린,1368cc,14 km/ln닛산 쥬크,2690만원,닛산|SUV|소형,1.6 가솔린,1618cc,12.1 km/ln람보르기니 가야르도 쿠페,32400만원,람보르기니|쿠페|중형,5.2 가솔린,5204cc,6.2 km/ln현대 더 뉴 아반떼,1395만원,현대|세단|준중형,1.6 가솔린,1591cc,14 km/ln벤츠 A클래스,3490만원,벤츠|해치백|소형,1.8 디젤,1796cc,18 km/l"
+
+var reg = new RegExp("^([^,]+),([0-9,]+)만원,([^,|]+)|([^,|]+)|([^,|]+),([^,]+),([^,]+)cc,([0-9.]+) km/l$", "gm");
+var replace = "INSERT Cars VALUES ('$1', '$3', '$4', '$5', '$6', $8, $2)&lt;br&gt;";
+
+var output = text.replace(reg, replace);
+alert(output);</pre>
+<p>Regex가 조금 복잡해 보이실지도 모르겠습니다. 간단히, 해제(解題)하여 보면...</p>
+<pre class="theme:tomorrow toolbar:2 nums:false lang:default decode:true">^                             # 줄의 처음
+ ([^,]+)                      # 쉼표가 아닌 글자들, '이름', $1
+ ,                            # 쉼표 구분자
+ ([0-9,]+)만원                 # 숫자로 이루어진 글자들, '가격', $2
+ ,
+ ([^,|]+)|([^,|]+)|([^,|]+) # '제조사' $3 | '차종' $4 | '분류' $5
+ ,
+ ([^,]+)                      # '등급' $6
+ ,
+ ([^,]+)cc                    # '배기량' $7
+ ,
+ ([0-9.]+) km/l               # '연비' $8
+$                             # 줄의 마지막</pre>
+<p>치환 문자열은 상대적으로 쉽습니다. 위에서 캡쳐한 항목들을 호출하는 형태일 뿐입니다. 실행시켜 보고 싶은 당신을 위해 준비했어요. <a href="http://jsbin.com/upesek/20/edit">여기~!</a></p>
+<h1>4. Reference</h1>
+<ul>
+<li><a href="https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions">https://developer.mozilla.org/en/docs/Web/JavaScript/Guide/Regular_Expressions</a> - Regular Expression in Javascript</li>
+</ul>
+<h1>5. Closing</h1>
+<p>예전에, Syntax Highlighter를 만들면서, Regex를 Parser로 사용했습니다. 정확한 의미의 Parser는 아니지만, 간편하고 쉽게 Parser를 흉내낼 수 있습니다. 그렇게 접근하는 것도 재밌을 것 같네요. ^^</p>

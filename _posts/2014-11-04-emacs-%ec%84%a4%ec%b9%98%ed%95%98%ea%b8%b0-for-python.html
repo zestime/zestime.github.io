@@ -1,0 +1,83 @@
+---
+layout: post
+title: Emacs 설치하기 for Python
+date: 2014-11-04 15:10:16.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Enviornment
+tags:
+- emacs
+- python
+- 이맥스
+- 파이썬
+meta:
+  _edit_last: '1'
+  _oembed_a33392c8ee3ac5b122a3481bf2479dd6: <iframe width="474" height="267" src="http://www.youtube.com/embed/0cZ7szFuz18?feature=oembed"
+    frameborder="0" allowfullscreen></iframe>
+  _oembed_time_a33392c8ee3ac5b122a3481bf2479dd6: '1415250271'
+  _oembed_91b925279bb5b9a46e46f5c4ae4d6486: "{{unknown}}"
+  _oembed_42c681fae88e3e60fde4d4ca6aa252bb: <iframe width="750" height="422" src="https://www.youtube.com/embed/0cZ7szFuz18?feature=oembed"
+    frameborder="0" allowfullscreen></iframe>
+  _oembed_time_42c681fae88e3e60fde4d4ca6aa252bb: '1439203615'
+  dsq_thread_id: '4087203327'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h2>Introduction</h2>
+<p>Emacs는 단축키 문제로 어렵게 생각하시는 분이 많습니다. 예전의 IDE들이 그러하듯, 정말 geek스럽기는 합니다. 하지만, 매력적인 부분들도 있죠. 저는 python을 사용할 때, Emacs가 편하더라구여... 둘의 상관 관계가 있나, 싶으신 분들을 위해, 다음의 동영상을 참고 하시기 바랍니다.</p>
+<p>http://www.youtube.com/watch?v=0cZ7szFuz18</p>
+<p>euro-python 2013의 한 session인데, 어떻게 Emacs를 쉽게 Python IDE로 사용할지 알려주고 있습니다. 오늘 같이 해 볼 일은 바로, Andrea Crotti의 내용을 같이 따라하는 일입니다.</p>
+<h2>Preparation</h2>
+<h4>Emacs</h4>
+<p>Mac에는 기본적으로 Terminal에서 사용할 수 있는 Emacs가 있습니다. 하지만, 버전이 낮기 때문에, 최신으로 설치하도록 합니다. 전, <a href="http://emacsformacosx.com/">Emacs For Mac</a> 을 설치했습니다.</p>
+<h4>A minimal emacs configuration</h4>
+<p>이제는 Andrea Crotti씨의 configuration을 설치할 차례입니다.</p>
+<pre class="lang:zsh decode:true"># 기존의 설정 사항이 있다면, 사용하지 않도록 합니다.
+&gt; mv .emacs.d .emacs.d.bak
+
+# pip가 없다면, 다음을 통해 다운받습니다. 
+&gt; sudo easy_install-2.7 pip
+
+# 다음의 python package 의존적입니다. 설치해주어야 합니다.
+&gt; pip install --user jedi epc pylint
+
+# git을 통해, minimal configuration을 다운받습니다.
+# ~/.emacs.d로 위치하실 필요는 없습니다. 여기서는 간단하게 진행하기 위해 아래와 같이 했습니다.
+&gt; git clone https://github.com/AndreaCrotti/minimal-emacs-configuration .emacs.d
+</pre>
+<p>emacs를 구동시키면 알아서, init.el 파일에 의해  설치를 수행합니다.</p>
+<h2>Run emacs</h2>
+<p>emacs를 실행시키면, 설치가 진행되는데 조금 걸립니다. 설치가 끝났다면, 본 격적으로 사용해 봐야겠죠.</p>
+<h4>magit</h4>
+<ul>
+<li>C-x g : git을 수행합니다. log에 대한 정보부터 차근차근 배워볼 필요가 있습니다.</li>
+</ul>
+<h4>jedi</h4>
+<ul>
+<li>C-c C-c : Python을 컴파일합니다. 실행시키면, 창 3개로 나뉘는데, 하단에 REPL(read-eval-print loop)이 나타납니다. 읽어보시면 아시겠지만, 현재 작성중인 python 파일의 내용이 자동으로 exec()을 이용해서, 적용되게 됩니다.</li>
+<li>C-c d : 해당 함수의 문서 설명을 보여줍니다. 사용법이나 정보가 필요한 경우, 유용하게 사용할 수 있습니다.</li>
+<li>M-. : jedi에 의해 수행되는, go to definition 입니다.</li>
+</ul>
+<h4>yassnippet</h4>
+<ul>
+<li>C-c &amp; C-n : yas에 의해 작동되는 snippet 관리입니다. 새로운 snippet을 생성합니다. 이때 적는 이름을 통해서, 나중에 python 작성시에 snippet의 code로 사용됩니다. code에 &lt;TAB&gt;키를 눌러 주시면, 자동적으로 펼쳐지게 됩니다. 예시는 아래를 참조하세요.
+<pre class="lang:python decode:true"># -*- mode: snippet; require-final-newline: nil -*-
+# name: fun
+# key: fun
+# binding: direct-keybinding
+# --
+def ${1:function_name}(${2:args}):
+    $0
+</pre>
+<p>C-c C-c 를 눌러, 저장하면 됩니다. 다만, 저의 경우에는 저장하려는 폴더가 없는 문제가 있어, 따로 추가해 주었습니다.</li>
+<li>C-c &amp; C-v : 작성한 snippets을 찾아볼 때 사용합니다.</li>
+</ul>
+<p>&nbsp;</p>
+<h2>Closing</h2>
+<p>이 정도만 알아도, Emacs에서 python을 한결 쉽게 사용할 수 있답니다.</p>

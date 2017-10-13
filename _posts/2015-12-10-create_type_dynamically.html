@@ -1,0 +1,140 @@
+---
+layout: post
+title: C#에서 동적으로 Type 만들기 using Emit
+date: 2015-12-10 13:36:42.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- C#
+tags:
+- class
+- CustomAttributeBuilder
+- metaprogramming
+- type
+- TypeBuilder
+meta:
+  _wpcom_is_markdown: '1'
+  _edit_last: '1'
+  dsq_thread_id: '4390959652'
+  _wp_old_slug: c%ec%97%90%ec%84%9c-%eb%8f%99%ec%a0%81%ec%9c%bc%eb%a1%9c-type-%eb%a7%8c%eb%93%a4%ea%b8%b0-using-emit
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h2>Introduction</h2>
+<p>사실, '동적으로 만든다.'라는 빈한 표현보다는 meta-programming이라는 표현을 주로 씁니다. Meta-programming은 code가 code를 만드는 일종의 기술로서, 당연히 static language보다는 dynamic language에서 많이 사용됩니다. 대표적인 예가, ruby나 django에서의 ORM관련 코드가 되겠습니다. 모델에 대한 클래스만 잘 만들면, 나머지 repository pattern이 자동적으로 runtime에 생성되는 예가 그렇습니다. 즉, code가 부가적인 code를 생성하는 경우를, meta-programming이라고 합니다.<br />
+오늘은, C#에서 사용할 일이 있었기에, 그에 대해 포스팅하려 합니다. C#은 아시다시피 Multi-paradigm language입니다. 정적 언어로 시작해 여러 동적 언어적 요소를 가지고 있는 넘사벽의 언어입니다. .NET에서의 meta-programming은 이미 여러 해 전부터 전해져 오던 이야기라, 뒤늦게 정리하는 감이 있습니다. 조금 더 관심있으신 분은 <em>Human Crafted Code is Sacred</em>라는 주제를 담고 있는 Kathleen Dollard의 강의 <a href="https://www.pluralsight.com/courses/understanding-metaprogramming">Understanding Metaprogramming</a>을 참고하시기 바랍니다.</p>
+<h2>기막힌 동거 : 정적과 동적</h2>
+<p>C#에 동적 언어적 요소가 많다고 해도, 그 근간은 정적 언어적 요소로 구성되어 있습니다. 이는, 우리가 새로운 타입을 만들게 되면, 정적 타입과 마찬가지로 반드시 어셈블리 어딘가에 위치하고 있어야 한다는 뜻이 됩니다. 그렇다고, 기존에 있는 어셈블리를 마음대로 수정할 수는 없는 노릇입니다. 이런 경우를 위해서, AssemblyBuilder, ModuleBuilder를 제공해 주고 있습니다.</p>
+<h3>Background</h3>
+<p>runtime에 생성될 타입이 위치할 Assembly를 만드는 단계입니다. Assembly라고 하면, Class Library Project와 같은 DLL을 의미하게 됩니다. 즉, runtime에만 사용하는 Class library를 만드는 셈입니다.</p>
+<pre>
+AssemblyBuilder assemblyBldr = Thread.GetDomain().DefineDynamicAssembly(new AssemblyName(AssemlyName), AssemblyBuilderAccess.Run);
+
+ModuleBuilder moduleBldr = assemblyBldr.DefineDynamicModule(ModuleName);
+</pre>
+<p>Assembly를 들어 보았지만, Module은 처음 듣는 말입니다. 'Module이라니? Namespace인가?'라고 생각하실 수도 있지만, 엄연히 다른 녀석입니다. Module은 일종의 Assembly 안에 위치하는 논리적 코드 집합체입니다. 여러 개의 Module이 하나의 Assembly를 구성할 수 있습니다.(대부분은 하나의 module이 하나의 assembly를 구성합니다.) Module은 당연히 여러 개의 class를 가지게 됩니다. Class의 Container즈음으로 생각하시면 되겠습니다. metaprogramming을 자주하신다면, Module을 달리하여 성격을 구분시킬 수 있을 것 같습니다.</p>
+<h3>TypeBuilder</h3>
+<p>Module이 Class를 담고 있다고 하였으니, ModuleBuilder는 TypeBuilder를 만드는 메쏘드를 가지고 있습니다.</p>
+<pre>
+TypeBuilder typeBldr = moduleBldr.DefineType
+    (nameOfNewType
+        , TypeAttributes.Public | TypeAttributes.Class
+        , inheritedType);
+
+var theTypeYouWant = typeBldr.CreateType();
+</pre>
+<p><strong>DefineType</strong>이라는 메쏘드가 그것인데요, 꽤 많은 <a href="https://msdn.microsoft.com/en-us/library/system.reflection.emit.modulebuilder.definetype(v=vs.110).aspx">Overload</a>를 제공하고 있습니다. 그 중에서 위의 경우에는, <em>inheritedType</em>을 상속받는 새로운 자식 클래스를 만드는 코드가 되겠습니다. 위와 같이, 작성하면 자식 타입이 뚝딱 생기게 됩니다. 현실에선, 저런 코드를 아무도 쓰지 않는 점을 제외하고는, 간단하게 동적으로 타입을 만드는 방법이 아닐 수가 없습니다. 위의 코드를 사용하지 않는 점은 부모와 똑같은 도플갱어같은 자식은 아무래도 섬뜩하죠. 자식은 뭐라도 하나 달라야죠.<br />
+이젠, 무엇이 달라질 수 있는지 확인할 차례입니다.</p>
+<h3>FieldBuilder &amp; PropertyBuidler &amp; MethodBuilder</h3>
+<p>PropertyBuilder는 당연히, property를 만들 때 사용합니다. 아시다시피, property는 get method와 set method로 구성되며, 실질적인 데이타는 field에 저장되는 경우가 많습니다. 이는, property를 구성하기 위해서는, field와 method를 같이 구현해야 한다는 뜻이 됩니다.</p>
+<pre>
+FieldBuilder fldBldr = typeBldr.DefineField("_" + PROPERTY_NAME, PROPERTY_TYPE, FieldAttributes.Private);
+
+// Generate a public property
+PropertyBuilder prptyBldr = typeBldr.DefineProperty(PROPERTY_NAME, PropertyAttributes.None, PROPERTY_TYPE,
+        new Type[] { PROPERTY_TYPE });
+
+// The property set and property get methods need the 
+MethodAttributes GetSetAttr = MethodAttributes.Public | MethodAttributes.HideBySig;
+
+// Define the "get" accessor method for newly created private field.
+MethodBuilder currGetPropMthdBldr = typeBldr.DefineMethod("get_value", GetSetAttr, PROPERTY_TYPE, null);
+
+// Intermediate Language stuff... as per Microsoft
+ILGenerator currGetIL = currGetPropMthdBldr.GetILGenerator();
+currGetIL.Emit(OpCodes.Ldarg_0);
+currGetIL.Emit(OpCodes.Ldfld, fldBldr);
+currGetIL.Emit(OpCodes.Ret);
+
+// Define the "set" accessor method for the newly created private field.
+MethodBuilder currSetPropMthdBldr = typeBldr.DefineMethod("set_value", GetSetAttr, null, new Type[] { PROPERTY_TYPE });
+
+// More Intermediate Language stuff...
+ILGenerator currSetIL = currSetPropMthdBldr.GetILGenerator();
+currSetIL.Emit(OpCodes.Ldarg_0);
+currSetIL.Emit(OpCodes.Ldarg_1);
+currSetIL.Emit(OpCodes.Stfld, fldBldr);
+currSetIL.Emit(OpCodes.Ret);
+
+// Assign the two methods created above to the PropertyBuilder's Set and Get
+prptyBldr.SetGetMethod(currGetPropMthdBldr);
+prptyBldr.SetSetMethod(currSetPropMthdBldr);
+</pre>
+<p>여기서부터, 포기하시는 분들이 발생합니다. Emit에 작성된 OpCodes를 만나는 순간, 이건 뭐지? 기계어인가 하는 의문이 들기 시작하고, 눈에 들어오지도 않습니다. 우리가 작성하는 코드는 CLR(Common Langage Runtime)에서 작동할 수 있도록, IL(Intemediate Langage)로 변환됩니다. 그러한 과정은 compile time에 일어나므로, runtime 시에는 개발자가 손수 한땀 한땀 해주어야 하는 셈입니다. C#에 대한 지식이 아닌, CLR에 대한 지식이 필요해지는 순간입니다. CLR은 <a href="http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-335.pdf">ECMA-335</a>이라는 표준으로 관리되고 있기에, Spec 문서에서 모든 명령어를 확인 할 수 있습니다.</p>
+<h4>TryRoslyn</h4>
+<p>하지만, 나는 시간이 없고 영어는 싫어합니다. 이럴 때 사용할 수 있는 방법이, <em>Roslyn</em>이라는 <a href="https://en.wikipedia.org/wiki/.NET_Compiler_Platform">.NET Compiler Platform</a>을 사용하는 것 입니다. Roslyn은 API를 통한 compile을 제공합니다. 무슨 애기냐면, 어떤 코드 조각을 던져 주면, 그것을 .NET의 다른 언어 혹은 IL로 변환하는 서비스를 제공합니다.</p>
+<p>세상에는 좋은 사람들이 많아서, <a href="http://tryroslyn.azurewebsites.net">TryRoslyn</a>이라는 서비스를 이미 제공하고 있습니다. 위의 property예제를 입력한 <a href="http://goo.gl/JTakQA">링크</a>를 보시면 조금 이해가 쉬울 것 같습니다. 우측의 IL 내용 중에서 set method를 살펴 보면.</p>
+<pre>
+// Methods
+.method public hidebysig specialname 
+    instance void set_Number (
+        int32 'value'
+    ) cil managed 
+{
+    // Method begins at RVA 0x2050
+    // Code size 8 (0x8)
+    .maxstack 8
+
+    IL_0000: ldarg.0
+    IL_0001: ldarg.1
+    IL_0002: stfld int32 DynamicType1::_number
+    IL_0007: ret
+} // end of method DynamicType1::set_Number
+</pre>
+<p>위와 같이 정의 됨을 알 수 있습니다. OpCodes를 모르시더라도, 필요한 메소드를 작성하시고 TryRoslyn을 통해 IL을 코드를 사용하시면 되겠습니다.</p>
+<blockquote><p>
+  MethodBuilder에 대해 따로 다루지 않기에 드리는 말씀이지만, AOP(Aspect of Programming)을 구현하는 방법에 대해 의문을 품은 적이 있었습니다. 그것도 정적 기반의 언어에서 어떻게 저런 일이 가능할까 싶었으며, overhead에 걱정도 많았습니다. 위에서 보는 method 구현예제에서 알 수 있듯이, wrapping method를 통해 선후에 다른 메서드를 호출할 수 있도록 작성하면 기초적인 수준의 AOP를 제공할 수 있습니다. overhead 또한, 초기 구성에 드는 비용이외에는 크지 않으리라는 것을 짐작할 수 있습니다.
+</p></blockquote>
+<h3>CustomAttributeBuilder</h3>
+<p>이쯤되면 감을 잡으셨을 것 같습니다. runtime에 type을 만들지만, 사실 compile time에 만드는 타입과 다를바가 없습니다. 이는 runtime에 만들어 지는 type도 generic, interface는 물론이고 attibute도 줄 수 있습니다. 마지막으로 attibute에 대한 예제를 살펴볼까 합니다.</p>
+<pre>
+Type addedAttr = typeof(TableAttribute);
+ConstructorInfo tableCtor = addedAttr.GetConstructor(new Type[] {});
+PropertyInfo schemaProperty = addedAttr.GetProperty("Schema");
+PropertyInfo nameProperty = addedAttr.GetProperty("Name");
+
+CustomAttributeBuilder addedAttrib = new CustomAttributeBuilder(
+    tableCtor,
+    new object[] {},
+    new[] {schemaProperty, nameProperty},
+    new object[] {"DBA", name});
+
+typeBldr.SetCustomAttribute(addedAttrib);
+</pre>
+<p>동적으로 만들어지는 Type이 특정 Attribute를 가지고 있어야 한다면, CustomAttributeBuilder를 통해 생성해 줄 수 있습니다. 위의 예제에서는 TableAttribute라는 Attribute를 만들면서, 해당 Attribute의 Schema와 Name이라는 2개의 Property에 값을 할당해주는 소스입니다. 정확히는 CustomAttributeBuilder의 생성자를 이용하여, Object Initializer를 이용하여 값을 할당하였습니다. 마지막으로, 이렇게 생성한 Attribute를 해당 타입에 등록시켜주었습니다.</p>
+<h2>정리</h2>
+<p>사실, 간단한 property를 가지는 type을 만들려고 할 때에는 이렇게 Emit을 이용한 방법은 '닭 잡는 데, 소 잡는 칼'을 쓰는 격입니다. 그럴 때에는 dynamic과 expandObejct를 이용하여 처리하는 편이, 훨씬 깔끔하고 간결합니다.<br />
+위의 방법은, wrapping method를 통한 AOP를 하고 싶다던지, attribute를 동적으로 할당하게 하고 싶을 때 사용하면 좋을 것 같습니다. 앞서 말씀드린 것 처럼, 인간의 코드는 sacred하기에 적고 함축적으로 접근하는 것이 유지보수나 오류의 가능성을 줄일 수 있다고 생각합니다. 적은 코드로 많은 일을 하는게 개발자의 꿈이지 않을까요.</p>
+<h3>Reference</h3>
+<ul>
+<li><a href="http://stackoverflow.com/questions/645728/what-is-a-module-in-net">What is a module in .NET?</a></li>
+<li><a href="http://www.codeproject.com/Articles/121568/Dynamic-Type-Using-Reflection-Emit">Dynamic Type Using Reflection Emit</a></li>
+<li><a href="https://github.com/ashmind/TryRoslyn">TryRoslyn on Github</a></li>
+<li><a href="http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-335.pdf">ECMA-335 Common Language<br />
+Infrastructure (CLI)</a></li>
+</ul>

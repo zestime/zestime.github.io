@@ -1,0 +1,287 @@
+---
+layout: post
+title: SICP Exercise - 1.2  Procedures and the Processes They Generate
+date: 2014-11-22 15:56:50.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Computer
+tags:
+- exercise
+- sicp
+- 마법사의 책
+- 컴퓨터 프로그램의 구조와 해석
+meta:
+  _edit_last: '1'
+  dsq_thread_id: '4305502720'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<p>1.2 장에 대한, 연습문제입니다. 조금씩 어려워지고 수학에 대한 이해도 필요해지는 것 같습니다. 3장에 가면, 지금이 그리워진다는데 갈 길은 멀기만 합니다.</p>
+<p>&nbsp;</p>
+<h6>Exercise 1.9</h6>
+<hr />
+<p>간단한 문제였습니다. 단순히, recursive와 iterative한 방법으로 전개하면 끝나는 문제였습니다. 예를 들면, 가령 다음과 같습니다.</p>
+<pre class="theme:github width-set:true width-mode:2 width:100 width-unit:1 toolbar:2 nums:false lang:lisp decode:true">(define (+ a b)
+  (if (= a 0)
+      b
+      (inc (+ (dec a) b))))
+
+(define (+ a b)
+  (if (= a 0)
+      b
+      (+ (dec a) (inc b))))
+
+; recursive form)
+(+ 4 5)
+(if (= 4 0) 5 (inc (+ 3 5)))
+(if (= 4 0) 
+    5 
+    (inc (if (= 3 0) 
+             5 
+             (inc (if (= 2 0) 
+                      5 
+                      (inc (if (= 1 0) 5 (inc .....))))))))
+
+; iterative form)
+(if (= 4 0)
+    5
+    (+ 3 6))
+
+(if (= 4 0)
+    5
+    (+ 3 6) ...
+      (+ 2 7) ...
+        (+ 1 8) ...</pre>
+<h6> Exercise 1.10</h6>
+<hr />
+<p>생각보다 시간이 많이 걸린 문제입니다. 역시, SICP가 수학이라는 생각을 지울 수 없었습니다. f(n), g(n)과 h(n)을 declarative knowledge로 표현하는 문제입니다.</p>
+<pre class="theme:github toolbar:2 nums:false lang:lisp decode:true">(define (A x y)
+  (cond ((= y 0) 0)
+        ((= x 0) (* 2 y))
+        ((= y 1) 2)
+        (else (A (- x 1)
+                 (A x (- y 1))))))
+
+(define (f n) (A 0 n))
+(define (g n) (A 1 n))
+(define (h n) (A 2 n))
+(define (k n) (* 5 n n))</pre>
+<p>눈으로 확인해도, f(n)은 간단하게 구할 수 있습니다. g(n)은 조금 복잡하지만, 전개해보면 금방 나오게 됩니다. 문제는 h(n)입니다. 전개하면 다음과 같은 식을 구할 수 있습니다. 즉, 이전에 구한 g(n)으로 전개가 됩니다.</p>
+<pre class="theme:github lang:default decode:true">;(A 2 2)
+(A 1 (A 1 1))
+(A 1 2) ; 2^2 = 2^2
+
+;(A 2 3)
+(A 1 (A 1 2))
+(A 1 4) ; 2^4 = 2^2^2
+
+;(A 2 4)
+(A 1 (A 2 3))
+(A 1 16) ; 2^16 = 2^2^2^2
+
+;(A 2 5)
+(A 1 (A 2 4))
+(A 1 65536) ; 2^65536 = 2^2^2^2^2</pre>
+<p>마지막 항의 경우에는, 2^65536이라는 거대한 숫자가 나옵니다. 10의 거듭제곱으로 나타낼 때 2만승에 가까운 수 입니다. 이를 declarative expression으로 표현 해야 하는데, 이런 함수를 배운 적이 없습니다. 지수승이 지수승으로 확장되는 함수 형태이기 때문입니다. <a href="http://community.schemewiki.org/?sicp-ex-1.10">SICP Solution</a>을 참고하니 다음과 같이 표현했네요.</p>
+<blockquote><p>h(n) :  <em>2^2^… (n times)</em></p></blockquote>
+<p>괜히, 오래 고민했네요, 간단하게 n times라고 적으면 되는 건데...</p>
+<h6>Exercise 1.11</h6>
+<hr />
+<p>재밌는 문제였습니다. 간단하면서도, 생각보다 머리가 잘 굴러가지 않는 느낌이 들었습니다. tree-recursive의 형태로 만드는 것은 직관적으로 도출할 수 있습니다. 단순히, 필요한 인자를 넣기만 하면 되니까요.</p>
+<pre class="theme:github toolbar:2 nums:false lang:lisp decode:true">(define (f-tree n)
+  (cond ((&lt; n 3) n)
+        (else (+ (f-tree (- n 1)) (f-tree (- n 2)) (f-tree (- n 3))))
+        )
+  )
+</pre>
+<p>cond에서 조건만 제대로 잡고, 나머지는 recursive로 처리해 버리면 간단하게 나오게 됩니다.</p>
+<p>iterative form을 만드는 것은 녹녹치 않았습니다. 일단, Fibonacci의 경우를 보더라도, iterative는 count라는 변수를 사용해야 합니다. 즉, 일반적인 프로그래밍에서 recursive와 iterative의 가장 큰 차이인, iterative의 종료 조건이 따로 필요합니다. 그리고 수열의 규칙성을 찾아야 했습니다. f(n) = f(n-1) + f(n-2) + f(n-3) 이라는 수열의 규칙성은 한 눈에 들어오지 않았습니다. 다음과 같이 적어보면 훨씬 쉽게 보이더군요.</p>
+<pre class="theme:github toolbar:2 nums:false lang:default decode:true">f(4) = f(1) + f(2) + f(3)
+f(5) = f(2) + f(3) + f(4)
+f(6) = f(3) + f(4) + f(5)
+</pre>
+<p>벌써, 찾으신 분도 있을 것 같지만, 부연해 드리겠습니다. 너무 당연한 수식이라, 특별한 규칙이 안 보일 수도 있습니다. 하지만, 값을 대입해 보면...</p>
+<pre class="theme:github toolbar:2 nums:false lang:default decode:true">f(4) = f(1) + f(2) + f(3) = 1 + 2 + 3 = 6
+f(5) = f(2) + f(3) + f(4) = 2 + 3 + 6 = 11
+f(6) = f(3) + f(4) + f(5) = 3 + 6 + 11 = 20
+</pre>
+<p>이제 보이시죠? 아직도 안보이는 분을 위해서, 한 번 더 적어보면...</p>
+<pre class="theme:github toolbar:2 nums:false lang:default decode:true">f(n) = a + b + c 라고 할 때,
+f(n+1) = b + c + ( a + b + c )
+</pre>
+<p>함수가 호출되면, 어떻게 값을 증가시켜야 하는지 알 수 있습니다. 여기에, 초기값에 대한 부분을 합치면 다음과 같이 정의할 수 있습니다.</p>
+<pre class="theme:github toolbar:2 nums:false lang:default decode:true">(define (f n)
+  (if (&lt; n 3) 
+      n
+      (f-iter 0 1 2 (- n 3))))
+
+(define (f-iter a b c count)
+  (if (&lt;= count 0) 
+      (+ a b c)
+      (f-iter b c (+ a b c) (- count 1)))
+  )</pre>
+<h6>Exercise 1.12</h6>
+<hr />
+<p>Pascal의 삼각형에 대한 문제입니다.  꽤 유명한 삼각형이라고 하는데, 찾아보니 <a href="http://mully.net/lee/2011/pascals_triangle/pascals_triangle.html">재밌는 성질</a>이 많았습니다. 사실, recursive로 풀어도 된다고 했으니까, 수식만 도출하면 간단하게 작성할 수 있습니다. 무엇을 정확히 구하는지 몰랐는 점만 빼고는 쉬운 문제였습니다. 삼각형의 총합은 2^n으로 끝나기에 의미가 없었습니다. 알고 보니, 'n행에서 k번째의 수는 무엇인가?'에 대한 procedure를 작성하는 것 이었습니다. 간단하게 구할 수 있죠. recursive니까요.</p>
+<pre class="theme:github toolbar:2 nums:false lang:default decode:true">(define (pascal n k)
+  (cond ((= k 1) 1)
+        ((= k n) 1)
+        (else (+ (pascal (- n 1) (- k 1)) (pascal (- n 1) k)))))</pre>
+<p>k가 잘못들어오는 경우에 대한 값체크는 하지 않았습니다.</p>
+<h6>Exercise 1.13</h6>
+<hr />
+<p>hint가 충분히 주어진 관계로, 식을 전개해서 증명하면 됩니다.피보나치 수열의 정의대로, f(0), f(1)을 구하고, f(n)관계로 확장시키면 됩니다. f(n)을 증명할 때 사용할 수 있는 식이, 앞서 나온  ø^2 = ø +1  관계입니다.</p>
+<pre class="theme:github toolbar:2 nums:false lang:default decode:true">// 증명해야 하는 식은,
+a = (1+√5)/2
+b = (1-√5)/2
+f(n) = (a^n - b^n)/√5
+
+// 피보나치 수열
+fibo(0) = 0
+fibo(1) = 1
+fibo(n) = fibo(n-1) + fibo(n-2)
+
+// 황금률
+a = (1+√5)/2
+a^2 = a + 1
+// b 또한, a와 동일
+b = (1-√5)/2
+b^2 = (1-2√5+5)/4 
+    = (6-2√5)/4 
+    = (3-√5)/2 = (1-√5)/2 + 1 = b + 1
+
+// 귀납 증명
+f(0) = (a^0 - b^0)/√5 = 0
+f(1) = (a - b)/√5 = √5/√5 = 1
+f(n) = f(n-1) + f(n-2)
+     = (a^(n-1) - b^(n-1))/√5 + (a^(n-2) - b^(n-2))/√5
+     = {a^(n-1) + a^(n-2) - b^(n-1) - b^(n-2)}/√5
+     = {a^(n-2)(a + 1) - b^(n-2)(b + 1)}/√5 
+     = {a^(n-2)*a^2 - b^(n-2)*b^2}/√5
+     = {a^n - b^n}/√5
+</pre>
+<p>SICP Solution를 확인해 보니, 여러가지 증명 방법이 있네요. 생각도 못한 것들도 있고, 비슷한 내용도 있네요.</p>
+<h6>Exercise 1.14</h6>
+<hr />
+<p>나무를 그리다 보면, 상당히 깊은 빡침을 느낄 수 있습니다. 너무 귀찮은데, 그걸 여러 경우에 걸쳐서 그려야 한다는 건, 그 차체로 책을 중단하고 싶은 욕구를 일으킵니다. 결국, 그리다가 때려치고, 더욱 간단하게 할 수 있는 방법을 찾아 보았습니다.</p>
+<p>계산 횟 수를 구하는 것은, cc라는 함수의 호출 횟 수로 산출할 수 있습니다. 공간 사용에 대한 것은 어떻게 구할 수 있을까요? 책에서는 tree-recursive 는 Θ(n)으로 공간 사용이 일어난다고 했습니다. 어째서 일까요? 횟수와 다르게 최대로 공간이 필요한 경우는 연산의 Depth가 가장 깊을 때 입니다. 즉, 공간을 최대로 쓰고 있는 지점은 연산의 횟수랑 상관없이 recursive call이 얼마나 중첩되었는지와 관련이 있습니다. 따라서, 아래와 같이 함수를 고쳐적고 돌려보았습니다.</p>
+<pre class="theme:github toolbar:2 nums:false lang:default decode:true">(define count 0)
+(define depth 0)
+
+(define (init)
+  (set! count 0)
+  (set! depth 0))
+
+(define (count-change amount)
+  (init)
+  (cc amount 5 1))
+
+(define (cc amount kinds-of-coins d)
+  (set! count (+ 1 count))
+  (cond ((&lt; depth d) (set! depth d)))
+  (cond ((= amount 0) 1)
+        ((or (&lt; amount 0) (= kinds-of-coins 0)) 0)
+        (else (+ (cc amount (- kinds-of-coins 1) (+ 1 d))
+                 (cc (- amount (first-denomination kinds-of-coins)) kinds-of-coins (+ 1 d))))))
+
+(define (first-denomination kinds-of-coins)
+  (cond ((= kinds-of-coins 1) 1)
+        ((= kinds-of-coins 2) 5)
+        ((= kinds-of-coins 3) 10)
+        ((= kinds-of-coins 4) 25)
+        ((= kinds-of-coins 5) 50)))</pre>
+<p>이렇게 수행해보면, 몇 번의 함수 호출이 있었는지 최대 중첩된 함수는 몇 개 였는지 알 수 있습니다. 이러한 내용을 다음과 같은 결과를 낼 수 있습니다.</p>
+<pre class="theme:github toolbar:2 nums:false lang:default decode:true">(count-change 11) 
+count
+depth
+(expt euler.0 (/ (log count) 11))
+;; 4, 55, 16, 1.4395103439519596
+(count-change 16)
+count
+depth
+(expt euler.0 (/ (log count) 16))
+;; 6, 103, 21, 1.3359872902247205
+(count-change 21)
+count
+depth
+(expt euler.0 (/ (log count) 21))
+;; 9, 177, 26, 1.27951784144814</pre>
+<p>공간 사용은 선형 비례하고 있으며, 연산 횟수는 약간 복합하게 보여집니다. O(α^n)이라 가정할 때, α을 값을 구해보려 하였으나 제대로 나오지 않았습니다. 왜 그런지는 찾을 수가 없네요.</p>
+<h6>Exercise 1.15</h6>
+<hr />
+<p>&nbsp;</p>
+<p>a. (sine 12.15)를 수행한는데, p가 얼머나 호출되는지에 대한 문제입니다. 이는, sine함수가 얼마나 호출되는지와 관련이 있습니다. 간단히, 쫓아가다 보면 쉽게 도출됩니다.</p>
+<pre class="theme:github toolbar:2 nums:false lang:default decode:true">(sine 12.15)
+(p (sine 4.05))
+(p (p (sine 1.35)))
+(p (p (p (sine 0.48333))))
+(p (p (p (p (sine 0.16111)))))
+(p (p (p (p (p (sine 0.05370))))))</pre>
+<p>b. 이러한 sine 함수의 계산 단계와 공간 사용을 a의 함수로 나타내는 문제입니다. 앞의 문제에서 감을 잡으셨겠지만, 실질적인 함수의 호출은 log로 나타나게 됩니다. 즉, Θ(log3n)이 됩니다. 공간 사용량은 함수 자체가 iteration이기 때문에, 똑같이 최대 수행 횟 수인, Θ(log3n) 입니다.</p>
+<h6>Exercise 1.16</h6>
+<hr />
+<p>힌트를 봤음에도, 정확한 의미를 이해하지 못했네요. 생각보다 어렵게 풀었습니다. 물론, 제가 적은 답은 완전히 iterative 한 형태도 아니었습니다. 문제를 관통하는 핵심적인 사항은, 지수를 제곱시킬 수 있다는 점입니다. 간단한 식으로 소개된 것 처럼, [latex](b^{n/2})^2 = (b^2)^{n/2}[/latex] 에서 설명하고 있습니다. 즉, 밑(base)을 제곱시켜서, iteration 횟 수를 줄일 수 있다는 뜻이 되겠습니다.</p>
+<pre class="theme:github width-set:true width:100 width-unit:1 toolbar:2 nums:false lang:lisp decode:true ">(define (expt-log b n)
+  (expt-log-iter b n 1))
+
+(define (expt-log-iter b n product)
+  (cond ((= n 0) product)
+        ((even? n) (expt-log-iter (square b) (/ n 2) product))
+        (else (expt-log-iter b (- n 1) (* b product)))))</pre>
+<h6> Exercise 1.17</h6>
+<hr />
+<p>이번 문제는, 1.16에서 사용한 접근과 거의 동일합니다. 대상이 거듭제곱에서 곱셈으로 변경되었을 뿐입니다. 문제에서 제시해 준 코드는 다음과 같습니다.</p>
+<pre class="lang:default decode:true ">; linear recursive
+(define (times-recursive a b)
+  (if (= b 0)
+      0
+      (+ a (times-recursive a (- b 1)))))</pre>
+<p>이를, logarithmic 형태로 바꾸면 됩니다. 여기에, 사용되는 방법은 1.16에서 항을 줄여가던 방법과 동일합니다. 굳이, 부연을 하자면, [latex]a*b=(a*2)*(b/2)[/latex]의 관계를 활용하시면 되겠습니다.</p>
+<pre class="lang:default decode:true ">(define (double x) (+ x x))
+(define (halve x) (/ x 2))
+
+(define (times a b)
+  (times-iter a b 0))
+
+; logarithmic procedure
+(define (times-iter a b result)
+  (cond ((= b 0) result)
+        ((even? b) (times-iter (double a) (halve b) result))
+        (else (times-iter a (- b 1) (+ a result)))
+        ))
+</pre>
+<h6>Exercise 1.18</h6>
+<hr />
+<p>음... 도무지 문제가 이해가 가지 않아서, <a href="http://community.schemewiki.org/?sicp-ex-1.18">SICP Solution</a>을 찾아 보았더니, 제가 푼 1.17의 답을 보여주네요. 1.17과 1.18은 둘 다 logarithmic 을 만족하고 하나는 recursive, 또 다른 하나는 iteration이어야 했나 봅니다. ;;;</p>
+<h6>Exercise 1.19</h6>
+<p>문제가 너무 길어서, 도무지 뭘 구하라는 것 인지, 알기 어려웠습니다. 내용인즉, Fibonacci를 쉽게 구하는 방법이 있다고 합니다. 그걸, lisp로 작성하니, 다음과 같다는 내용입니다.</p>
+<pre class="lang:default decode:true ">(define (fib n)
+  (fib-iter 1 0 0 1 n))
+
+(define (fib-iter a b p q count)
+  (cond ((= count 0) b)
+        ((even? count)
+         (fib-iter a
+                   b
+                   ; compute p`
+                   ; compute q`
+                   (/ count)))
+        (else (fib-iter (+ (* b q) (* a q) (* a p))
+                        (+ (* b p) (* a q))
+                        p
+                        q
+                        (- count 1)))))
+</pre>
+<p>여기서, p`와 q`를 구하는게 문제가 되겠습니다.</p>
+<p>&nbsp;</p>
+<p>Exercise 1.20</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>

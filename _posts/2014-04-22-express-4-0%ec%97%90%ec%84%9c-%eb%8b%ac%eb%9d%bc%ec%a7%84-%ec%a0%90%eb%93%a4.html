@@ -1,0 +1,195 @@
+---
+layout: post
+title: Express 4.0에서 달라진 점들...
+date: 2014-04-22 19:44:40.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Computer
+tags:
+- express
+- javascript
+- nodejs
+meta:
+  _edit_last: '1'
+  dsq_thread_id: '4052467680'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h1>Introduction</h1>
+<p>간만에, Node.js로 서버를 구성하는데, 뭔가 이상하던군요. 예제 코드를 차근 차근 따라해 보는 와중에, 말도 안되는 오류가 났습니다.</p>
+<blockquote><p>Error: Most middleware (like logger) is no longer bundled with Express and must be installed separately. Please see https://github.com/senchalabs/connect#middleware.</p></blockquote>
+<p>아니, 이게 무슨 소리인지 번뜩 이해가 안갔습니다. 더 이상 middleware를 지원하지 않는다니, 야속함이 느껴졌습니다.</p>
+<h1>Express 4.0</h1>
+<p>보름 전인 4월 9일에, Express 4.0이 나왔습니다. 4.0이 나오면서, 기존의 거대한 Express가 쪼개진 것 입니다. 정확히는, 중립적인 Express가 되었다고 표현하는게 맞을 것 같습니다. middleware라고 불리는 녀석들을 모두 놓아주고, 개발자가 필요한 module들을 설치하여 사용하도록 변경되었습니다. 이런 차이 점을 정리해 보도록 하겠습니다.</p>
+<h2>App.Configure() 제거</h2>
+<p>실은, 이번에 간단한 서버를 작성하면 가장 황당한 부분이었습니다. 늘, Configure를 통해서 Express를 셋팅하다가, 갑자기 이 녀석이 사라져 버렸기 때문입니다. 이전의 Configure를 통해서, middleware를 등록하던 방식은 불가능합니다. 이런 경우라면, if문을 사용하라고 하네요.</p>
+<pre class="lang:js decode:true ">// configure를 통한 셋팅은 사용할 수 없습니다.
+app.configure( function() {
+    app.set('views', config.rootPath + '/server/views');
+    app.set('view engine', 'jade');
+
+    // middleware 등록도 불가
+    app.use(express.logger('dev'));
+    app.use(express.cookieParser());
+    ...
+});</pre>
+<p>예를 들면, 다음과 같습니다.</p>
+<pre class="lang:js decode:true ">if (config.mode == 'development') {
+    app.set('views', config.devPath + '/server/views');
+    ...
+} else if (config.mode == 'production') {
+    app.set('views', config.rootPath + '/server/views');
+    ...
+}</pre>
+<p>위와 같이 구성하시면, 크게 무리 없을실거라 생각됩니다.</p>
+<h2>middleware 분리</h2>
+<p>middleware라는 것은, 기존에 express와 함께 제공되면, bodyParser, cookieParser, session 등과 같은 편의적인 library입니다. 이전에는 app.configure와 함께 다음과 같이 사용했습니다.</p>
+<pre class="toolbar:2 lang:js decode:true">// express 3.x 스타일
+app.configure( function() {
+    app.set('views', config.rootPath + '/server/views');
+    app.set('view engine', 'jade');
+    app.use(express.logger('dev'));
+    app.use(express.cookieParser());
+    app.use(express.bodyParser());
+    app.use(express.session({secret:'I DO I DO'}));
+});
+</pre>
+<p>그러나, 이제는 달라졌습니다. 번들로 제공되던, middleware가 없으므로 모두 require시켜야 합니다.</p>
+<pre class="toolbar:2 lang:js decode:true">var express = require('express'),
+    morgan = require('morgan'),
+    cookieParser = require('cookie-parser'),
+    session = require('express-session'),
+    bodyParser = require('body-parser');
+
+var app = express();
+
+if ( 'development' == config.mode ) {
+   app.use(morgan('dev'));
+   app.use(bodyParser());
+   app.use(cookieParser());
+   app.use(session({secret: 'multi vision unicorns'}));
+}
+</pre>
+<p>눈치 빠른 분들은 짐작하셨겠지만, npm으로 위의 middleware를 관리해 주셔야 합니다. 그래서, 저의 package.json의 경우는 다음과 같습니다.</p>
+<pre class="lang:js decode:true">{
+  ...
+  "dependencies": {
+    "body-parser": "^1.0.2",
+    "cookie-parser": "^1.0.1",
+    "express": "^4.0.0",
+    "express-session": "^1.0.3",
+    "jade": "^1.3.1",
+    "method-override": "^1.0.0",
+    "mongoose": "^3.8.8",
+    "morgan": "^1.0.0",
+    "stylus": "^0.43.1"
+  }
+}</pre>
+<p>보시다 싶이, 필요한 middleware들이 모두 추가되었습니다. 이는 <a href="http://scotch.io/bar-talk/expressjs-4-0-new-features-and-upgrading-from-3-0">ExpressJS 4.0: New Features and Upgrading from 3.0</a>에 잘 정리되어 있었습니다. 발췌를 좀 하자면...</p>
+<table class="table table-striped table-bordered table-hover">
+<thead>
+<tr>
+<td>Express 3.0 Name</td>
+<td>Express 4.0 Name</td>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bodyParser</td>
+<td><a style="color: #008cba;" href="https://github.com/expressjs/body-parser" target="_blank">body-parser</a></td>
+</tr>
+<tr>
+<td>compress</td>
+<td><a style="color: #008cba;" href="https://github.com/expressjs/compression" target="_blank">compression</a></td>
+</tr>
+<tr>
+<td>cookieSession</td>
+<td><a style="color: #008cba;" href="https://github.com/expressjs/cookie-session" target="_blank">cookie-session</a></td>
+</tr>
+<tr>
+<td>logger</td>
+<td><a style="color: #008cba;" href="https://github.com/expressjs/morgan" target="_blank">morgan</a></td>
+</tr>
+<tr>
+<td>cookieParser</td>
+<td><a style="color: #008cba;" href="https://github.com/expressjs/cookie-parser" target="_blank">cookie-parser</a></td>
+</tr>
+<tr>
+<td>session</td>
+<td><a style="color: #008cba;" href="https://github.com/expressjs/session" target="_blank">express-session</a></td>
+</tr>
+<tr>
+<td>favicon</td>
+<td><a style="color: #008cba;" href="https://github.com/expressjs/favicon" target="_blank">static-favicon</a></td>
+</tr>
+<tr>
+<td>response-time</td>
+<td><a style="color: #008cba;" href="https://github.com/expressjs/response-time" target="_blank">response-time</a></td>
+</tr>
+<tr>
+<td>error-handler</td>
+<td><a style="color: #008cba;" href="https://github.com/expressjs/errorhandler" target="_blank">errorhandler</a></td>
+</tr>
+<tr>
+<td>method-override</td>
+<td><a style="color: #008cba;" href="https://github.com/expressjs/method-override" target="_blank">method-override</a></td>
+</tr>
+<tr>
+<td>timeout</td>
+<td><a style="color: #008cba;" href="https://github.com/expressjs/timeout" target="_blank">connect-timeout</a></td>
+</tr>
+<tr>
+<td>vhost</td>
+<td><a style="color: #008cba;" href="https://github.com/expressjs/vhost" target="_blank">vhost</a></td>
+</tr>
+<tr>
+<td>csrf</td>
+<td><a style="color: #008cba;" href="https://github.com/expressjs/csurf" target="_blank">csurf</a></td>
+</tr>
+</tbody>
+</table>
+<p>과 같으니 참고 하시기 바랍니다.</p>
+<h2>Router 객체 추가</h2>
+<p>이전의 router는 express의 인스턴스인 app에 직접적으로 할당하여 진행되는 구조였습니다. 예를 들면 다음과 같습니다.</p>
+<pre class="toolbar:2 lang:js decode:true">app.get('/api/users', auth.requiresRole('admin'), function(req, res) {
+    User.find({}).exec(function(err, collection) {
+        res.send(collection);
+    })
+});
+
+app.get('/partials/*', function (req, res) {
+    res.render('../../public/app/' + req.params);
+});</pre>
+<p>위와 같은 형태로 구성하였는데요, 이제는 Router 객체를 통해서 셋팅하도록 변경되었습니다. 다음 코드와 같이, 먼저 router객체를 생성하여 등록한 다음, 최종적으로 app 객체에 바인딩하는 형태입니다.</p>
+<pre class="toolbar:2 lang:js decode:true">var router = express.Router(); // router 객체를 생성합니다.
+
+router.use(function(req, res, next) {
+    // do logging - 모든 request에 대해 수행됩니다.
+    next();
+});
+
+router.route('/jobs')
+    .post(jobController.create)
+    .get(jobController.getList); // post, get에 대해 등록하였습니다.
+
+router.route('/jobs/:name')
+    .get(jobController.get)
+    .put(jobController.update)
+    .delete(jobController.delete);
+
+app.use('/', router);</pre>
+<p>개인적으로는 훨씬 깔끔하게 router 코드를 작성하게 된 것이 아닌가 합니다. 별도의 파일로 작성하는 것은 예전부터 해 왔으나, 금번의 업데이트로 가독성이 더욱 좋아진 느낌입니다.</p>
+<h1>Conclusion</h1>
+<p>그 외에도, 변경된 점들이 있으니 <a href="https://github.com/visionmedia/express/blob/master/History.md">History</a> 참고 하시면 되겠습니다. 간략하게 express 4.0에 대해서 정리해 보았습니다. 저처럼 당황하지 마시길, 바랍니다.</p>
+<h1>Reference</h1>
+<ul>
+<li><a href="http://scotch.io/bar-talk/expressjs-4-0-new-features-and-upgrading-from-3-0">ExpressJS 4.0: New Features and Upgrading from 3.0</a></li>
+<li><a href="https://github.com/visionmedia/express/wiki/New-features-in-4.x">New features in 4.x</a></li>
+<li><a href="https://github.com/visionmedia/express/wiki/Migrating-from-3.x-to-4.x">Migrating from 3.x to 4.x</a></li>
+</ul>

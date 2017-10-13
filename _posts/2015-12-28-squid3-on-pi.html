@@ -1,0 +1,86 @@
+---
+layout: post
+title: squid3 on Pi
+date: 2015-12-28 11:14:29.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Linux
+tags: []
+meta:
+  _wpcom_is_markdown: '1'
+  _edit_last: '1'
+  dsq_thread_id: '4439514133'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<h2>proxy</h2>
+<p>생각보다, proxy 서버를 자주 사용 합다. 특히, 외국의 사이트를 이용하는 경우 proxy를 이용하면 마치 외국에 있는 것처럼 속일 수가 있습니다. 크롬에서 plugin으로 사용할 수 있는, zenmate가 대표적인데 손 쉬운 설정으로 많은 사용자를 가지고 있습니다. 그렇다고, zenmate를 만들겠다는 것은 아니고, 집에서 혼자 외롭게 지내고 있는 raspberry pi를 proxy로 사용하는 방법에 대해 살펴 볼 생각입니다. 회사 내에서 IP가 막혀 답답하셨던 분들을 위한, 집에 놀고 있는 공유기와 Pi를 괴롭힐 야심찬 계획이 되겠습니다.</p>
+<h2>proxy on Pi</h2>
+<p>Pi라고 하지만, 그냥 linux 머신과 다를바가 없습니다. 여러 배포판들이 있는데, linux 환경만 된다면 크게 문제 없다. 나의 경우에는 정신 배포판이 아닌, <a href="http://blog.hypriot.com/">hypriot</a>을 사용하고 있다. 링크에서 알 수 있듯이, Pi에서 Docker(LXC기반의 가상 환경)를 test하기 위해서 전부터 사용하고 있었습니다. debian 계열이기 때문에, ubuntu 환경과 비슷하다고 생각하시면 되겠습니다.</p>
+<h3>Install squid3</h3>
+<p>오징어를 설치할 차례입니다. proxy 기능을 제공해주는 프로그램은 <a href="http://www.squid-cache.org/">squid3</a> 이외에도 몇 가지가 있습니다. 구관이 명관이라, 전부터 알고 지내던 squid3를 설치할 생각입니다. 이미, 유명한 프로젝트이기 때문에 설치는 무척 간편합니다.</p>
+<p><code>sudo apt-get install squid3</code></p>
+<p>apt-get을 이용해서 설치하면 끝나겠습니다. 너무 쉽죠? ㅎ</p>
+<h3>Configuration squid3</h3>
+<p>사실, 설치는 일도 아닙니다. 셋팅하는 법이 어렵다기 보다는, 너무 많은 기능을 제공하기 때문에 복잡하게 느껴질 수 있습니다. <code>/etc/squid3/squid.conf</code>라는 파일을 참고하시면 7,600줄에 이르는 상세한 설명을 보실 수 있습니다.<br />
+인터넷만 잘 되면 되기 때문에, 대부분은 설정할 필요가 없는데, 아무것도 설정하지 않으면 아무것도 되지 않습니다. 특히, 나중에 웹페이지가 안나오고, access denied만 보여진다면 필시, <code>squid.conf</code>의 설정이 문제입니다. 다음의 몇 가지를 염두에 두시면, 사용이 한결 수월해 집니다.</p>
+<h4>acl(Access List)</h4>
+<p>말 그대로, Access List입니다. 예를 들어, ip가 1번부터 32번 까지라고 할 때, 이를 acl로 묶어서 표현합니다. 거기에 이름을 붙여서(aclname), 일종의 그룹명처럼 사용하는 것입니다.</p>
+<pre><code># acl aclname acltype argument ...
+
+acl biz_network src 10.1.42.0/242
+acl to_localhost dst 127.0.0.0/24
+acl biz_hours time M T W T F 9:00-17:00
+</code></pre>
+<p><code>src</code>로 어디서 부터 오는지, <code>dst</code>는 해당 패킷이 어디로 향하는지, <code>time</code>은 특정 시간대를 그룹으로 설정하게 됩니다.</p>
+<h4>http_access</h4>
+<p>앞에서 설정한, access list를 바탕으로 사용할 수 '있다', '없다'의 여부를 설정하게 됩니다.</p>
+<pre><code># http_access allow|deny [!]aclname ...
+
+http_access allow biz_network biz_hours
+http_access deny to_localhost
+</code></pre>
+<p>이렇게 특정 access list에 대해서, http에 대한 접근을 할 수 없도록 막을 수 있습니다.  acl은 하나 혹은 여러 개를 열거하여 각각이 만족될 때에 가능하도록 설정할 수 있습니다. 위의 <em>biz_network</em>은 <em>biz_hours</em>에만 사용이 가능한 셈입니다.</p>
+<h4>http_port</h4>
+<p>가장 중요한 관문인, port입니다. 기본적으로는 3128로 설정되어 있습니다. 보안상의 이유로 다른 port로 변경하곤 합니다.</p>
+<pre><code>http_port 3128
+</code></pre>
+<h4>caching</h4>
+<p>이후, proxy의 특성상, caching을 위한 설정을 가지는 경우가 있습니다. 회사 내에서 사용한다면 비슷한 사이트를 자주가는 경우가 많으니, 성능을 향상시키기 좋을 것 같습니다. 그렇지만 Pi의 경우에는 개인적으로 사용하기 때문에 설정하지 않겠습니다. 혹시 필요하신 분은 '<a href="https://www.lisenet.com/2014/install-and-configure-squid3-caching-proxy-on-debian-wheezy/">install-and-configure-squid3-caching-proxy-on-debian-wheezy</a>'이라는 포스트를 참고 하시면 되겠습니다.</p>
+<h3>squid3 Authentication</h3>
+<p>실은, 이 포스팅의 가장 큰 이유는 인증 방식의 proxy 사용 때문이었습니다. 회사와 같은 고정IP를 쓰는 경우가 아니라면, 위의 설정 방식만으로는 아쉬움이 남습니다. 차라리, 허가된 사용자를 등록하고 username과 password를 통한 접근은 할 수 없을 까요?</p>
+<p>물론, squid3는 이러한 인증 방식 또한 제공하고 있습니다.</p>
+<pre><code>auth_param basic program /usr/lib/squid3/basic_ncsa_auth /etc/squid3/passwords
+auth_param basic realm proxy
+acl authenticated proxy_auth REQUIRED
+http_access allow authenticated
+</code></pre>
+<p><code>auth_param</code>을 통해서, 어떠한 방식으로 인증을 할지, 그리고 password는 어디에 저장되어 있는지를 설정합니다. 마찬가지로, 이를 acl로 명명하고 http_access를 통해 사용을 허가하면 되겠습니다. 다만, <code>/etc/squid3/passwords</code>라는 파일을 만들어줘야 합니다. <code>htpasswd</code>라는 프로그램을 통해서 생성하면 되겠습니다.</p>
+<pre><code>sudo htpasswd -c /etc/squid3/passwords username_you_want
+</code></pre>
+<p>으로 간단히 만드실 수 있습니다. 만약, <code>htpasswd</code>가 없다면,</p>
+<pre><code>sudo apt-get install apache2-utils
+</code></pre>
+<p>을 설치하면 되겠습니다.<br />
+이렇게 설정하시면, 최초에 proxy서버로 요청을 보내면, 인증 과정을 통하게 됩니다. 적절한 ID와 password를 제공해 주시면, 이후 편리하게 proxy 서버를 이용할 수 있게 됩니다.</p>
+<h3>squid3 사용하기</h3>
+<p>apt-get에 의한 설치가 끝나고, 자동적으로 daemon이 돌게 됩니다. configuration을 변경하셨다면, service를 재시작하는 아량도 보여주셔야 겠죠.</p>
+<pre><code>sudo service squid3 restart
+</code></pre>
+<p>사용은 간단합니다. 대부분의 브라우저가 network 속성에서 proxy에 대한 설정을 제공해 주고 있습니다. 여기에, 집의 공유기 주소와 적절한 port를 넘겨 주면 되겠습니다. 예를 들어,</p>
+<ul>
+<li>ip : your_subdomain.iptime.org</li>
+<li>port : 3128</li>
+</ul>
+<p>로 설정하시고, 웹서핑을 시작하시면 실제로는 집에 있는 공유기를 통해 인터넷을 이용하게 되겠습니다.</p>
+<h2>reference</h2>
+<ul>
+<li><a href="http://stackoverflow.com/questions/3297196/how-to-set-up-a-squid-proxy-with-basic-username-and-password-authentication">How to set up a squid proxy with basic username and password authentication</a></li>
+<li><a href="https://help.ubuntu.com/lts/serverguide/squid.html">Ubuntu Server Guide - Squid - Proxy Server</a></li>
+</ul>

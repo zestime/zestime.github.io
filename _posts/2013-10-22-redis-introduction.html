@@ -1,0 +1,94 @@
+---
+layout: post
+title: Redis Introduction
+date: 2013-10-22 12:43:34.000000000 +09:00
+type: post
+published: true
+status: publish
+categories:
+- Database
+tags:
+- dbms
+- In-memory databse
+- nosql
+- Redis
+- RedisIO
+meta:
+  _edit_last: '1'
+  dsq_thread_id: '4089099797'
+author:
+  login: kp
+  email: zestime@gmail.com
+  display_name: kp
+  first_name: Kiyong
+  last_name: Han
+---
+<p><img class="alignright" alt="" src="{{ site.baseurl }}/assets/500px-Redis_Logo.svg.png" width="500" height="167" /></p>
+<p>&nbsp;</p>
+<h1>Introduction</h1>
+<p>회사에서 팀원들과 'Crawler'를 만들어 보고 있습니다. DB를 무엇으로 해볼까 생각하다가, In-Memory Database에 호기심으로, Redis를 선정했습니다. Blazing fast를 자랑하는 Redis를 살펴볼까 합니다.</p>
+<h1>What is Redis</h1>
+<p>Redis는 메모리에서 key-value로 저장되는 store입니다. 간단히 말씀드리면, 익히 알던 Database라기 보다는, 거대한 Dictionary(사전)가 있다고 생각하시면 되겠습니다. Redis가 조금 다른 점은 Value로 여러 가지 타입을 지원하는 점입니다.</p>
+<ul>
+<li>Strings - 당연히 문자열이 지원됩니다.</li>
+<li>Lists - 리스트</li>
+<li>Sets - 집합들</li>
+<li>Sorted Sets - 정렬된 집합들(Auto-complete를 구현할 때 좋습니다.)</li>
+<li>Hashes - 사전안에 사전</li>
+</ul>
+<p>을 지원하게 됩니다. 다른 특징을 좀 더 살펴보면, 다음과 같습니다.</p>
+<ul>
+<li>Written in: C/C++</li>
+<li>Main point: Blazing fast</li>
+<li>License: BSD</li>
+<li>Protocol: Telnet-like</li>
+<li>Disk-backed in-memory database</li>
+<li>transactions</li>
+<li>Values can be set to expire</li>
+<li>Execute Lua scripts at server</li>
+</ul>
+<p>위의 특징으로 인해, 급속한 데이타의 변경이 많은 곳에서 강하다고 합니다. 활용할 곳은 많아 보이는데요, 주로 다른 DBMS랑 연계된 형태로 많이 쓴다고 합니다.</p>
+<h1>Install</h1>
+<p>설치는 간단해서 말씀드릴 내용은 없습니다만, 저는 다음의 문서를 참고했습니다.</p>
+<ul>
+<li><a href="https://library.linode.com/databases/redis/ubuntu-12.04-precise-pangolin">https://library.linode.com/databases/redis/ubuntu-12.04-precise-pangolin</a> - Ubuntu 12.04를 기준으로 설치 안내 문서</li>
+<li><a href="http://redis.io/topics/quickstart">http://redis.io/topics/quickstart</a> - 공식 사이트의 Quick Start</li>
+</ul>
+<p>앞서, In-memory database라고 말씀드렸는데요, 그렇다고 물리 파일을 전혀 사용하지 않는 것은 아닙니다. 물론, 사용하지 않도록 할 수도 있습니다만, 이러한 설정을 알고 계시는 편이 나중에 추척하기 쉽습니다. 친절하게 <span style="color: #008080;"><strong><em>/etc/redis/redis.conf</em></strong></span>  에 자세히 설명되어 있습니다만, 중요하게 짚고 넘어가야할 부분은 다음과 같습니다.</p>
+<pre class="toolbar:2 nums:false nums-toggle:false lang:sh decode:true">(...)
+
+logfile /var/log/redis.log # log 파일 위치
+
+port 6379 # 사용할 port
+bind 127.0.0.1 # 사용할 ip
+timeout 300 # connection의 timeout
+
+(...)
+
+dbfilename dump.rdb # dump file의 이름
+dir /var/lib/redis # dump file의 위치
+
+(...)</pre>
+<p>위의 설정치는 거의 Default입니다만, 저의 경우에는 몇 가지 문제가 있었습니다. 다음을 조금 신경쓰셔야 합니다.</p>
+<ul>
+<li> dump file이 안생겨요.<br />
+dir로 위치를 명시해 주셔야하고, 실행하는 계정이 해당 폴더에 권한이 있어야 합니다. 이러한 문제는 log파일을 보시면 알 수 있습니다.</li>
+<li>remote connect가 안되요.<br />
+저는 vagrant에서 돌렸는데요. 이러한 경우, bind의 ip를 '0.0.0.0' 으로 설정하셔야 합니다. <a href="http://stackoverflow.com/questions/18157353/connection-reset-when-port-forwarding-with-vagrant">http://stackoverflow.com/questions/18157353/connection-reset-when-port-forwarding-with-vagrant</a><br />
+혹은, port forwarding도 확인하셔야 합니다. 6379 port를 사용하기로 했으니, Vagrantfile에서 forwarding을 명시해 주셔야 합니다.</li>
+</ul>
+<h1>How to use</h1>
+<p>driver를 이용하시거나, redis-cli로 접근하여 보면, 난감하게 느껴지실 수 있습니다. RDBMS에서 사용하는 명령어가 하나도 지원되지 않기 때문입니다. 이럴 때에는 <a href="http://redis.io/commands">http://redis.io/commands</a> 를 보시기 바랍니다. 조금만 들여 보시면, Simple의 매력에 빠지게 됩니다. Assembly같은 느낌이 들지만, 명령어가 너무나도 적기 때문에 금방 적응하실 수 있습니다.</p>
+<h1>How to design</h1>
+<p>명령어를 조금 알고 났는데, 도저히 design을 못하겠더라구여... 아무래도 생소한 paradigm이니까, 기존 RDBMS처럼 table을 뽑을 수도 없었으니까요. 그럴 때에는 <a href="http://redis.io/topics/twitter-clone">http://redis.io/topics/twitter-clone</a>가 도움이 되었습니다. 아시다 싶이, Dictionary는 Key에 유리한 구조이지, Value에 유리한 구조가 아닙니다. Redis 역시, Value 검색이라던지 Manipulation은 제한적입니다. 이는, 데이타의 성격에 따라 중복되더라도 Key로 설정해야 한다는 이야기가 됩니다. 예를 들면 다음과 같습니다.</p>
+<pre class="toolbar:2 nums:false lang:sh decode:true">set uid:0001:hash relkm32e09wfmkwkemda
+set hash:relkm32e09wfmkwkemda 1</pre>
+<p>첫 줄은 Hash 값을 Value로 저장하는 부분입니다. 이렇게 저장하면, 나중에 Hash 값으로 uid를 찾아낼 수 없습니다. 따라서, 두 번째 줄처럼, hash를 key로 uid를 value로 하는 새로운 key-value쌍을 추가하게 됩니다.</p>
+<h1>Reference</h1>
+<ul>
+<li><a href="http://redis.io/topics/quickstart">http://redis.io/topics/quickstart</a> - redis 시작하기</li>
+<li><a href="http://redis.io/commands">http://redis.io/commands</a> - redis 명령어들</li>
+<li><a href="http://stackoverflow.com/questions/18157353/connection-reset-when-port-forwarding-with-vagrant">http://stackoverflow.com/questions/18157353/connection-reset-when-port-forwarding-with-vagrant</a> - vagrant에서 connection failed</li>
+<li><a href="http://redis.io/topics/twitter-clone">http://redis.io/topics/twitter-clone</a> - redis에서 twitter clone 예제</li>
+<li><a href="https://pypi.python.org/pypi/redis">https://pypi.python.org/pypi/redis</a> - python에서 redis 사용하기</li>
+</ul>
