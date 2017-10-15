@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Week1. Introduction Deep Learning"
+title:  "1. Introduction Deep Learning"
 date:   2017-08-29 15:49:45 +0900
 categories: classes neural-networks-and-deep-learning
 ---

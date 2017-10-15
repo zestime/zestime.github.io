@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Week3. Shallow Neural Network"
+title:  "3. Shallow Neural Network"
 date:   2017-09-03 10:03:45 +0900
 categories: classes neural-networks-and-deep-learning
 ---

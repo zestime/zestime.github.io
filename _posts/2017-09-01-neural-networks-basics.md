@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Week2. Neural Networks Basics"
+title:  "2. Neural Networks Basics"
 date:   2017-09-01 14:05:45 +0900
 categories: classes neural-networks-and-deep-learning
 ---

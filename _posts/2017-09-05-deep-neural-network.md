@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Week4. Deep Neural Network"
+title:  "4. Deep Neural Network"
 date:   2017-09-05 14:03:45 +0900
 categories: classes neural-networks-and-deep-learning
 ---

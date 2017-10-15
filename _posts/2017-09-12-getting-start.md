@@ -1,13 +1,15 @@
 ---
 layout: post
-title:  "Javascript Getting Start"
+title:  "Javascript - 1.Getting Start"
 date:   2017-09-12 14:03:45 +0900
 categories: javascript play-with-javascript 
 ---
 
+> ### 시작에 앞 서...
+> Javascript로 그 동안 밥을 빌어 먹었으니, 책을 써 볼까 합니다. 책 이름은 '가장 얇은 Javascript'입니다. Douglas의 *Javascript: The Good Part*에 영향을 받은 것 맞습니다. 그 외에도 좋은 책들이 많았으나, 저는 겉멋 든 개발자들에게 어울릴 가장 얇은 책을 적어볼까 합니다.
+> - [1. Getting Start]({{ site.baseurl }}{% link _posts/2017-09-12-getting-start.md %})
+{:.intro}
 
-
-## Getting Start
 
 너무 지엽적인 부분에 집착하면, 숲을 보는 지혜를 잊기 쉽습니다. 가야할 길이 멀다면, 정상을 바라보는 것만으로도 강한 동기가 되어줄 수 있습니다. 디테일에 치중하기 보다는, 우리의 여정을 먼저 간략히 살펴보고 갈까 합니다.
 

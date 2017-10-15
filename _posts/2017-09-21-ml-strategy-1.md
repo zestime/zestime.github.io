@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "ML Strategy(1)"
+title:  "1. ML Strategy(1)"
 date:   2017-09-21 10:08:45 +0900
 categories: classes ml-strategy
 ---

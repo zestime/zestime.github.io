@@ -22,15 +22,6 @@ tags:
 - storm
 - yarn
 - zookeeper
-meta:
-  _edit_last: '1'
-  dsq_thread_id: '4137813115'
-author:
-  login: kp
-  email: zestime@gmail.com
-  display_name: kp
-  first_name: Kiyong
-  last_name: Han
 ---
 <h1>Into...</h1>
 <p>Hadoop을 처음 접하시는 분들은, 어리둥절할 때가 많습니다. 특히나, 협업을 하게 되면, 이런 이야기를 많이 듣게 됩니다. "hive로 충분히 처리할 수 있어요." 혹은 "zookeeper로 관리하면 됩니다." 도대체 무슨 소리인지 통 알 수가 없는 자기들끼리의 언어로 말하는 상황을 목격하실 수 있습니다. 도대체, 왜 그러는 걸까요? 오늘은 저런 대화에 '절대, 당황하지 않고, 아는 척하며 넘어가면 끝~!'을 목표로 준비했습니다.</p>
@@ -49,9 +40,9 @@ Hadoop의 가장 본연적인 Data processing을 진행하는 부분입니다. M
 <h1>완소 친구들 Essential Components</h1>
 <p>Hadoop은 그 자체로도, 훌륭한 프레임워크입니다. 매번 MapReduce 프로그래밍을 한다는 것은 쉬운 일이 아닙니다. 더욱 쉽게 다양하게 사용할 수 있도록, 사람들은 다양한 노력을 했습니다.</p>
 <ul>
-<li> <a href="http://blog.kusweet.com/wp-content/uploads/2014/03/pig.jpg"><img class="alignnone wp-image-493 size-thumbnail" src="{{ site.baseurl }}/assets/pig-150x150.jpg" alt="pig" width="150" height="150" /></a><span style="color: #800000;"><strong>Pig</strong></span><br />
+<li> <img class="alignnone wp-image-493 size-thumbnail" src="{{ site.baseurl }}/assets/pig-150x150.jpg" alt="pig" width="150" height="150" /><span style="color: #800000;"><strong>Pig</strong></span><br />
 맞습니다. 돼지입니다. SQL이 아닌 형태의 Data 조작을 제공합니다. Pig Latin이라는 데이타 조작용 스크립트를 제공합니다. 스크립트가 MapReduce 작업으로 실행되는 형태입니다. Hive와 더불어 상두마차이지만, 한국에선 선호도 높지 않다고 합니다.</li>
-<li><a href="http://blog.kusweet.com/wp-content/uploads/2014/03/hive.png"><img class="alignnone wp-image-495 size-thumbnail" src="{{ site.baseurl }}/assets/hive-150x150.png" alt="hive" width="150" height="150" /></a> <span style="color: #800000;"><strong>Hive</strong></span><br />
+<li><img class="alignnone wp-image-495 size-thumbnail" src="{{ site.baseurl }}/assets/hive-150x150.png" alt="hive" width="150" height="150" /> <span style="color: #800000;"><strong>Hive</strong></span><br />
 SQL on Hadoop을 표방하여, SQL과 비슷한 Hive QL을 제공합니다. HiveQL로 작성된 쿼리가 MapReduce작업으로 변경되어 Hadoop에서 돌아가는 구조입니다. Java로 MapReduce를 작성하는 것보다 단순하고 쉬워 애용하고 있습니다.</li>
 <li><span style="color: #800000;"><strong>HCatalog</strong></span><br />
 HDFS에는 테이블의 개념이 없습니다. HDFS에는 아무런 파일이 올라갈 수 있지만, MapReduce에서 주로 처리되는 작업은 텍스트 파일입니다. 텍스트 파일을 마치 테이블처럼 보기 위해서 HCatalog를 사용하게 됩니다. 일명, Metadata abstraction Layer라고 불립니다. 실제로 저장된 형태가 아닌, 추상화된 형태인 Table과 같이 접근할 수 있도록 해줍니다.</li>
@@ -59,23 +50,23 @@ HDFS에는 테이블의 개념이 없습니다. HDFS에는 아무런 파일이 �
 <p style="display: inline !important;"><span style="color: #800000;"><strong>HBase</strong></span><br />
 HBase는 대용량 데이타에 랜덤 IO나 실시간 Read/Write를 하는 경우에 유용하게 사용할 수 있습니다. Column 기반의 Database이지만, 관계형 DBMS와 다르게 비정형 데이타를 수용할 수 있습니다.</p>
 </li>
-<li> <a href="http://blog.kusweet.com/wp-content/uploads/2014/03/ZooKeeper_logo.jpg"><img class="alignnone size-thumbnail wp-image-496" src="{{ site.baseurl }}/assets/ZooKeeper_logo-150x150.jpg" alt="ZooKeeper_logo" width="150" height="150" /></a><span style="color: #800000;"><strong>ZooKeeper</strong></span><br />
+<li> <img class="alignnone size-thumbnail wp-image-496" src="{{ site.baseurl }}/assets/ZooKeeper_logo-150x150.jpg" alt="ZooKeeper_logo" width="150" height="150" /><span style="color: #800000;"><strong>ZooKeeper</strong></span><br />
 주키퍼는 그룹 서비스와 분산화된 동기화를 바탕으로 서버 설정 정보 및 네이밍, 설정 정보를 관리하는 서비스 입니다.</li>
-<li><span style="color: #800000;"><strong> <a href="http://blog.kusweet.com/wp-content/uploads/2014/03/download-e1395735329279.jpeg"><img class="alignnone size-full wp-image-497" src="{{ site.baseurl }}/assets/download-e1395735329279.jpeg" alt="download-e1395735329279" width="150" height="36" /></a>Oozie</strong></span><br />
+<li><span style="color: #800000;"><strong> <img class="alignnone size-full wp-image-497" src="{{ site.baseurl }}/assets/download-e1395735329279.jpeg" alt="download-e1395735329279" width="150" height="36" />Oozie</strong></span><br />
 Workflow를 관리해주는 Tool입니다. 일련의 배치 작업을 XML에 기술하여, 하둡 시스템 스스로 작업이 가능하게끔 도와주는 역활을 합니다. 제공되는 Action(Workflow를 구성하는 최소 단위)에는 pig, hive는 물론 shell 작업과 Java Map/Reduce 작업들도 포함됩니다. sqoop과 같이 사용하면, 데이타를 가져와 가공하고 다시 내보는 작업을 하나의 workflow로 동작시킬 수 있습니다.</li>
-<li><span style="color: #800000;"><strong><a href="http://blog.kusweet.com/wp-content/uploads/2014/03/sqoop.png"><img class="alignnone size-full wp-image-498" src="{{ site.baseurl }}/assets/sqoop.png" alt="sqoop" width="170" height="72" /></a> Sqoop</strong></span><br />
+<li><span style="color: #800000;"><strong><img class="alignnone size-full wp-image-498" src="{{ site.baseurl }}/assets/sqoop.png" alt="sqoop" width="170" height="72" /> Sqoop</strong></span><br />
 Sqoop은 RDBMS와의 연결을 위한 프로그램입니다. DB에서 HDFS로 데이타 가져오기 혹은 내보내기 작업을 하는 경우에 이용하게 됩니다. 물론, Sqoop의 작업 자체도 Map 작업으로 동작하게 되어 있어서, 여러 노드를 이용한 분산 작업 또한 가능합니다. MySQL과 PostgreSQL의 상성이 띄어납니다.</li>
 </ul>
 <p>지금까지 살펴 본 프로그램들은 Hadoop을 구성하는데, 필수적이진 않지만 대부분 사용하는 프로그램이라고 할 수 있겠습니다. 위의 Tool이 직접적으로 필요한 이유는, Hadoop 자체가 제공해주는 부분이 부족한 탓도 있으며, 사용성을 높이기 위한 시도라고 생각하시면 되겠습니다. 어찌되었든, 개발자 입장에서는 생태계가 풍부할 수록 선택 범위가 넓어, 갖가지 시도를 할 수 있으니 좋은 공부거리가 됩니다.</p>
 <h1>더 끌어 올리기 Higher than above</h1>
 <p>앞서 살펴본 parts는 사실 대부분의 경우에 사용되는 기본적인 구성이라고 할 수 있습니다. 그것보다 더 나아간 형태의 parts를 알아보겠습니다.</p>
 <h3></h3>
-<p><a href="http://blog.kusweet.com/wp-content/uploads/2014/03/spark-logo.png"><img class="alignnone size-full wp-image-499" src="{{ site.baseurl }}/assets/spark-logo.png" alt="spark-logo" width="258" height="137" /></a></p>
+<p><img class="alignnone size-full wp-image-499" src="{{ site.baseurl }}/assets/spark-logo.png" alt="spark-logo" width="258" height="137" /></p>
 <p>스파크입니다. 스파크는 대용량 데이타 처리를 조금 더 빠르게 시도하기 위한 노력이라고 보시면 되겠습니다. 하둡을 사용하기 쉽고 빠른 분석을 만들뿐 아니라, 배치와 스트리밍 작업 그리고 Interactive Analytics를 제공합니다. Java기반의 functional language인 Scala를 이용하는 것이 특징입니다. 사이트의 자료에 의하면 Hadoop보다 in-mamory와 disk의 구별없이 모두 100배 정도의 성능 향상을 보였다고 합니다.</p>
 <h2><a title="Back to main page" href="http://storm.incubator.apache.org/">Storm</a></h2>
 <p>Hadoop의 실시간 분석 능력을 높이기 위한 프로젝트라고 생각하시면 되겠습니다. 실시간 분석 엔진으로 이미, 유수의 기업들에 의해 사용되어지고 있습니다. 실제로 적용해본 적이 없어서, 정확한 사용에 대해 말씀드릴 수는 없지만, 언어를 구별하지 않는다는 특징이 있습니다. 그리고 아직은 정식 프로젝트가 아니라 apache incubator에 있는 상황입니다.</p>
 <p>&nbsp;</p>
-<p><a href="http://blog.kusweet.com/wp-content/uploads/2014/03/C-Users-Jennifer-Desktop-Brochure-Assets-mahout.png"><img class="alignnone size-full wp-image-500" src="{{ site.baseurl }}/assets/C-Users-Jennifer-Desktop-Brochure-Assets-mahout.png" alt="C-Users-Jennifer-Desktop-Brochure-Assets-mahout" width="412" height="174" /></a></p>
+<p><img class="alignnone size-full wp-image-500" src="{{ site.baseurl }}/assets/C-Users-Jennifer-Desktop-Brochure-Assets-mahout.png" alt="C-Users-Jennifer-Desktop-Brochure-Assets-mahout" width="412" height="174" /></p>
 <p>Hadoop을 사용하는 목적은 여러가지가 있을 수 있습니다. 단순한 통계에서부터 어떠한 결과를 구하는 것일 수도 있습니다. 우리가 Machine Learning이라고 부르는, Classification도 그러한 예가 될 수 있습니다. 하지만, Mahout를 이용하면, 대용량 데이타를 가지고 쉬운 분류가 가능하다고 하네요.</p>
 <h1>Reference</h1>
 <ul>

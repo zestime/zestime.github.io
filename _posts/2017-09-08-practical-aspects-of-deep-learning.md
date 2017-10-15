@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Practical Aspects of Deep Learning"
+title:  "1. Practical Aspects of Deep Learning"
 date:   2017-09-08 14:03:45 +0900
 categories: classes improving-deep-neural-networks
 ---

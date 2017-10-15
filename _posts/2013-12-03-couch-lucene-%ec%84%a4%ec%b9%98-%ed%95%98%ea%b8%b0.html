@@ -12,17 +12,6 @@ tags:
 - lucene
 - search engine
 - simple search
-meta:
-  _edit_last: '1'
-  _oembed_584d73d618e5be6455b8b548abd6f1db: "{{unknown}}"
-  _oembed_3ee406de11799e017fa32da1e640b75e: "{{unknown}}"
-  dsq_thread_id: '4055711173'
-author:
-  login: kp
-  email: zestime@gmail.com
-  display_name: kp
-  first_name: Kiyong
-  last_name: Han
 ---
 <p>이 문서는 Couch-Lucene에 대한 설치 문서 입니다. ubuntu 12.04.3을 기준으로 작성되었습니다.</p>
 <p>Couch-Lucene을 사용하기 위해서는, 다음의 패키지가 필요합니다.</p>
@@ -125,16 +114,16 @@ curl: (7) couldn't connect to host</pre>
 <h1>How to use</h1>
 <p>실행만 한다고, 모든게 자동적으로 돌아가지는 않습니다. 먼저, couchdb의 설정을 확인합니다. 설치하면서, 입력했던 [http_global_handlers]가 정상적인지 확인합니다.</p>
 <p>&nbsp;</p>
-<p><a href="http://blog.kusweet.com/wp-content/uploads/2013/12/configuration.png"><img class="alignnone size-full wp-image-462" src="{{ site.baseurl }}/assets/configuration.png" alt="configuration" width="824" height="460" /></a>lucene이 couchdb의 문서를 검색하기 위해서는, 무엇을 검색할지 알려주어야 합니다. 이러한 과정은 _design 문서를 통해서 이루어 집니다.</p>
+<p><img class="alignnone size-full wp-image-462" src="{{ site.baseurl }}/assets/configuration.png" alt="configuration" width="824" height="460" />lucene이 couchdb의 문서를 검색하기 위해서는, 무엇을 검색할지 알려주어야 합니다. 이러한 과정은 _design 문서를 통해서 이루어 집니다.</p>
 <p>&nbsp;</p>
-<p><a href="http://blog.kusweet.com/wp-content/uploads/2013/12/fulltext.png"><img class="alignnone size-full wp-image-464" src="{{ site.baseurl }}/assets/fulltext.png" alt="fulltext" width="481" height="372" /></a>위와 같이, '_design/'으로 시작되는 문서를 만들어야 합니다. 그리고 그 안에는 fulltext라는 key에 검색할 대상과 결과에 대한 문서를 작성합니다. 위의 예에서는, 'all'이라는 문서에 index와 analyzer 를 설정한 예입니다. index는 Document를 반환하는 구조인데, add 함수로 검색할 내용과 반환할 내용을 정리합니다. analyzer의 경우에는, lucene이 지원하는 모든 분석기를 사용할 수 있습니다. 한국어에 특화된 '형태소 분석기'는 default로 포함되지 않았습니다.</p>
+<p><img class="alignnone size-full wp-image-464" src="{{ site.baseurl }}/assets/fulltext.png" alt="fulltext" width="481" height="372" />위와 같이, '_design/'으로 시작되는 문서를 만들어야 합니다. 그리고 그 안에는 fulltext라는 key에 검색할 대상과 결과에 대한 문서를 작성합니다. 위의 예에서는, 'all'이라는 문서에 index와 analyzer 를 설정한 예입니다. index는 Document를 반환하는 구조인데, add 함수로 검색할 내용과 반환할 내용을 정리합니다. analyzer의 경우에는, lucene이 지원하는 모든 분석기를 사용할 수 있습니다. 한국어에 특화된 '형태소 분석기'는 default로 포함되지 않았습니다.</p>
 <p>위와 같이 design문서를 작성하고 나면, 이제는 실제로 RESTful로 접근할 차례입니다. 주소는 다음과 같습니다.<br />
 <strong>http://&lt;IP&gt;:5984/_fti/local/&lt;DATABASE&gt;/_design/&lt;Design Document Name&gt;/&lt;Search Document Name&gt;?q=&lt;Querying Keyword&gt;</strong><br />
 의 형태로 진행됩니다. 예를 들면, localhost에 접근하고, database가 test이며, 앞에서 정의한 design문서로 abc를 검색하다면,</p>
 <p>http://localhost:5984/_fti/local/test/_design/search/all?q=abc</p>
 <p>와 같은 형태가 됩니다. 실질적인 예를 보면, 다음과 같습니다.</p>
 <p>&nbsp;</p>
-<p><a href="http://blog.kusweet.com/wp-content/uploads/2013/12/RESULT.png"><img class="alignnone size-full wp-image-465" src="{{ site.baseurl }}/assets/RESULT.png" alt="RESULT" width="651" height="259" /></a>당연히, 결과는 JSON으로 반환됩니다. 주요, 값들을 살펴보면, 다음과 같습니다.</p>
+<p><img class="alignnone size-full wp-image-465" src="{{ site.baseurl }}/assets/RESULT.png" alt="RESULT" width="651" height="259" />당연히, 결과는 JSON으로 반환됩니다. 주요, 값들을 살펴보면, 다음과 같습니다.</p>
 <ul>
 <li>limit : 최대로 반환되는 결과 수</li>
 <li>q : 질의한 내용으로, 앞서 design 문서에서 add 함수로 추가된 field를 뜻합니다. 'default'는 전체를 의미합니다.</li>

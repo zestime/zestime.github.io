@@ -10,33 +10,22 @@ categories:
 tags:
 - performance
 - quality
-meta:
-  _edit_last: '1'
-  _oembed_b2c7935a1c3399bb6b1c6b2467f07b84: "{{unknown}}"
-  _oembed_2843a8812cf721473756d7305fe19cae: "{{unknown}}"
-  dsq_thread_id: '4019168169'
-author:
-  login: kp
-  email: zestime@gmail.com
-  display_name: kp
-  first_name: Kiyong
-  last_name: Han
 ---
 <h1>Introduction</h1>
 <p>무언가를 만들다 보면, 내가 잘하고 있는지 혹은 놓친 것은 없는지 늘 조급해집니다. 화가가 붓을 놓는 순간이, 채색이 끝난 순간이 아닌 것처럼, 우리의 저작(저作)에도 마침표를 마칠 순간을 결정해야 합니다. 만약, Web이라면 Google의 PageSpeed Insight라는 좋은 도구가 도움이 될 것입니다.</p>
 <h1>PageSpeed Insight</h1>
 <p><a href="https://developers.google.com/speed/pagespeed/insights/" target="_blank">https://developers.google.com/speed/pagespeed/insights/</a>의 주소로 가시면, 다음과 같은 페이지를 마주하게 됩니다.</p>
-<p><a href="http://blog.kusweet.com/wp-content/uploads/2014/12/Screen-Shot-2014-12-11-at-2.26.48-pm.png"><img class="alignnone size-full wp-image-686" src="{{ site.baseurl }}/assets/Screen-Shot-2014-12-11-at-2.26.48-pm.png" alt="Screen Shot 2014-12-11 at 2.26.48 pm" width="932" height="355" /></a></p>
+<p><img class="alignnone size-full wp-image-686" src="{{ site.baseurl }}/assets/Screen-Shot-2014-12-11-at-2.26.48-pm.png" alt="Screen Shot 2014-12-11 at 2.26.48 pm" width="932" height="355" /></p>
 <p>한 눈에 봐도, 무엇을 해야 하는지 아실 수 있습니다. URL만 넣어주면, 내가 무엇을 놓치고 있는 분석해 줍니다. 몇 가지 rule이 있는데, 그것을 충족하고 있는지 혹은 개선할 부분이라고 생각되는 것들을 알려 줍니다.</p>
-<p><a href="http://blog.kusweet.com/wp-content/uploads/2014/12/Screen-Shot-2014-12-11-at-2.31.28-pm.png"><img class="alignnone size-full wp-image-687" src="{{ site.baseurl }}/assets/Screen-Shot-2014-12-11-at-2.31.28-pm.png" alt="Screen Shot 2014-12-11 at 2.31.28 pm" width="920" height="789" /></a></p>
+<p><img class="alignnone size-full wp-image-687" src="{{ site.baseurl }}/assets/Screen-Shot-2014-12-11-at-2.31.28-pm.png" alt="Screen Shot 2014-12-11 at 2.31.28 pm" width="920" height="789" /></p>
 <p>결과는 크게 2가지 부분으로 구성되어 있습니다. Mobile인 경우와 Desktop으로 나누어서, 각각의 개선점들을 알려 줍니다. Rule을 몇 개나 위반했는지 조사해서 그 결과를 100만점의 점수로 표현해 줍니다. 위의 예에서는, 61점으로 상당히 저조한 수준입니다.</p>
 <h1>Extension</h1>
 <p>이 좋은 도구를 막상 사용하려면 문제가 있습니다. 실제로 중요한 페이지는 대부분 로긴한 이후에 보여지게 됩니다. 위와 같은 방법으로 단순히 URL만 넘겨 주어서는 알 수가 없습니다. 이러한 순간을 위해, <a href="https://chrome.google.com/webstore/detail/pagespeed-insights-by-goo/gplegfbjlmmehdoakndmohflojccocli?hl=en" target="_blank">Extension</a>을 사용하시면 되겠습니다. ( 크롬 브라우저 외에는 구글에서 정식으로 제공하는 것은 없는 것으로 보이네요.)</p>
 <p>Extension을 설치하면, 별다른 메뉴가 나타나지는 않습니다. 개발자 도구에 통합되게 되는데, 아래와 같이 개발자 도구에 'PageSpeed'라는 메뉴가 추가됩니다. 이를 통해, Browser 에서 보여지는 페이지에 대한 분석을 진행할 수 있습니다.</p>
-<p><a href="http://blog.kusweet.com/wp-content/uploads/2014/12/Screen-Shot-2014-12-11-at-2.48.15-pm.png"><img class="alignnone size-full wp-image-688" src="{{ site.baseurl }}/assets/Screen-Shot-2014-12-11-at-2.48.15-pm.png" alt="Screen Shot 2014-12-11 at 2.48.15 pm" width="656" height="380" /></a></p>
+<p><img class="alignnone size-full wp-image-688" src="{{ site.baseurl }}/assets/Screen-Shot-2014-12-11-at-2.48.15-pm.png" alt="Screen Shot 2014-12-11 at 2.48.15 pm" width="656" height="380" /></p>
 <p>&nbsp;</p>
 <p>눈치 채셨겠지만, 처음의 경우는 구글 서버에서 해당 사이트에 접속하여 분석한 결과이며, 이번에는 브라우저가 분석한 결과를 보여주기에 테스트하기가 훨씬 쉬워졌습니다.</p>
-<p><a href="http://blog.kusweet.com/wp-content/uploads/2014/12/Screen-Shot-2014-12-11-at-3.04.03-pm.png"><img class="alignnone size-full wp-image-689" src="{{ site.baseurl }}/assets/Screen-Shot-2014-12-11-at-3.04.03-pm.png" alt="Screen Shot 2014-12-11 at 3.04.03 pm" width="700" height="441" /></a></p>
+<p><img class="alignnone size-full wp-image-689" src="{{ site.baseurl }}/assets/Screen-Shot-2014-12-11-at-3.04.03-pm.png" alt="Screen Shot 2014-12-11 at 3.04.03 pm" width="700" height="441" /></p>
 <p>분석하였더니, 수정할 부분이 꽤 많네요. 끝은 끝이 아니라더니, 언제 저걸 다 수정할지 깝깝합니다.</p>
 <h1>Closing</h1>
 <p>위와 같은 분석 도구는 완벽하지 않습니다. 하지만, 개선의 여지가 있는 항목에 대해서는 조목조목 알려주고 있다고 생각됩니다. 너무 느린 페이지를 어떻게 개선해야 할지 감이 오지 않을 때, 훌륭한 지침으로 사용할 수 있겠습니다. 시간이 난다면, 어떻게 검사하는지 한번 뜯어 보고 싶네요 ^^</p>

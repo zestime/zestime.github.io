@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Hyperparameter tuning"
+title:  "3. Hyperparameter tuning"
 date:   2017-09-14 10:25:45 +0900
 categories: classes improving-deep-neural-networks
 ---

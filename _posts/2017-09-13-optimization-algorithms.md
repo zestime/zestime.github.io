@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Optimization Algorithms"
+title:  "2. Optimization Algorithms"
 date:   2017-09-13 10:25:45 +0900
 categories: classes improving-deep-neural-networks
 ---
