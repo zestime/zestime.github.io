@@ -101,6 +101,13 @@ let block = "outer";
 console.log(block);                   // outer
 ``` 
 
+> ### scope 
+> scope(스코프)는 변수가 유효한 범위를 뜻합니다. function scope라고 하면, 함수 내에서 사용하는 변수들이 유효한 범위입니다. function이 수행 중에만 내부 변수들을 사용할 수 있으므로, function scope은 함수가 실행되면 시작하고 종료시에는 소멸된다고 할 수 있습니다. 내부 변수들 역시 scope과 같이 생성과 소멸되므로, scope는 변수의 life cycle과 관련있습니다. 
+> ### block scope 
+> function scope가 function과 관련이 있는 것처럼, block scope(블럭 스코프)는 block과 관련이 있습니다. block은 `{`와 `}`으로 이루어진 코드 묶음입니다. while문이나 if문에서 내부적으로만 사용하는 변수를 만들 수 있게된 것이죠.
+{:.explain}
+
+
 ## Function
 
 Function(함수)는 프로그램의 근간을 이루는 타입입니다. function은 first-class object(1급객체)로 다양하게 사용할 수 있습니다. 또 closure를 통해 function의 상태를 가질 수 있습니다.
@@ -184,20 +191,13 @@ console.log(another.lang);        // "UTF-8"
 
 `Object.assign()`과 `Object.create()`는 Object를 만들 때 사용합니다. 특징은 조금 다른데요, `assign`의 경우는 mix-in이라는 표현을 사용하고, `create`의 경우에는 prototype inheritance라고 합니다.
 
-### mix-in
+- **mix-in** : 합집합을 구하는 것이라고 할 수 있습니다. A와 B가 서로 다른 Object이지만, mix-in을 하게 되면, A의 모든 key와 B의 모든 key를 합친 하나의 Object를 만들게 됩니다. 겹치는 key에 대해선, 덮어쓰게 되므로 object의 순서에 주의를 해야 합니다.
 
-합집합을 구하는 것이라고 할 수 있습니다. A와 B가 서로 다른 Object이지만, mix-in을 하게 되면, A의 모든 key와 B의 모든 key를 합친 하나의 Object를 만들게 됩니다. 겹치는 key에 대해선, 덮어쓰게 되므로 object의 순서에 주의를 해야 합니다.
-
-
-### prototype
-
-prototype은 Javascript에서 inheritance(상속)을 표현하는 방법입니다. prototype이라는 용어가 낯설 수도 있지만, base type 정도로 생각하시면 되겠습니다. 
-
-
+- **prototype** : prototype은 Javascript에서 inheritance(상속)을 표현하는 방법입니다. prototype이라는 용어가 낯설 수도 있지만, 부모 타입 정도로 생각하시면 되겠습니다. 
 
 ## This
 
-`this`는 OOP에서는 instance 자신을 뜻하는 용어로 사용되나, javascript는 좀 애매하게 작동합니다. 간단히 말하면, `.`연산자의 앞의 object를 의미합니다.
+`this`는 OOP에서는 instance 자신을 뜻하는 용어로 사용되나, javascript는 좀 애매하게 작동합니다. 간단히 말하면, `.`연산자의 앞의 object를 의미합니다. 이게 도대체 무슨 말인고 하니,
 
 ```js
 const math = {
@@ -211,15 +211,60 @@ math.dir();		// {pi: 3.14, dir: function(){...}}
 
 const dir = math.dir;
 dir();			// Window{....}
-
-math.dir();		// {pi: 3.14, dir: function(){...}}
 ```
 
-참 이상한 결과가 아닐 수 없습니다. 변수에 참조를 걸었더니, 
-잘 작동하는 함수에 대해서, dir로 참조하도록 하고 실행헀더니 전혀 다른 결과가 나옵니다. 그 말인듯, this가 이전에는 math를, 다음 번에는 window객체를 참조하고 있다는 뜻 입니다.
+참 이상한 결과가 아닐 수 없습니다. 같은 함수인데, 어떻게 저런 결과가 나올 수가 있을까요. 혹시, 함수 내부에서 `this`를 사용해서 그런걸까요? 맞습니다. `this`는 함수가 수행될 때 결정됩니다. 그리고 그 결정은 호출할 때 이뤄지게 됩니다. 처음에 함수를 호출한 경우에는, `math`에 있는 `dir()`를 호출한 셈입니다. 두 번째 호출은 함수만 호출했기 때문에, `this`는 사실 없어야 합니다. 하지만, 결과를 보면 전역 객체(global object)인 `Window`가 나오는 것을 볼 수 있습니다. 
 
-사실, 이건 이해하기 어렵게 만들면 프로그램을 복잡하게 만드는 요소가 있습니다. Javascript는 Java/C#과 같은 강력한 OOP를 제공하는 언어가 아닙니다. 
+> ### global scope vs local scope 
+> global(전역)과 local(지역)으로 나뉘는데, local scope은 일반적인 함수를 생각하시면 되고, global scope은 웹브라우저에는 window객체가 됩니다. local scope은 생성과 소멸을 반복하지만 global scope은 프로그램 실행시에 1번 생성되어 종료시까지 유지되게 됩니다. 즉, global scope은 잘 관리되지 않으면 global namespace pollution(오염)에 노출될 수 있습니다. 
+{:.explain}
 
+## Generator
+
+Generator를 한번에 수행하지 않고 나눠서 수행하는 function입니다. 이게 도대체 무슨 말인고 하니, 일반적으로 function은 한번 수행하기 시작하면 return을 만나거나 body(함수 몸체)를 모두 수행하게 됩니다. 이에 반해, generator는 여러 번에 걸쳐 수행될 수 있는 특수한 function입니다. `function *`으로 선언하고 `yield`를 통해 return value를 반환하고 실행 범위까지 표시하게 됩니다.
+
+```js
+function* adder() {
+  let called = 0;
+  yield called;             // (1)
+  called += 1;
+  yield;                    // (2)
+  called += 3;
+  yield* sub_generator();
+  called += yield called;   // (5)
+  yield called;             // (6)
+}
+
+function* sub_generator() {
+  yield "from sub";         // (3)
+  yield "still in sub";     // (4)
+}
+
+```
+
+예제가 조금 길지만, 이게 generator의 전부라고 할 수 있습니다. `generator()`를 살펴보면, `function*`으로 **generator**라고 선언했습니다. 내부를 보면, `called`라는 local variable을 선언하고 0이라는 값을 주었습니다. 그리고 바로 `yield`구문을 이용해서 실행을 멈추고 `called`를 반환하였습니다. 다시 말하면, function을 수행하다가 `yield`를 만나면 실행을 멈추고, 이후에 있는 식을 반환하게 됩니다. 다음 실행은 마찬가지로 다음 `yield`인 *(2)*까지 수행됩니다. 이번에는 반환값을 따로 표시하지 않았습니다. 그리고 수행되다가 `yield*`이라는 구문을 만나게 됩니다. `yield*`이라는 표현에 당황하실 수도 있는데, 여러 개의 `yield`를 처리해야 한다는 뜻으로 생각하시면 됩니다. generator 내부에 또 다른 generator를 호출하는 경우에 사용합니다. 예제 코드에서도 `sub_generator()`라는 또 다른 generator를 호출하고 있습니다. 다른 generator이지만, 동작은 동일하게 이뤄집니다. `yield`를 만날 때 까지 수행하고 반환값을 넘겨주게 됩니다. 지금까지 `yield`는 줄의 처음에 단독으로 사용되었습니다. *(5)*는 조금 특이하게 식의 일부로 사용되고 있습니다. generator 내부로 매개 변수를 넘겨주고 싶을 때 이렇게 식의 일부로 `yield`를 사용하시면 되겠습니다. 기억하셔야 할 점은 `yield called`가 수행되고 `called += {매개 변수}`가 수행된다는 점입니다. 마지막 *(6)*을 통해서 `called`를 반환하고, generator는 수행을 마치게 됩니다.
+
+이번에는 호출하는 코드를 살펴 보겠습니다.
+```js
+var s = adder();            // adder-generator 생성
+
+console.log(s.next());      // { value: 0, done: false }
+console.log(s.next());      // { value: undefined, done: false }
+console.log(s.next());      // { value: 'from sub', done: false }
+console.log(s.next());      // { value: 'still in sub', done: false }
+console.log(s.next());      // { value: 4, done: false }
+console.log(s.next(12));    // { value: 16, done: false }
+console.log(s.next());      // { value: undefined, done: true }
+```
+일반 function과는 다르게 generator 생성해야 합니다. 단순히 호출하면 되는데, 실제 실행은 `next()`를 통해서 하게 됩니다. 한 번 `next()`를 호출할 때 마다, yield까지 수행되게 됩니다. `next()`의 반환값은 보시다시피, Object입니다. 특이한 점은 `done`이라는 flag고 있다는 점입니다. 이 flag는 generator가 모두 수행되었는지 알려주게 됩니다. *(2)*와 같이 반환 값이 없는 경우에, 수행이 완료되어서 반환 값이 없는 건지 아니면 코드 상에 반환값을 주지 않아서 없는 건지 모호한 경우가 생깁니다. 이런 경우를 분명하게 하기 위해서, `done`이라는 flag가 있습니다. 그리고 *(5)*의 경우는 `next(parameter)`를 주어, generator에 전달하고 있음을 알 수 있습니다. 그리고 마지막까지 수행을 하게 되면, `done`이 true로 나옴을 알 수 있습니다. function은 호출할 때 마다 새롭게 수행되지만, generator는 한번 수행을 마치면 새로 생성해야만 합니다.
+
+## Symbol
+
+es6에 새롭게 추가된 타입으로 symbol이 있습니다. symbol은 어떤 상태나 property를 가리키는 경우 유용합니다. 예를 들어,  
+
+## Proxy
+
+## Async
 
 
 `{}`을 이용해서, 빈 object를 만들었습니다. 주로, 여러 변수를 묶는 용도로 사용되기도 하고, 함수등을 value로 할당하여 namespace와 같이 사용하기도 합니다.
@@ -232,8 +277,7 @@ const option = {
 
 const Logger = {
   error: msg => console.log('ERROR: ' + msg)
-  debug: msg => console.log('DEBUG: ' + msg)
-};
+  debug: msg => console.log('DEBUG: ' + msg)};
 
 logger.error("Lost");
 
