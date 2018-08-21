@@ -9,8 +9,8 @@ categories: recommender-system
 > ### 시작에 앞 서...
 > 아시는 분들도 계시겠지만, 제가 요즘 Recommender System(추천시스템, 이하 RS)에 관심이 많습니다. 검색이 색인에 대한 결과라고 한다면, 추천은 색인에 대한 점수가 유저마다 달라야 해결할 수 있는 문제입니다. 이러한 RS에 대해서 좀 다뤄볼까 합니다.
 >
-> - [1. Recommender System?]({{ site.baseurl }}{% link _posts/2017-10-12-recommender-system.md %})
-> - [2. Recommender System with Deep Learning]({{ site.baseurl }}{% link _posts/2017-10-13-recommender-system-with-deep-learning.md %})
+> - 1. Recommender System?
+> - 2. Recommender System with Deep Learning
 > - 3. Restricted Boltzmann Machine for Collaborative Filtering
 {:.intro}
 
